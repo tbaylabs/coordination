@@ -1,0 +1,17 @@
+{
+  "name": "Ubuntu Jammy with Python and conda",
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {}
+  },
+  "postCreateCommand": "chmod +x .devcontainer/postCreate.sh && .devcontainer/postCreate.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "ms-python.python"
+      ]
+    }
+  },
+  "forwardPorts": [4040]
+}
