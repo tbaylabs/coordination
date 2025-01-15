@@ -148,10 +148,6 @@ def prepare_for_repeated_measures(df):
     Returns:
         pd.DataFrame: Prepared DataFrame suitable for repeated measures analysis
     """
-    # Verify all task_instruction values are 'coordinate'
-    if not all(df['task_instruction'] == 'coordinate'):
-        raise ValueError("All task_instruction values must be 'coordinate'")
-    
     # Get standard columns with minimal metrics
     prepared_df = prepare_df_for_display(
         df,
