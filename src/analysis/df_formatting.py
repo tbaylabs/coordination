@@ -102,31 +102,41 @@ def prepare_df_for_display(df, use_simple_names=True, include_cols=None,
     
     return display_df[display_cols]
 
-def print_nice_dataframe(df, max_rows=20, use_simple_names=True, include_cols=None, 
-                        top_results_only=True):
-    """Generic function for nicely printing any DataFrame."""
-    try:
-        display_df = prepare_df_for_display(
-            df, use_simple_names, include_cols, top_results_only
-        )
-        
-        if use_simple_names:
-            print("Note: Using simplified column names for display\n")
-        
-        if len(display_df) > max_rows:
-            print(f"Displaying first {max_rows} rows (total: {len(display_df)}):\n")
-            print(tabulate(display_df.head(max_rows), headers='keys', 
-                         tablefmt='grid', showindex=False))
-        else:
-            print(tabulate(display_df, headers='keys', tablefmt='grid', 
-                         showindex=False))
-    except ImportError:
-        pd.set_option('display.max_rows', max_rows)
-        print(display_df.to_string())
+def print_nice_dataframe(df, max_rows=20, show_index=False):
+    """Generic function for nicely printing any DataFrame.
+    
+    Args:
+        df (pd.DataFrame): DataFrame to display
+        max_rows (int): Maximum number of rows to display
+        show_index (bool): Whether to show the index in the output
+    """
+    if len(df) > max_rows:
+        print(f"Displaying first {max_rows} rows (total: {len(df)}):\n")
+        print(tabulate(df.head(max_rows), headers='keys', 
+                     tablefmt='grid', showindex=show_index))
+    else:
+        print(tabulate(df, headers='keys', tablefmt='grid', 
+                     showindex=show_index))
 
-def print_aggregate_trial_results(df, **kwargs):
-    """Specialized printing for aggregate trial results."""
-    print_nice_dataframe(df, **kwargs)
+def print_nice_aggregate_trial_results_table(df, max_rows=20):
+    """Prints aggregate trial results with nice formatting and simplified column names.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing trial results
+        max_rows (int): Maximum number of rows to display
+    """
+    # Prepare DataFrame for display
+    display_df = prepare_df_for_display(
+        df, 
+        use_simple_names=True,
+        include_cols=None,  # You might want to specify default columns here
+        top_results_only=True
+    )
+    
+    print("Note: Using simplified column names for display\n")
+    
+    # Use the generic printing function
+    print_nice_dataframe(display_df, max_rows=max_rows, show_index=False)
 
 def prepare_for_repeated_measures(df):
     """
