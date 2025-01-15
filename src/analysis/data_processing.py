@@ -36,6 +36,9 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
         results['status'] = 'warning'
         results['metrics']['rows_with_high_unanswered'] = len(high_unanswered)
         issues.append(f"Found {len(high_unanswered)} rows with unanswered_prop > {unanswered_threshold}")
+        if verbose:
+            print("\n=== Rows with unanswered_prop above threshold ===")
+            print(high_unanswered[['model_name', 'task_instruction', 'task_options', 'unanswered_prop']])
     
     # Check metrics for invalid values
     metric_cols = ['top_prop_all', 'convergence_answered', 'convergence_all']
@@ -49,6 +52,9 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
             results['status'] = 'error'
             results['metrics']['rows_with_invalid_metrics'] += len(invalid_metrics)
             issues.append(f"Found {len(invalid_metrics)} rows with invalid {col}")
+            if verbose:
+                print(f"\n=== Invalid metric rows for {col} ===")
+                print(invalid_metrics[['model_name', 'task_instruction', 'task_options', col]])
     
     # Check total count
     invalid_totals = df[df['total_count'] != 120]
@@ -56,6 +62,9 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
         results['status'] = 'error'
         results['metrics']['invalid_total_counts'] = len(invalid_totals)
         issues.append(f"Found {len(invalid_totals)} rows with total_count != 120")
+        if verbose:
+            print("\n=== Rows with invalid total_count !== 120 ===")
+            print(invalid_totals[['model_name', 'task_instruction', 'task_options', 'total_count']])
     
     results['issues'] = issues
     
