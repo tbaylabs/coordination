@@ -174,12 +174,21 @@ def prepare_for_repeated_measures(df):
         ).reset_index()
         
         # Rename columns appropriately
-        wide_metric.columns = [
-            'model', 
-            'task_options',
-            f'{metric}_without_reasoning',
-            f'{metric}_with_reasoning'
-        ]
+        expected_cols = {
+            'none': f'{metric}_without_reasoning',
+            'step-by-step': f'{metric}_with_reasoning',
+            'control': f'{metric}_control'
+        }
+        
+        # Build final column list:
+        new_cols = []
+        for col in wide_metric.columns:
+            if col in expected_cols:
+                new_cols.append(expected_cols[col])
+            else:
+                new_cols.append(col)
+        
+        wide_metric.columns = new_cols
         metrics_df.append(wide_metric)
     
     # Merge the metric DataFrames

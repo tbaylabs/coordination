@@ -33,7 +33,7 @@ def prepare_repeated_measures_anova_exp2(df, model_family, verbose=False):
     # Initial filtering
     df = filter_by_model_family(df, model_family)
     df = df[df['task_instruction'] == 'coordinate']
-    df = df[df['task_reasoning'].isin(['none', 'step-by-step'])]
+    df = df[df['task_reasoning'].isin(['none', 'step-by-step', 'control'])]
     
     info['after_filtering_rows'] = len(df)
     

@@ -397,6 +397,60 @@ def create_comprehensive_analysis(df):
     
     plt.show()
 
+def plot_control_reasoning_bars(df, metric='top_prop', title=None):
+    """
+    Creates a bar graph showing mean performance for each model on three conditions:
+      - control
+      - without reasoning
+      - with reasoning
+    for the specified metric ('top_prop' or 'convergence').
+    """
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    # Gather columns from repeated-measures data
+    # e.g., top_prop_control, top_prop_without_reasoning, top_prop_with_reasoning
+    control_col = f"{metric}_control"
+    no_reason_col = f"{metric}_without_reasoning"
+    with_reason_col = f"{metric}_with_reasoning"
+
+    # Melt into long format if the control column exists
+    melted = pd.melt(
+        df,
+        id_vars=['model', 'task_options'],
+        value_vars=[c for c in [control_col, no_reason_col, with_reason_col] if c in df.columns],
+        var_name='condition',
+        value_name='score'
+    )
+
+    # Convert condition names to a friendlier label
+    condition_labels = {
+        control_col: 'Control',
+        no_reason_col: 'Without Reasoning',
+        with_reason_col: 'With Reasoning'
+    }
+    melted['condition'] = melted['condition'].map(condition_labels)
+
+    # Calculate means (or we can just plot raw if desired)
+    grouped = melted.groupby(['model', 'condition'])['score'].mean().reset_index()
+
+    plt.figure(figsize=(8, 5))
+    sns.barplot(
+        data=grouped,
+        x='model',
+        y='score',
+        hue='condition'
+    )
+    plt.ylim(0, 1)  # Adjust as needed
+    if not title:
+        title = f"Mean {metric.capitalize()} by Model and Condition"
+    plt.title(title, pad=15)
+    plt.legend(title="Condition")
+    sns.despine()
+    plt.tight_layout()
+    plt.show()
+
 def simplify_column_names(df):
     """
     Simplifies column names from the descriptive format to a more concise format for visualization.
