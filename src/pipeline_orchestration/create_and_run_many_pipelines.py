@@ -1,5 +1,5 @@
-from create_many_pipelines import create_many_pipelines
-from run_many_pipelines import run_many_pipelines
+from .create_many_pipelines import create_many_pipelines
+from .run_many_pipelines import run_many_pipelines
 
 def create_and_run_many_pipelines(
     prompt_conditions,
