@@ -1,5 +1,6 @@
 import pandas as pd
 import warnings
+from src.analysis.df_formatting import print_nice_dataframe
 
 """
 Functions for processing, cleaning, and formatting data for analysis.
@@ -39,7 +40,7 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
         issues.append(f"Found {len(high_unanswered)} rows with unanswered_prop > {unanswered_threshold}")
         if verbose:
             print("\n=== Rows with unanswered_prop above threshold ===")
-            print(high_unanswered[['file_name', 'model_name', 'task_instruction', 'task_options', 'unanswered_prop']])
+            print_nice_dataframe(high_unanswered[['file_name', 'model_name', 'task_instruction', 'task_options', 'unanswered_prop']])
     
     # Check metrics for invalid values
     metric_cols = ['top_prop_all', 'convergence_answered', 'convergence_all']
@@ -55,7 +56,7 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
             issues.append(f"Found {len(invalid_metrics)} rows with invalid {col}")
             if verbose:
                 print(f"\n=== Invalid metric rows for {col} ===")
-                print(invalid_metrics[['file_name', 'model_name', 'task_instruction', 'task_options', col]])
+                print_nice_dataframe(invalid_metrics[['file_name', 'model_name', 'task_instruction', 'task_options', col]])
     
     # Check total count
     invalid_totals = df[df['total_count'] != 120]
@@ -65,7 +66,7 @@ def validate_experiment_data(df, unanswered_threshold=0.2, verbose=False):
         issues.append(f"Found {len(invalid_totals)} rows with total_count != 120")
         if verbose:
             print("\n=== Rows with invalid total_count !== 120 ===")
-            print(invalid_totals[['file_name', 'model_name', 'task_instruction', 'task_options', 'total_count']])
+            print_nice_dataframe(invalid_totals[['file_name', 'model_name', 'task_instruction', 'task_options', 'total_count']])
     
     results['issues'] = issues
     
