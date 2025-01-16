@@ -108,6 +108,13 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     # Generate results-summary
     options_list_with_unanswered = options_list + ["unanswered"]
     results_summary = {option: 0 for option in options_list_with_unanswered}
+    
+    # Initialize extraction method counters
+    extraction_counts = {
+        "extracted_by_rule_count": 0,
+        "extracted_by_llm_count": 0,
+        "extracted_by_human_count": 0
+    }
 
     for result in results_list:
         extracted_answer = result["extracted_answer"]
@@ -115,9 +122,17 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             results_summary[extracted_answer] += 1
         else:
             raise ValueError(f"Unexpected extracted answer '{extracted_answer}' in results.")
+        
+        # Count extraction methods
+        if result["extracted_by"] == "rule":
+            extraction_counts["extracted_by_rule_count"] += 1
+        elif result["extracted_by"] == "llm":
+            extraction_counts["extracted_by_llm_count"] += 1
+        elif result["extracted_by"] == "human":
+            extraction_counts["extracted_by_human_count"] += 1
 
-    # Add results-summary to the JSON structure
-    results_data["results-summary"] = results_summary
+    # Add results-summary and extraction counts to the JSON structure
+    results_data["results-summary"] = {**results_summary, **extraction_counts}
 
     # Save the updated results JSON file
     with open(results_file_path, 'w') as file:

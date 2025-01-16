@@ -102,6 +102,16 @@ def aggregate_trial_results(results_folder_path=None):
             else:
                 convergence_all = None
 
+            # Get extraction counts from results summary
+            extracted_by_rule_count = results_summary.get("extracted_by_rule_count", 0)
+            extracted_by_llm_count = results_summary.get("extracted_by_llm_count", 0)
+            extracted_by_human_count = results_summary.get("extracted_by_human_count", 0)
+            
+            # Calculate extraction proportions
+            extracted_by_rule_prop = extracted_by_rule_count / total_count if total_count > 0 else 0
+            extracted_by_llm_prop = extracted_by_llm_count / total_count if total_count > 0 else 0
+            extracted_by_human_prop = extracted_by_human_count / total_count if total_count > 0 else 0
+
             rows.append({
                 "file_name": file_path.name,
                 "model_name": model_name,
@@ -128,6 +138,12 @@ def aggregate_trial_results(results_folder_path=None):
                 "fourth_prop_all": fourth_prop_all,
                 "convergence_answered": convergence_answered,
                 "convergence_all": convergence_all,
+                "extracted_by_rule_count": extracted_by_rule_count,
+                "extracted_by_llm_count": extracted_by_llm_count,
+                "extracted_by_human_count": extracted_by_human_count,
+                "extracted_by_rule_prop": extracted_by_rule_prop,
+                "extracted_by_llm_prop": extracted_by_llm_prop,
+                "extracted_by_human_prop": extracted_by_human_prop
             })
 
         except Exception as e:
