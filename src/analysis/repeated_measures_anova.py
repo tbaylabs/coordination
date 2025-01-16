@@ -10,10 +10,9 @@ from src.analysis.df_formatting import prepare_for_repeated_measures, print_nice
 Functions for running repeated measures ANOVA on experimental results.
 """
 
-def prepare_repeated_measures_anova_exp2(df, model_family, verbose=False):
+def clean_balance_filter(df, model_family, verbose=False):
     """
-    Prepares data for experiment 2 repeated measures ANOVA ensuring balanced design.
-    Returns data in repeated measures format.
+    Cleans, balances and filters data for analysis.
     
     Args:
         df (pd.DataFrame): Input DataFrame
@@ -21,7 +20,7 @@ def prepare_repeated_measures_anova_exp2(df, model_family, verbose=False):
         verbose (bool): If True, prints detailed preparation info
     
     Returns:
-        pandas.DataFrame: Data prepared in repeated measures format
+        pandas.DataFrame: Cleaned and balanced DataFrame
     """
     info = {
         'initial_rows': len(df),
@@ -74,10 +73,7 @@ def prepare_repeated_measures_anova_exp2(df, model_family, verbose=False):
         # Print single line summary if not verbose but there were removals
         print(f"Data preparation: removed {info['pruning_results']['rows_removed']} rows (unanswered) and {info['balancing_results']['rows_removed']} rows (balance)")
     
-    # Convert to repeated measures format
-    repeated_df = prepare_for_repeated_measures(df)
-    
-    return repeated_df
+    return df
 
 try:
     import pingouin as pg
@@ -114,6 +110,19 @@ def suppress_warnings():
         yield
 
 def run_repeated_measures_anova(df, verbose=False):
+    """
+    Runs repeated measures ANOVA on the prepared data testing for interaction
+    between reasoning condition and model size.
+    
+    Args:
+        df (pd.DataFrame): DataFrame in standard format (not repeated measures)
+        verbose (bool): If True, prints detailed statistics and ANOVA results
+            
+    Returns:
+        dict: Dictionary containing ANOVA results and summary statistics
+    """
+    # First prepare the data in repeated measures format
+    df = prepare_for_repeated_measures(df)
     """
     Runs repeated measures ANOVA on the prepared data testing for interaction
     between reasoning condition and model size.
