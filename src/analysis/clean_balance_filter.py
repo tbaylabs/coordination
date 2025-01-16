@@ -9,7 +9,7 @@ from src.analysis.df_formatting import prepare_for_repeated_measures, print_nice
 """
 Functions for running repeated measures ANOVA on experimental results.
 """
-
+fvisual
 def clean_balance_filter(df, model_family, verbose=False):
     """
     Cleans, balances and filters data for analysis.
