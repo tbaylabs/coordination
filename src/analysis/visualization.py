@@ -1,6 +1,24 @@
 """
 Functions for creating visualizations of experimental results.
 """
+from tabulate import tabulate
+
+
+def print_nice_dataframe(df, max_rows=120, show_index=False):
+    """Generic function for nicely printing any DataFrame.
+    
+    Args:
+        df (pd.DataFrame): DataFrame to display
+        max_rows (int): Maximum number of rows to display
+        show_index (bool): Whether to show the index in the output
+    """
+    if len(df) > max_rows:
+        print(f"Displaying first {max_rows} rows (total: {len(df)}):\n")
+        print(tabulate(df.head(max_rows), headers='keys', 
+                     tablefmt='grid', showindex=show_index))
+    else:
+        print(tabulate(df, headers='keys', tablefmt='grid', 
+                     showindex=show_index))
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -19,7 +37,8 @@ def set_comparison_style():
     
     return {
         "without": "#20B2AA",  # Light sea green
-        "with": "#DA70D6"      # Orchid
+        "with": "#DA70D6",      # Orchid
+        "control": "grey"
     }
 
 def set_change_style():
@@ -169,19 +188,14 @@ def boxplot_model_performance_comparison(df, metric='top_prop', title=None):
 
 def plot_interaction_lines(df, metric='top_prop', title=None):
     """
-    Create an interaction plot showing means for with/without reasoning across models.
-    
-    Args:
-        df (pd.DataFrame): DataFrame in repeated measures format
-        metric (str): Either 'top_prop' or 'convergence'
-        title (str): Plot title
+    Create an interaction plot showing means for control, without reasoning, and with reasoning across models.
     """
-    # Create figure with more space for title
     plt.figure(figsize=(10, 7))
     
     # Calculate means for each model and condition
     plot_data = pd.DataFrame({
         'model': df['model'].unique(),
+        'control': df.groupby('model')[f'{metric}_control'].mean(),
         'without': df.groupby('model')[f'{metric}_without_reasoning'].mean(),
         'with': df.groupby('model')[f'{metric}_with_reasoning'].mean()
     }).reset_index(drop=True)
@@ -191,22 +205,36 @@ def plot_interaction_lines(df, metric='top_prop', title=None):
     sizes = [int(model.split('-')[-1][:-1]) for model in unique_models]
     model_order = [x for _, x in sorted(zip(sizes, unique_models))]
     
+    # Get current color cycle
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    colors = prop_cycle.by_key()['color']
+    
     # Plot lines with error bars
     for i, model in enumerate(model_order):
         model_data = df[df['model'] == model]
+        
+        # Get means and SEMs for all conditions
+        control_mean = model_data[f'{metric}_control'].mean()
         without_mean = model_data[f'{metric}_without_reasoning'].mean()
         with_mean = model_data[f'{metric}_with_reasoning'].mean()
+        
+        control_sem = model_data[f'{metric}_control'].sem()
         without_sem = model_data[f'{metric}_without_reasoning'].sem()
         with_sem = model_data[f'{metric}_with_reasoning'].sem()
         
         size = int(model.split('-')[-1][:-1])
-        plt.errorbar([0, 1], [without_mean, with_mean],
-                    yerr=[[without_sem, with_sem], [without_sem, with_sem]],
+        color = colors[i % len(colors)]
+        
+        # Plot line with all three points
+        plt.errorbar([0, 1, 2], [control_mean, without_mean, with_mean],
+                    yerr=[[control_sem, without_sem, with_sem], 
+                          [control_sem, without_sem, with_sem]],
                     marker='o', markersize=8, linewidth=1.5,
+                    color=color,
                     label=f"{size}B")
     
     # Customize appearance
-    plt.xticks([0, 1], ['None', 'CoT'])
+    plt.xticks([0, 1, 2], ['Control', 'None', 'CoT'])
     plt.xlabel('Reasoning')
     plt.ylabel(f"{'Top Response Proportion' if metric == 'top_prop' else 'Convergence Score'}")
     plt.ylim(0.2, 1.0)
@@ -221,7 +249,6 @@ def plot_interaction_lines(df, metric='top_prop', title=None):
         title = f"Mean Performance Over All Task Variations Across Reasoning Elicitation\n{family_name}"
     plt.title(title, pad=20)
     
-    # Add more space above title
     plt.subplots_adjust(top=0.85)
     
     sns.despine()
@@ -309,31 +336,64 @@ def plot_paired_changes(df, metric='top_prop', title=None):
 
 def plot_scores_by_model_size(df, metric='top_prop', title=None):
     """
-    Create a line plot showing scores across model sizes for with/without reasoning.
+    Create a line plot showing scores across model sizes for with/without reasoning,
+    plus horizontal lines for control and convergence values.
     """
-    print(df)
+    print("\nInput DataFrame:")
+    print_nice_dataframe(df)
     colors = set_comparison_style()
+    
+    print("\nInitial setup:")
+    models = df['model'].unique()
+    print(f"Models found: {models}")
+    sizes = [int(model.split('-')[-1][:-1]) for model in models]
+    print(f"Sizes extracted: {sizes}")
+    model_order = [x for _, x in sorted(zip(sizes, models))]
+    print(f"Model order: {model_order}")
     
     plt.figure(figsize=(10, 6))
     
-    models = df['model'].unique()
-    sizes = [int(model.split('-')[-1][:-1]) for model in models]
-    model_order = [x for _, x in sorted(zip(sizes, models))]
+    print("\nCalculating means and SEMs:")
+    all_means = {}
+    all_sems = {}
     
-    for condition, color_key in [('without', 'without'), ('with', 'with')]:
+    # Plot all conditions including control as lines
+    for condition, color_key in [('without', 'without'), ('with', 'with'), ('control', 'control')]:
         means = []
         sems = []
-        for model in model_order:
-            model_data = df[df['model'] == model][f'{metric}_{condition}_reasoning']
-            means.append(model_data.mean())
-            sems.append(model_data.sem())
+        print(f"\nCondition: {condition}")
         
+        for model in model_order:
+            # For control, use metric_control instead of metric_control_reasoning
+            column = f'{metric}_control' if condition == 'control' else f'{metric}_{condition}_reasoning'
+            print(f"Model: {model}")
+            print(f"Looking for column: {column}")
+            print(f"Available columns: {df.columns.tolist()}")
+            
+            model_data = df[df['model'] == model][column]
+            mean = model_data.mean()
+            sem = model_data.sem()
+            means.append(mean)
+            sems.append(sem)
+            print(f"Data for {model}: Mean = {mean}, SEM = {sem}")
+        
+        all_means[condition] = means
+        all_sems[condition] = sems
+        
+        print(f"\nPlotting for condition {condition}:")
         x_pos = range(len(model_order))
+        label = 'Control' if condition == 'control' else f'{"With" if condition == "with" else "Without"} Chain-of-Thought'
+        print(f"x_positions: {list(x_pos)}")
+        print(f"means: {means}")
+        print(f"sems: {sems}")
+        print(f"label: {label}")
+        
         plt.errorbar(x_pos, means, yerr=sems, 
                     color=colors[color_key], 
                     marker='o', markersize=8, linewidth=2,
-                    label=f'{"With" if condition == "with" else "Without"} Chain-of-Thought')
+                    label=label)
     
+    print("\nSetting up plot formatting:")
     plt.xticks(range(len(model_order)), [m.split('-')[-1].upper() for m in model_order])
     plt.xlabel('Model Size (Billion Parameters)', fontsize=11)
     
@@ -350,6 +410,14 @@ def plot_scores_by_model_size(df, metric='top_prop', title=None):
     sns.despine()
     plt.grid(axis='y', linestyle='--', alpha=0.3)
     plt.tight_layout()
+    
+    print("\nFinal summary of all means:")
+    for condition, means in all_means.items():
+        print(f"{condition}: {means}")
+    
+    print("\nFinal summary of all SEMs:")
+    for condition, sems in all_sems.items():
+        print(f"{condition}: {sems}")
 
 def plot_model_comparison(df):
     """
