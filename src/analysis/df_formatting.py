@@ -160,6 +160,9 @@ def prepare_for_repeated_measures(df):
     keep_cols = ['model', 'task_options', 'task_reasoning'] + metric_cols
     prepared_df = prepared_df[keep_cols]
     
+    # Remove duplicate rows with the same (model, task_options, task_reasoning)
+    prepared_df = prepared_df.drop_duplicates(subset=['model', 'task_options', 'task_reasoning'])
+    
     # Reshape to have with/without reasoning as columns for each metric
     metrics_df = []
     for metric in metric_cols:
