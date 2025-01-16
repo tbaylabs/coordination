@@ -56,11 +56,15 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             dict: A dictionary for the results list.
         """
         extracted_answer = None
-        # Determine the extracted_answer
+        extracted_by = None
+        
+        # Determine the extracted_answer and extracted_by
         if answer_extraction_entry.get("rule_extract") is not None:
             extracted_answer = answer_extraction_entry["rule_extract"]
+            extracted_by = "rule"
         elif answer_extraction_entry.get("llm_extract") is not None:
             extracted_answer = answer_extraction_entry["llm_extract"]
+            extracted_by = "llm"
         elif answer_extraction_entry.get("human_extract") == "not checked by a human":
             # Log the error and associated dictionary
             print(f"Error: Human extract not checked for result_number {answer_extraction_entry['result_number']}")
@@ -68,6 +72,7 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             return None
         elif answer_extraction_entry.get("human_extract") is not None:
             extracted_answer = answer_extraction_entry["human_extract"]
+            extracted_by = "human"
         else:
             raise ValueError(f"Invalid extraction state for result_number {answer_extraction_entry['result_number']}")
 
@@ -75,6 +80,7 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
         return {
             "results_number": answer_extraction_entry["result_number"],
             "extracted_answer": extracted_answer,
+            "extracted_by": extracted_by,
             "extraction_attempt_id": answer_extraction_entry["extraction_attempt_id"],
             "call_id": answer_extraction_entry["call_id"]
         }
