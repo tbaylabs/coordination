@@ -4,7 +4,7 @@ from src.analysis.data_processing import (
     validate_experiment_data,
     repeated_measures_rebalance
 )
-from src.analysis.df_formatting import prepare_for_repeated_measures
+from src.analysis.df_formatting import prepare_for_repeated_measures, print_nice_dataframe
 
 """
 Functions for running repeated measures ANOVA on experimental results.
@@ -35,6 +35,10 @@ def prepare_repeated_measures_anova_exp2(df, model_family, verbose=False):
     df = df[df['task_reasoning'].isin(['none', 'step-by-step', 'control'])]
     
     info['after_filtering_rows'] = len(df)
+    
+    if verbose:
+        print("\nData after filtering by model family and reasoning conditions:")
+        print_nice_dataframe(df)
     
     # Validate
     info['validation_results'] = validate_experiment_data(df, verbose=verbose)
