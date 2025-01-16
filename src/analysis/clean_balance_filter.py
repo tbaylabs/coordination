@@ -4,12 +4,11 @@ from src.analysis.data_processing import (
     validate_experiment_data,
     repeated_measures_rebalance
 )
-from src.analysis.df_formatting import prepare_for_repeated_measures, print_nice_dataframe
+from src.analysis.df_formatting import make_long_df, print_nice_dataframe
 
 """
 Functions for running repeated measures ANOVA on experimental results.
 """
-fvisual
 def clean_balance_filter(df, model_family, verbose=False):
     """
     Cleans, balances and filters data for analysis.
@@ -122,7 +121,7 @@ def run_repeated_measures_anova(df, verbose=False):
         dict: Dictionary containing ANOVA results and summary statistics
     """
     # First prepare the data in repeated measures format
-    df = prepare_for_repeated_measures(df)
+    # df = df.drop(columns=['top_prop_control', 'convergence_control'])
     """
     Runs repeated measures ANOVA on the prepared data testing for interaction
     between reasoning condition and model size.

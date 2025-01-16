@@ -311,6 +311,7 @@ def plot_scores_by_model_size(df, metric='top_prop', title=None):
     """
     Create a line plot showing scores across model sizes for with/without reasoning.
     """
+    print(df)
     colors = set_comparison_style()
     
     plt.figure(figsize=(10, 6))

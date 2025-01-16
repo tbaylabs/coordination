@@ -12,7 +12,6 @@ def get_standard_column_exclusions(top_results_only=True):
         'file_name',
         'temperature',
         'xml_prompt',
-        'task_instruction',
         'answered_count',
         'unanswered_count',
         'total_count',
@@ -38,7 +37,7 @@ def get_standard_column_exclusions(top_results_only=True):
 def get_standard_column_order(use_simple_names=True, top_results_only=True):
     """Returns standard column ordering based on configuration."""
     if use_simple_names:
-        primary_cols = ['model', 'task_options', 'task_reasoning']
+        primary_cols = ['model', 'task_options', 'task_reasoning', 'task_instruction']
         metric_cols = ['convergence', 'top_prop', 'top']
     else:
         primary_cols = ['model_name', 'task_options', 'task_reasoning']
@@ -138,9 +137,12 @@ def print_nice_aggregate_trial_results_table(df, max_rows=20):
     # Use the generic printing function
     print_nice_dataframe(display_df, max_rows=max_rows, show_index=False)
 
-def prepare_for_repeated_measures(df):
+import pandas as pd
+
+def make_long_df(df):
     """
-    Prepares aggregate trial results for repeated measures analysis.
+    Prepares aggregate trial results for repeated measures analysis,
+    including a 'control' column for both 'convergence' and 'top_prop'.
     
     Args:
         df (pd.DataFrame): Input DataFrame from aggregate_trial_results
@@ -157,47 +159,106 @@ def prepare_for_repeated_measures(df):
     
     # Keep only convergence and top_prop metrics
     metric_cols = ['convergence', 'top_prop']
-    keep_cols = ['model', 'task_options', 'task_reasoning'] + metric_cols
+    keep_cols = ['model', 'task_options', 'task_reasoning', 'task_instruction'] + metric_cols
     prepared_df = prepared_df[keep_cols]
     
-    # Remove duplicate rows with the same (model, task_options, task_reasoning)
-    prepared_df = prepared_df.drop_duplicates(subset=['model', 'task_options', 'task_reasoning'])
+    # Remove duplicate rows with the same (model, task_options, task_reasoning, task_instruction)
+    prepared_df = prepared_df.drop_duplicates(
+        subset=['model', 'task_options', 'task_reasoning', 'task_instruction']
+    )
     
-    # Reshape to have with/without reasoning as columns for each metric
-    metrics_df = []
+    # We'll collect the pivoted DataFrames for each metric, then merge them at the end
+    all_metrics_merged = None
+    
     for metric in metric_cols:
-        wide_metric = prepared_df.pivot(
+        # --- 1. Subset for coordinate instructions: pivot on task_reasoning ---
+        df_coordinate = prepared_df[prepared_df['task_instruction'] == 'coordinate'].copy()
+        
+        wide_coordinate = df_coordinate.pivot(
             index=['model', 'task_options'],
             columns='task_reasoning',
             values=metric
         ).reset_index()
         
-        # Rename columns appropriately
-        expected_cols = {
-            'none': f'{metric}_without_reasoning',
-            'step-by-step': f'{metric}_with_reasoning',
-            'control': f'{metric}_control'
-        }
+        # rename columns from { 'none': '*_without_reasoning', 'step-by-step': '*_with_reasoning' }
+        wide_coordinate = wide_coordinate.rename(
+            columns={
+                'none': f'{metric}_without_reasoning',
+                'step-by-step': f'{metric}_with_reasoning'
+            }
+        )
         
-        # Build final column list:
-        new_cols = []
-        for col in wide_metric.columns:
-            if col in expected_cols:
-                new_cols.append(expected_cols[col])
-            else:
-                new_cols.append(col)
+        # Some pivot calls may not produce both columns if data is missing,
+        # so fill them in if they don't exist
+        for col_suffix in ['without_reasoning', 'with_reasoning']:
+            col_name = f'{metric}_{col_suffix}'
+            if col_name not in wide_coordinate.columns:
+                wide_coordinate[col_name] = None
         
-        wide_metric.columns = new_cols
-        metrics_df.append(wide_metric)
+        # Keep just the columns we need
+        keep_coordinate = [
+            'model', 'task_options',
+            f'{metric}_without_reasoning', f'{metric}_with_reasoning'
+        ]
+        wide_coordinate = wide_coordinate[keep_coordinate]
+        
+        # --- 2. Subset for control instructions (task_instruction='control', task_reasoning='none') ---
+        df_control = prepared_df[
+            (prepared_df['task_instruction'] == 'control') & 
+            (prepared_df['task_reasoning'] == 'none')
+        ].copy()
+        
+        wide_control = df_control.pivot(
+            index=['model', 'task_options'],
+            columns='task_reasoning',
+            values=metric
+        ).reset_index()
+        
+        # rename columns: 'none' → '*_control'
+        wide_control = wide_control.rename(
+            columns={
+                'none': f'{metric}_control'
+            }
+        )
+        
+        # If pivot is empty or missing the column, ensure it exists
+        if f'{metric}_control' not in wide_control.columns:
+            wide_control[f'{metric}_control'] = None
+        
+        # Keep just the relevant columns
+        keep_control = [
+            'model', 'task_options',
+            f'{metric}_control'
+        ]
+        wide_control = wide_control[keep_control]
+        
+        # --- 3. Merge the coordinate and control wide DataFrames for this metric ---
+        wide_metric = pd.merge(
+            wide_coordinate,
+            wide_control,
+            on=['model', 'task_options'],
+            how='outer'  # or "inner", depending on your needs
+        )
+        
+        # --- 4. Merge this metric-wide DataFrame with the (potentially) already-merged metrics ---
+        if all_metrics_merged is None:
+            # First metric – just use this as our starting point
+            all_metrics_merged = wide_metric
+        else:
+            # Merge with existing data
+            all_metrics_merged = pd.merge(
+                all_metrics_merged,
+                wide_metric,
+                on=['model', 'task_options'],
+                how='outer'
+            )
     
-    # Merge the metric DataFrames
-    final_df = pd.merge(
-        metrics_df[0], 
-        metrics_df[1], 
-        on=['model', 'task_options']
-    )
+    # all_metrics_merged now contains, for each metric, columns:
+    #   * [metric]_without_reasoning
+    #   * [metric]_with_reasoning
+    #   * [metric]_control
     
-    return final_df
+    return all_metrics_merged
 
 def print_repeated_measures_df(df, max_rows=20):
     """Specialized printing for repeated measures format."""
