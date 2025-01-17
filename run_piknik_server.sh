@@ -28,8 +28,7 @@ while true; do
     if [[ "$CLIPBOARD" != "$LAST_CLIPBOARD" ]]; then
         echo "[Sender] Copying new content to Piknik"
         # Add the clipboard content followed by the instruction line
-        MODIFIED_CONTENT="$CLIPBOARD"$'\nReply with a single code block designated as "txt" format. Write in md in that txt code block, but use <code_block> and </code_block> instead of "```".\n\n'
-        echo "$MODIFIED_CONTENT" | piknik -copy
+MODIFIED_CONTENT="$CLIPBOARD"$'\nReply with a single code block surrounded by triple backticks and using the language identifier "txt". The content inside this code block should be written in markdown format, but any code blocks within the markdown should use <code_block> and </code_block> tags instead of triple backticks.\n\n'        echo "$MODIFIED_CONTENT" | piknik -copy
         LAST_CLIPBOARD="$CLIPBOARD"
     fi
     
