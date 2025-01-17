@@ -129,12 +129,29 @@ chmod +x run_piknik_server.sh
 
 Download Piknik for macOS from the [Piknik Releases page](https://github.com/jedisct1/piknik/releases/latest)
 
-### 2. Create the Clipboard Receiver Script
+### 2. Create Piknik Directory
 
-Create a file named `clipboard_receiver.sh` with this content:
+Create a dedicated directory for Piknik files:
+
+```bash
+mkdir ~/.piknik
+cd ~/.piknik
+```
+
+### 3. Create the Clipboard Receiver Script
+
+Create a `.piknik` directory in your home folder and create a file named `clipboard_receiver.sh` inside it with this content:
 
 ```bash
 #!/bin/bash
+
+# Check for config file in current directory
+if [ -f ./.piknik.toml ]; then
+    chmod 600 ./.piknik.toml
+else
+    echo "Warning: .piknik.toml not found in current directory. Make sure to create it before running the receiver."
+    exit 1
+fi
 
 # Trap Ctrl+C (SIGINT) to exit cleanly
 trap 'echo -e "\nStopping clipboard receiver..."; exit 0' SIGINT
@@ -147,8 +164,8 @@ echo "------------------------"
 LAST_PIKNIK_CLIPBOARD=""
 
 while true; do
-    # Get the clipboard content from Piknik
-    NEW_CLIPBOARD=$(piknik -paste 2>/dev/null)  # Suppress error messages
+    # Get the clipboard content from Piknik, using local config
+    NEW_CLIPBOARD=$(piknik -config ./.piknik.toml -paste 2>/dev/null)  # Suppress error messages
     
     # Check if the Piknik clipboard has changed
     if [[ "$NEW_CLIPBOARD" != "$LAST_PIKNIK_CLIPBOARD" && ! -z "$NEW_CLIPBOARD" ]]; then
@@ -192,7 +209,8 @@ EncryptSk = "[your_generated_key]"
 
 Important notes:
 - Use the same keys on both Mac and devcontainer
-- Place the `.piknik.toml` file directly in your workspace, not in a `.piknik` folder
+- On the devcontainer, place the `.piknik.toml` file directly in your workspace
+- On your Mac, place the `.piknik.toml` file in your `~/.piknik` directory alongside the receiver script
 - The keys shown above are placeholders - use your actual generated keys
 
 ### Port Forwarding
@@ -200,7 +218,7 @@ Important notes:
 Add to your `.devcontainer.json`:
 
 ```json
-"forwardPorts": [8075]
+"forwardPorts": [4040, 8075]
 ```
 
 ## Usage
