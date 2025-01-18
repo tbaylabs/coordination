@@ -37,17 +37,41 @@ output_path = Path(__file__).parent / 'convergence_chart.png'
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"Chart saved to {output_path}")
 
-# we want to group by model name, and produce one chart for each of task_reasoning and task_instruction. task_options should be combined and averaged.
+# Chart 2: Model comparison across experiment conditions
+plt.figure(figsize=(12, 6))
 
-# chart 2: eg. comparison of [claude-3-haiku, llama-33-70b, ..., gemini-flash] models, each should be a
-# line on the chart, with the values as the averaged `convergence_all` over the various `task_option` values.
+# Create experiment condition mapping
+conditions = {
+    ('control', 'none'): 'control',
+    ('control', 'step-by-step'): 'control-COT',
+    ('coordinate', 'none'): 'coordinate-none',
+    ('coordinate', 'step-by-step'): 'coordinate-COT'
+}
 
-# so we have 4 options for (task_instruction, task_reasoning):
-# control, none
-# control, step-by-step
-# coordinate, none
-# coordibnate, step-by-step
-# Let's give them the names: control, control-COT, coordinate-none, coordinate-COT
-# Can we graph these as the x-axis (called Experiment), but leave out control-COT as there's likely no data points
+# Add experiment condition to dataframe
+df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
 
-# TODO
+# Filter out control-COT if it has no data
+if 'control-COT' not in df['experiment'].unique():
+    conditions = {k:v for k,v in conditions.items() if v != 'control-COT'}
+
+# Group by model and experiment, calculate mean convergence
+model_comparison = df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
+
+# Plot each model's performance
+for model in model_comparison.index:
+    plt.plot(model_comparison.columns, model_comparison.loc[model], 
+             marker='o', linestyle='-', label=model)
+
+# Add labels and title
+plt.xlabel('Experiment Condition')
+plt.ylabel('Average Convergence (All)')
+plt.title('Model Performance Comparison Across Experiment Conditions')
+plt.grid(True)
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# Adjust layout and save plot
+plt.tight_layout()
+output_path = Path(__file__).parent / 'model_comparison_chart.png'
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+print(f"Model comparison chart saved to {output_path}")
