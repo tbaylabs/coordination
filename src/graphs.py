@@ -57,8 +57,11 @@ def write_graphs():
     # Remove all rows with 'other' experiment and with '0-control-COT' experiment
     df = df[~df['experiment'].isin(['other', '0-control-COT'])]
 
-    # Group by model and experiment, calculate mean top_prop
-    model_comparison = df.groupby(['model_name', 'experiment'])['top_prop_all'].mean().unstack()
+    # Calculate top_prop_answered
+    df['top_prop_answered'] = df['top_option_count'] / df['answered_count']
+
+    # Group by model and experiment, calculate mean top_prop_answered
+    model_comparison = df.groupby(['model_name', 'experiment'])['top_prop_answered'].mean().unstack()
 
     # Plot each model's performance
     for model in model_comparison.index:
@@ -67,16 +70,16 @@ def write_graphs():
 
     # Add labels and title
     plt.xlabel('Experiment Condition')
-    plt.ylabel('Average Top Proportion (All)')
-    plt.title('Model Performance Comparison (Top Proportion) Across Experiment Conditions')
+    plt.ylabel('Average Top Proportion (Answered)')
+    plt.title('Model Performance Comparison (Top Proportion Answered) Across Experiment Conditions')
     plt.grid(True)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
     # Adjust layout and save plot
     plt.tight_layout()
-    output_path = Path(__file__).parent / 'model_comparison_top_prop_chart.png'
+    output_path = Path(__file__).parent / 'model_comparison_top_prop_answered_chart.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"Model comparison (top proportion) chart saved to {output_path}")
+    print(f"Model comparison (top proportion answered) chart saved to {output_path}")
 
 
 if __name__ == '__main__':
