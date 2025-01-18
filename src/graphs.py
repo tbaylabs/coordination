@@ -1,7 +1,9 @@
 from pathlib import Path
 import matplotlib
-import csv
+import pandas as pd
 
-r = csv.reader((Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv').read_text().splitlines())
+# Read CSV into DataFrame
+df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
 
-print(next(r))
+# Print first few rows
+print(df.head())
