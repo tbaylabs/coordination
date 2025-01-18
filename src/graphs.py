@@ -1,12 +1,30 @@
 from pathlib import Path
-import matplotlib
+import matplotlib.pyplot as plt
 import pandas as pd
 
 # Read CSV into DataFrame
 df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
 
-# Print first few rows
-print(df.head())
+# Group by task_instruction and calculate mean convergence_all
+grouped = df.groupby('task_instruction')['convergence_all'].mean().reset_index()
+
+# Create the plot
+plt.figure(figsize=(10, 6))
+plt.plot(grouped['task_instruction'], grouped['convergence_all'], 
+         marker='o', linestyle='-', color='b')
+
+# Add labels and title
+plt.xlabel('Task Instruction')
+plt.ylabel('Average Convergence (All)')
+plt.title('Average Convergence by Task Instruction')
+plt.grid(True)
+
+# Rotate x-axis labels for better readability
+plt.xticks(rotation=45)
+
+# Adjust layout and show plot
+plt.tight_layout()
+plt.show()
 
 # file_name,model_name,temperature,xml_prompt,task_instruction,task_reasoning,task_options,top_option_name,top_option_count,second_option_name,second_option_count,third_option_name,third_option_count,fourth_option_name,fourth_option_count,unanswered_count,answered_count,total_count,unanswered_prop,top_prop_all,second_prop_all,third_prop_all,fourth_prop_all,convergence_answered,convergence_all,extracted_by_rule_count,extracted_by_llm_count,extracted_by_human_count,extracted_by_rule_prop,extracted_by_llm_prop,extracted_by_human_prop
 # res_coordinate_shapes-3-text_none_llama-33-70b.json,llama-33-70b,default,False,coordinate,none,shapes-3-text,filled diamond,57,filled triangle,35,hollow diamond,16,hollow triangle,12,0,120,120,0.0,0.475,0.2916666666666667,0.13333333333333333,0.1,0.33847222222222223,0.33847222222222223,17,103,0,0.14166666666666666,0.8583333333333333,0.0
