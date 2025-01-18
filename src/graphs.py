@@ -81,6 +81,30 @@ def write_graphs():
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"Model comparison (top proportion answered) chart saved to {output_path}")
 
+    # Chart 3: Model comparison using top_prop_all
+    plt.figure(figsize=(12, 6))
+
+    # Group by model and experiment, calculate mean top_prop_all
+    model_comparison = df.groupby(['model_name', 'experiment'])['top_prop_all'].mean().unstack()
+
+    # Plot each model's performance
+    for model in model_comparison.index:
+        plt.plot(model_comparison.columns, model_comparison.loc[model], 
+                marker='o', linestyle='-', label=model)
+
+    # Add labels and title
+    plt.xlabel('Experiment Condition')
+    plt.ylabel('Average Top Proportion (All)')
+    plt.title('Model Performance Comparison (Top Proportion All) Across Experiment Conditions')
+    plt.grid(True)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    # Adjust layout and save plot
+    plt.tight_layout()
+    output_path = Path(__file__).parent / 'model_comparison_top_prop_all_chart.png'
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"Model comparison (top proportion all) chart saved to {output_path}")
+
 
 if __name__ == '__main__':
     write_graphs()
