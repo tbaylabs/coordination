@@ -51,9 +51,8 @@ conditions = {
 # Add experiment condition to dataframe
 df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
 
-# Filter out control-COT if it has no data
-if 'control-COT' not in df['experiment'].unique():
-    conditions = {k:v for k,v in conditions.items() if v != 'control-COT'}
+# Remove all rows with 'other' experiment and with 'control-COT' experiment
+# TODO
 
 # Group by model and experiment, calculate mean convergence
 model_comparison = df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
