@@ -52,7 +52,7 @@ conditions = {
 df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
 
 # Remove all rows with 'other' experiment and with 'control-COT' experiment
-# TODO
+df = df[~df['experiment'].isin(['other', 'control-COT'])]
 
 # Group by model and experiment, calculate mean convergence
 model_comparison = df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
