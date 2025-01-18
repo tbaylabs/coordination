@@ -15,7 +15,7 @@ def write_graphs():
 
 
     # chart 1: (just a test chart) A line chart with the x axis as `task_instruction`, and the Y `convergence_all``
-
+    """
     # Group by task_instruction and calculate mean convergence_all
     grouped = df.groupby('task_instruction')['convergence_all'].mean().reset_index()
 
@@ -38,6 +38,7 @@ def write_graphs():
     output_path = Path(__file__).parent / 'convergence_chart.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"Chart saved to {output_path}")
+    """
 
     # Chart 2: Model comparison across experiment conditions
     plt.figure(figsize=(12, 6))
@@ -56,8 +57,8 @@ def write_graphs():
     # Remove all rows with 'other' experiment and with '0-control-COT' experiment
     df = df[~df['experiment'].isin(['other', '0-control-COT'])]
 
-    # Group by model and experiment, calculate mean convergence
-    model_comparison = df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
+    # Group by model and experiment, calculate mean top_prop
+    model_comparison = df.groupby(['model_name', 'experiment'])['top_prop_all'].mean().unstack()
 
     # Plot each model's performance
     for model in model_comparison.index:
@@ -66,16 +67,16 @@ def write_graphs():
 
     # Add labels and title
     plt.xlabel('Experiment Condition')
-    plt.ylabel('Average Convergence (All)')
-    plt.title('Model Performance Comparison Across Experiment Conditions')
+    plt.ylabel('Average Top Proportion (All)')
+    plt.title('Model Performance Comparison (Top Proportion) Across Experiment Conditions')
     plt.grid(True)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
     # Adjust layout and save plot
     plt.tight_layout()
-    output_path = Path(__file__).parent / 'model_comparison_chart.png'
+    output_path = Path(__file__).parent / 'model_comparison_top_prop_chart.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"Model comparison chart saved to {output_path}")
+    print(f"Model comparison (top proportion) chart saved to {output_path}")
 
 
 if __name__ == '__main__':
