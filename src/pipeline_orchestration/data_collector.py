@@ -2,9 +2,10 @@
 Functions for collecting data from LLMs and managing the collection process.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import json
+import time
 from litellm import completion
 
 from ..utils import get_model_mapping, generate_permutations, get_permutation_pattern_from_result_number
@@ -73,7 +74,28 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
         permutations_list = generate_permutations()
 
+        # Rate limiting for Gemini models
+        gemini_rate_limit = 10  # Max requests per minute
+        gemini_last_call_time = None
+        gemini_call_count = 0
+
         for result_number in missing_result_numbers:
+            # Handle rate limiting for Gemini models
+            if "gemini" in model_name.lower():
+                current_time = datetime.now()
+                if gemini_last_call_time and (current_time - gemini_last_call_time) < timedelta(minutes=1):
+                    gemini_call_count += 1
+                    if gemini_call_count >= gemini_rate_limit:
+                        # Calculate sleep time until next minute window
+                        sleep_time = 60 - (current_time - gemini_last_call_time).seconds
+                        print(f"Gemini rate limit reached. Sleeping for {sleep_time} seconds...")
+                        time.sleep(sleep_time)
+                        gemini_call_count = 0
+                        gemini_last_call_time = datetime.now()
+                else:
+                    gemini_last_call_time = current_time
+                    gemini_call_count = 1
+
             # Initialize log_entry with basic info
             log_entry = {
                 "call_number": call_number,
