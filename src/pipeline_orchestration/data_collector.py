@@ -107,6 +107,18 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
                 content_received = response["choices"][0]["message"]["content"]
 
+                # Extract and serialize response details
+                response_details = {
+                    "id": response.id,
+                    "created": response.created,
+                    "model": response.model,
+                    "usage": {
+                        "prompt_tokens": response.usage.prompt_tokens,
+                        "completion_tokens": response.usage.completion_tokens,
+                        "total_tokens": response.usage.total_tokens
+                    } if hasattr(response, 'usage') else None
+                }
+
                 # Log successful response
                 log_entry = {
                     "call_number": call_number,
@@ -117,7 +129,7 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                     "error_message": None,
                     "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "response": response
+                    "response": response_details
                 }
                 print(f"Successfully collected data for result_number {result_number}")
 
