@@ -116,17 +116,23 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
                 content_received = response["choices"][0]["message"]["content"]
 
-                # Extract and serialize response details
-                response_details = {
-                    "id": response.id,
-                    "created": response.created,
-                    "model": response.model,
-                    "usage": {
-                        "prompt_tokens": response.usage.prompt_tokens,
-                        "completion_tokens": response.usage.completion_tokens,
-                        "total_tokens": response.usage.total_tokens
-                    } if hasattr(response, 'usage') else None
-                }
+                # Extract only needed response details for o1/o1-mini models
+                response_details = {}
+                if model_name in ["o1", "o1-mini"]:
+                    if hasattr(response, 'usage'):
+                        response_details = {
+                            "id": response.id,
+                            "created": response.created,
+                            "usage": {
+                                "prompt_tokens": response.usage.prompt_tokens,
+                                "completion_tokens": response.usage.completion_tokens,
+                                "completion_tokens_details": {
+                                    "reasoning_tokens": response.usage.completion_tokens_details.get("reasoning_tokens", 0),
+                                    "accepted_prediction_tokens": response.usage.completion_tokens_details.get("accepted_prediction_tokens", 0),
+                                    "rejected_prediction_tokens": response.usage.completion_tokens_details.get("rejected_prediction_tokens", 0)
+                                }
+                            }
+                        }
 
                 # Log successful response
                 log_entry = {
