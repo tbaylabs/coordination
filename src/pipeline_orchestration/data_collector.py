@@ -117,6 +117,7 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                     "error_message": None,
                     "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "response": response
                 }
                 print(f"Successfully collected data for result_number {result_number}")
 
@@ -131,6 +132,8 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                     "error_message": str(e),
                     "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "response": response
+
                 }
                 error_logs.append(log_entry)
                 print(f"Error encountered for result_number {result_number}: {e}")
