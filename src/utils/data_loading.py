@@ -26,6 +26,7 @@ def load_environment():
         "GROQ_API_KEY",
         "OPENROUTER_API_KEY",
         "GITHUB_API_KEY",
+        "GEMINI_API_KEY"
     ]
 
     accessible_vars = {}
