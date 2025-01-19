@@ -30,10 +30,21 @@ def load_environment():
     ]
 
     accessible_vars = {}
+    missing_vars = []
     for env_var in env_vars:
         value = os.getenv(env_var)
-        if value and len(value) >= 8:
-            accessible_vars[env_var] = f"{value[:8]}<redacted>"
+        if value:
+            if len(value) >= 8:
+                accessible_vars[env_var] = f"{value[:8]}<redacted>"
+            else:
+                print(f"Warning: {env_var} value is too short (length {len(value)})")
+        else:
+            missing_vars.append(env_var)
+    
+    if missing_vars:
+        print(f"Warning: Missing environment variables: {', '.join(missing_vars)}")
+        print(f"Current environment file: {env_path}")
+        print(f"File exists: {env_path.exists()}")
     
     return accessible_vars
 
