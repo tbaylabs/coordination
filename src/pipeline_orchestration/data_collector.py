@@ -74,6 +74,19 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
         permutations_list = generate_permutations()
 
         for result_number in missing_result_numbers:
+            # Initialize log_entry with basic info
+            log_entry = {
+                "call_number": call_number,
+                "result_number": result_number,
+                "prompt_as_sent": None,
+                "content_received": None,
+                "status": "error",  # Default to error, will update if successful
+                "error_message": None,
+                "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "response": {}
+            }
+            
             try:
                 # Generate permutation pattern and prompt
                 permutation_pattern = get_permutation_pattern_from_result_number(
@@ -137,34 +150,21 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                             }
                         }
 
-                # Log successful response
-                log_entry = {
-                    "call_number": call_number,
-                    "result_number": result_number,
+                # Update log entry for success
+                log_entry.update({
                     "prompt_as_sent": prompt,
                     "content_received": content_received,
                     "status": "success",
-                    "error_message": None,
-                    "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
                     "response": response_details
-                }
+                })
                 print(f"Successfully collected data for result_number {result_number}")
 
             except Exception as e:
-                # Log error
-                log_entry = {
-                    "call_number": call_number,
-                    "result_number": result_number,
-                    "prompt_as_sent": None,
-                    "content_received": None,
-                    "status": "error",
+                # Update log entry for error
+                log_entry.update({
                     "error_message": str(e),
-                    "call_id": f"{call_number}_{hash_key[:6]}_{file_name}",
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "response": response
-
-                }
+                    "response": {}
+                })
                 error_logs.append(log_entry)
                 print(f"Error encountered for result_number {result_number}: {e}")
             finally:
