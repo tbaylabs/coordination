@@ -75,7 +75,7 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
         permutations_list = generate_permutations()
 
         # Rate limiting for Gemini models
-        gemini_rate_limit = 10  # Max requests per minute
+        gemini_rate_limit = 5  # Max requests per minute
         gemini_last_call_time = None
         gemini_call_count = 0
 
