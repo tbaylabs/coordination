@@ -120,17 +120,29 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                 response_details = {}
                 if model_name in ["o1", "o1-mini"]:
                     if hasattr(response, 'usage'):
+                        # Safely extract token details
+                        token_details = {}
+                        if hasattr(response.usage, 'completion_tokens_details'):
+                            try:
+                                token_details = {
+                                    "reasoning_tokens": response.usage.completion_tokens_details.reasoning_tokens,
+                                    "accepted_prediction_tokens": response.usage.completion_tokens_details.accepted_prediction_tokens,
+                                    "rejected_prediction_tokens": response.usage.completion_tokens_details.rejected_prediction_tokens
+                                }
+                            except AttributeError:
+                                token_details = {
+                                    "reasoning_tokens": 0,
+                                    "accepted_prediction_tokens": 0,
+                                    "rejected_prediction_tokens": 0
+                                }
+                        
                         response_details = {
                             "id": response.id,
                             "created": response.created,
                             "usage": {
                                 "prompt_tokens": response.usage.prompt_tokens,
                                 "completion_tokens": response.usage.completion_tokens,
-                                "completion_tokens_details": {
-                                    "reasoning_tokens": response.usage.completion_tokens_details.get("reasoning_tokens", 0),
-                                    "accepted_prediction_tokens": response.usage.completion_tokens_details.get("accepted_prediction_tokens", 0),
-                                    "rejected_prediction_tokens": response.usage.completion_tokens_details.get("rejected_prediction_tokens", 0)
-                                }
+                                "completion_tokens_details": token_details
                             }
                         }
 
