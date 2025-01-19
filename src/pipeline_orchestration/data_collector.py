@@ -99,15 +99,6 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
                 response = completion(**completion_params)
                 
-                # Print raw response structure for debugging
-                print("\nRaw response structure:")
-                print(f"Type: {type(response)}")
-                print(f"Dir: {dir(response)}")
-                try:
-                    print(f"Dict: {response.__dict__}")
-                except Exception as e:
-                    print(f"Could not print dict: {e}")
-                
                 # Check response structure
                 if "choices" not in response or not response["choices"]:
                     raise ValueError("The LLM response is missing 'choices' or is empty.")
