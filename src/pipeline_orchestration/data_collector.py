@@ -120,9 +120,9 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
                 content_received = response["choices"][0]["message"]["content"]
 
-                # Extract only needed response details for o1/o1-mini models
+                # Extract only needed response details for o1 family models
                 response_details = {}
-                if model_name in ["o1", "o1-mini"]:
+                if model_name in ["o1", "o1-mini", "o1-preview"]:
                     if hasattr(response, 'usage'):
                         # Safely extract token details
                         token_details = {}
