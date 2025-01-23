@@ -50,6 +50,7 @@ def prepare_graph_data():
 
 def create_charts_1_and_2():
     """Create line charts for LLaMA models and GPT-4o"""
+    print("Creating chart 1 and 2")
     data = prepare_graph_data()
     import numpy as np
     
@@ -113,6 +114,7 @@ def create_charts_1_and_2():
 
 def create_charts_3_and_4():
     """Create line charts for Sonnet, reasoning models and GPT-4o"""
+    print("Creating chart 3 and 4")
     data = prepare_graph_data()
     import numpy as np
     
@@ -175,6 +177,7 @@ def create_charts_3_and_4():
 
 def create_charts_5_and_6():
     """Create line charts for LLaMA models"""
+    print("Creating chart 5 and 6")
     data = prepare_graph_data()
     import numpy as np
     
@@ -224,6 +227,7 @@ def create_charts_5_and_6():
 
 def create_charts_7_and_8():
     """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o"""
+    print("Creating chart 7 and 8")
     data = prepare_graph_data()
     import numpy as np
     
