@@ -5,19 +5,22 @@ def prepare_graph_data():
     # Read CSV into DataFrame
     df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
 
-    # Create experiment condition mapping
+    # Create experiment condition mapping with ordering
     conditions = {
-        ('control', 'step-by-step'): '0-control-COT',
-        ('control', 'none'): '1-control',
-        ('coordinate', 'none'): '2-coordinate-none',
-        ('coordinate', 'step-by-step'): '3-coordinate-COT'
+        ('control', 'none'): 'control',
+        ('coordinate', 'none'): 'coordinate-none',
+        ('coordinate', 'step-by-step'): 'coordinate-COT'
     }
-
+    
     # Add experiment condition to dataframe
     df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
-
-    # Remove all rows with 'other' experiment and with '0-control-COT' experiment
-    df = df[~df['experiment'].isin(['other', '0-control-COT'])]
+    
+    # Remove all rows with 'other' experiment
+    df = df[df['experiment'] != 'other']
+    
+    # Create ordered category for experiment conditions
+    experiment_order = ['control', 'coordinate-none', 'coordinate-COT']
+    df['experiment'] = pd.Categorical(df['experiment'], categories=experiment_order, ordered=True)
 
     # Calculate top_prop_answered
     df['top_prop_answered'] = df['top_option_count'] / df['answered_count']
