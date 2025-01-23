@@ -167,13 +167,13 @@ def create_charts_3_and_4():
     return fig
 
 def create_charts_5_and_6():
-    """Create line charts for LLaMA models and GPT-4o"""
+    """Create line charts for LLaMA models"""
     data = prepare_graph_data()
     import numpy as np
     
-    # Filter models - LLaMA models + GPT-4o
+    # Filter models - LLaMA models only
     selected_models = [
-        'llama-31-405b', 'llama-31-70b', 'llama-31-8b', 'claude-35-sonnet'
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
     ]
     
     # Prepare data for plotting
