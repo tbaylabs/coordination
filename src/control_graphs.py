@@ -11,12 +11,32 @@ from prepare_graph_data import prepare_graph_data
 ## For the standard one, lets call it with llama 31 models, gpt 4o, and sonnet 
 ## Call the reasoning one with o1-mini and r1
 
-def calculate_condition_differences():
-    """Calculate and return differences between control and coordinate conditions"""
+def calculate_reasoning_differences(models):
+    """Calculate differences between control and coordinate for reasoning models"""
     data = prepare_graph_data()
-    
-    # We'll use top_prop_all as the main metric
     metric_data = data['top_prop_all']
+    
+    # Filter for reasoning models
+    metric_data = metric_data.loc[models]
+    
+    # Calculate differences (only control vs coordinate)
+    differences = pd.DataFrame({
+        'control_coordinate_diff': metric_data['coordinate'] - metric_data['control']
+    })
+    
+    # Add model names and sort by coordinate performance
+    differences['model'] = differences.index
+    differences = differences.sort_values('control_coordinate_diff', ascending=False)
+    
+    return differences
+
+def calculate_standard_differences(models):
+    """Calculate differences between conditions for standard models"""
+    data = prepare_graph_data()
+    metric_data = data['top_prop_all']
+    
+    # Filter for standard models
+    metric_data = metric_data.loc[models]
     
     # Calculate differences
     differences = pd.DataFrame({
@@ -24,25 +44,38 @@ def calculate_condition_differences():
         'control_cot_diff': metric_data['coordinate-COT'] - metric_data['control']
     })
     
-    # Add model names as a column
+    # Add model names and sort by coordinate-COT performance
     differences['model'] = differences.index
-    
-    # Sort by largest control_coordinate_diff first
-    differences = differences.sort_values('control_coordinate_diff', ascending=False)
+    differences = differences.sort_values('control_cot_diff', ascending=False)
     
     return differences
 
-def print_condition_differences():
-    """Print a formatted table showing condition differences"""
-    differences = calculate_condition_differences()
+def print_reasoning_differences():
+    """Print formatted table for reasoning models"""
+    reasoning_models = ['o1-mini', 'deepseek-r1']
+    differences = calculate_reasoning_differences(reasoning_models)
     
-    # Format the differences as percentages
+    # Format as percentages
+    formatted_diff = differences.copy()
+    formatted_diff['control_coordinate_diff'] = formatted_diff['control_coordinate_diff'].apply(lambda x: f"{x:.1%}")
+    
+    print("\nReasoning Models - Differences (positive = coordinate better than control):")
+    print_nice_dataframe(formatted_diff[['model', 'control_coordinate_diff']])
+
+def print_standard_differences():
+    """Print formatted table for standard models"""
+    standard_models = [
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b',
+        'gpt-4o', 'claude-35-sonnet'
+    ]
+    differences = calculate_standard_differences(standard_models)
+    
+    # Format as percentages
     formatted_diff = differences.copy()
     formatted_diff['control_coordinate_diff'] = formatted_diff['control_coordinate_diff'].apply(lambda x: f"{x:.1%}")
     formatted_diff['control_cot_diff'] = formatted_diff['control_cot_diff'].apply(lambda x: f"{x:.1%}")
     
-    # Print with nice formatting
-    print("\nDifferences between conditions (positive = coordinate better than control):")
+    print("\nStandard Models - Differences (positive = coordinate better than control):")
     print_nice_dataframe(formatted_diff[['model', 'control_coordinate_diff', 'control_cot_diff']])
 
 def print_nice_dataframe(df, max_rows=20, show_index=False):
@@ -62,4 +95,5 @@ def print_nice_dataframe(df, max_rows=20, show_index=False):
                      showindex=show_index))
 
 if __name__ == "__main__":
-    print_condition_differences()
+    print_reasoning_differences()
+    print_standard_differences()
