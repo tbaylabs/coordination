@@ -11,6 +11,8 @@ from prepare_graph_data import prepare_graph_data
 ## For the standard one, lets call it with llama 31 models, gpt 4o, and sonnet 
 ## Call the reasoning one with o1-mini and r1
 
+##todo: include in the tables generated absolute differences (where you just deduct one percentage from the other) and proportional changes
+
 def calculate_reasoning_differences(models):
     """Calculate differences between control and coordinate for reasoning models"""
     data = prepare_graph_data()
