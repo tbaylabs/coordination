@@ -191,11 +191,6 @@ def create_charts_5_and_6():
         # Get the metric data for selected models
         metric_data = data[metric].loc[selected_models]
         
-        # Remove coordinate-COT for o1-mini and deepseek-r1
-        for model in ['o1-mini', 'deepseek-r1']:
-            if model in metric_data.index:
-                metric_data.loc[model, 'coordinate-COT'] = np.nan
-        
         # Plot each model's line
         for model in selected_models:
             if model in metric_data.index:
@@ -203,23 +198,19 @@ def create_charts_5_and_6():
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
                 
-                # Add horizontal dotted line for reasoning models
-                if model in ['o1-mini', 'deepseek-r1']:
-                    # Get the coordinate value
-                    coord_value = metric_data.loc[model, 'coordinate']
-                    if not pd.isna(coord_value):
-                        # Draw dotted line from coordinate to coordinate-COT
-                        ax.hlines(y=coord_value, 
-                                 xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
-                                 colors=line.get_color(), 
-                                 linestyles='dotted')
+                # Get the control value and draw horizontal dotted line across all conditions
+                control_value = metric_data.loc[model, 'control']
+                ax.hlines(y=control_value, 
+                         xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                         colors=line.get_color(), 
+                         linestyles='dotted')
         
         # Set plot properties
         ax.set_title(title)
         ax.set_xlabel('Condition')
         ax.set_ylabel('Proportion')
-        ax.set_ylim(0, 1)
-        ax.grid(True)
+        ax.set_ylim(0.3, 0.7)
+        ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     plt.tight_layout()
