@@ -168,3 +168,43 @@ def refresh_results(results_file_path, n=120):
         json.dump(results_data, file, indent=4)
     
     gather_results(results_file_path, answer_extraction_path, n)
+
+def refresh_all_results(n=120):
+    """
+    Refreshes all results files in the 3_results folder that have exactly n results.
+    
+    Args:
+        n (int): The expected number of results in each file (default 120)
+    """
+    project_root = Path(__file__).parent.parent.parent
+    results_dir = project_root / "pipeline" / "3_results"
+    
+    if not results_dir.exists():
+        raise FileNotFoundError(f"Results directory not found: {results_dir}")
+    
+    refreshed_count = 0
+    skipped_count = 0
+    
+    for results_file in results_dir.glob("*.json"):
+        try:
+            with open(results_file, 'r') as file:
+                results_data = json.load(file)
+            
+            current_results = len(results_data.get("results", []))
+            
+            if current_results != n:
+                print(f"Warning: Skipping {results_file.name} - has {current_results} results (expected {n})")
+                skipped_count += 1
+                continue
+                
+            refresh_results(str(results_file), n)
+            refreshed_count += 1
+            print(f"Refreshed: {results_file.name}")
+            
+        except Exception as e:
+            print(f"Error processing {results_file.name}: {str(e)}")
+            skipped_count += 1
+    
+    print(f"\nRefresh complete:")
+    print(f"  Files refreshed: {refreshed_count}")
+    print(f"  Files skipped: {skipped_count}")
