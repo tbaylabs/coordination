@@ -1,6 +1,23 @@
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+# Configure matplotlib to use a modern style
+mpl.rcParams.update({
+    'figure.facecolor': 'white',
+    'axes.grid': True,
+    'grid.linestyle': '--',
+    'grid.alpha': 0.5,
+    'axes.facecolor': 'white',
+    'axes.edgecolor': 'black',
+    'axes.linewidth': 0.8,
+    'font.size': 12,
+    'legend.frameon': True,
+    'legend.framealpha': 0.8,
+    'legend.facecolor': 'white',
+    'legend.edgecolor': 'black'
+})
 
 # Define consistent color palette for all models
 MODEL_COLORS = {
