@@ -67,7 +67,6 @@ def prepare_graph_data():
 
 def create_charts_1_and_2():
     """Create line charts for LLaMA models and GPT-4o"""
-    print("Creating chart 1 and 2")
     data = prepare_graph_data()
     import numpy as np
     
@@ -125,13 +124,18 @@ def create_charts_1_and_2():
         ax.set_ylim(0, 1)
         ax.grid(True)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        # Add chart number in top right
+        ax.text(1.02, 1.02, '#3' if metric == 'top_prop_all' else '#4', 
+               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
+        # Add chart number in top right
+        ax.text(1.02, 1.02, '#1' if metric == 'top_prop_all' else '#2', 
+               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
     
     plt.tight_layout()
     return fig
 
 def create_charts_3_and_4():
     """Create line charts for Sonnet, reasoning models and GPT-4o"""
-    print("Creating chart 3 and 4")
     data = prepare_graph_data()
     import numpy as np
     
@@ -194,7 +198,6 @@ def create_charts_3_and_4():
 
 def create_charts_5_and_6():
     """Create line charts for LLaMA models"""
-    print("Creating chart 5 and 6")
     data = prepare_graph_data()
     import numpy as np
     
@@ -238,13 +241,15 @@ def create_charts_5_and_6():
         ax.set_ylim(0.3, 0.7)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        # Add chart number in top right
+        ax.text(1.02, 1.02, '#5' if metric == 'top_prop_all' else '#6', 
+               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
     
     plt.tight_layout()
     return fig
 
 def create_charts_7_and_8():
     """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o"""
-    print("Creating chart 7 and 8")
     data = prepare_graph_data()
     import numpy as np
     
@@ -295,6 +300,9 @@ def create_charts_7_and_8():
         ax.set_ylim(0.25, 1)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        # Add chart number in top right
+        ax.text(1.02, 1.02, '#7' if metric == 'top_prop_all' else '#8', 
+               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
     
     plt.tight_layout()
     return fig
