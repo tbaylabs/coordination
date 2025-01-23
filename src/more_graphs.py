@@ -140,9 +140,12 @@ def create_charts_3_and_4():
             if model in metric_data.index:
                 metric_data.loc[model, 'coordinate-COT'] = np.nan
         
-        # Plot each model's line
-        for model in selected_models:
-            if model in metric_data.index:
+        # Sort models by their performance in the coordinate condition (descending)
+        sorted_models = metric_data['coordinate'].sort_values(ascending=False).index.tolist()
+                
+        # Plot each model's line in sorted order
+        for model in sorted_models:
+            if model in selected_models and model in metric_data.index:
                 line, = ax.plot(metric_data.columns, metric_data.loc[model], 
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
