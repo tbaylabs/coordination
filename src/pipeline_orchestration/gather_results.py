@@ -132,12 +132,18 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
         elif result["extracted_by"] == "human":
             extraction_counts["extracted_by_human_count"] += 1
 
-    # Add results-summary and extraction counts to the JSON structure
-    results_data["results-summary"] = {**results_summary, **extraction_counts}
+    # Create a new ordered dictionary with results-summary first
+    ordered_data = {
+        "pipeline-hash": results_data.get("pipeline-hash"),
+        "overview": results_data.get("overview"),
+        "pipeline-paths": results_data.get("pipeline-paths"),
+        "results-summary": {**results_summary, **extraction_counts},
+        "results": results_data.get("results", [])
+    }
 
-    # Save the updated results JSON file
+    # Save the updated results JSON file with ordered structure
     with open(results_file_path, 'w') as file:
-        json.dump(results_data, file, indent=4)
+        json.dump(ordered_data, file, indent=4)
 
 def refresh_results(results_file_path, n=120):
     """
