@@ -66,8 +66,19 @@ def create_charts_1_and_2():
         # Plot each model's line
         for model in selected_models:
             if model in metric_data.index:
-                ax.plot(metric_data.columns, metric_data.loc[model], 
-                       marker='o', label=model)
+                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                              marker='o', label=model)
+                
+                # Add horizontal dotted line for reasoning models
+                if model in ['o1-mini', 'deepseek-r1']:
+                    # Get the coordinate value
+                    coord_value = metric_data.loc[model, 'coordinate']
+                    if not pd.isna(coord_value):
+                        # Draw dotted line from coordinate to coordinate-COT
+                        ax.hlines(y=coord_value, 
+                                 xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
+                                 colors=line.get_color(), 
+                                 linestyles='dotted')
         
         # Set plot properties
         ax.set_title(title)
