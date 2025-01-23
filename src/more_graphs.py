@@ -216,13 +216,13 @@ def create_charts_5_and_6():
     return fig
 
 def create_charts_7_and_8():
-    """Create line charts for LLaMA models"""
+    """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o"""
     data = prepare_graph_data()
     import numpy as np
     
-    # Filter models - LLaMA models only
+    # Filter models - LLaMA 33 70b, Sonnet and GPT-4o
     selected_models = [
-        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
+        'llama-33-70b', 'claude-35-sonnet', 'gpt-4o'
     ]
     
     # Prepare data for plotting
@@ -257,7 +257,7 @@ def create_charts_7_and_8():
         ax.set_title(title)
         ax.set_xlabel('Condition')
         ax.set_ylabel('Proportion')
-        ax.set_ylim(0.3, 0.7)
+        ax.set_ylim(0.25, 1)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
