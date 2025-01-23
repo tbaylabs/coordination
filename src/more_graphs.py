@@ -2,6 +2,18 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Define consistent color palette for all models
+MODEL_COLORS = {
+    'llama-31-405b': '#1f77b4',  # blue
+    'llama-31-70b': '#ff7f0e',   # orange
+    'llama-31-8b': '#2ca02c',    # green
+    'llama-33-70b': '#17becf',   # cyan
+    'gpt-4o': '#d62728',         # red
+    'claude-35-sonnet': '#9467bd',  # purple
+    'o1-mini': '#8c564b',        # brown
+    'deepseek-r1': '#e377c2'     # pink
+}
+
 def prepare_graph_data():
     """Prepare and return the processed data for chart creation"""
     # Read and process data
@@ -70,7 +82,8 @@ def create_charts_1_and_2():
         for model in selected_models:
             if model in metric_data.index:
                 line, = ax.plot(metric_data.columns, metric_data.loc[model], 
-                              marker='o', label=model)
+                              marker='o', label=model,
+                              color=MODEL_COLORS[model])
                 
                 # Add horizontal dotted line for reasoning models
                 if model in ['o1-mini', 'deepseek-r1']:
@@ -128,7 +141,8 @@ def create_charts_3_and_4():
         for model in selected_models:
             if model in metric_data.index:
                 line, = ax.plot(metric_data.columns, metric_data.loc[model], 
-                              marker='o', label=model)
+                              marker='o', label=model,
+                              color=MODEL_COLORS[model])
                 
                 # Add horizontal dotted line for reasoning models
                 if model in ['o1-mini', 'deepseek-r1']:
