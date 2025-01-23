@@ -105,3 +105,59 @@ def create_llm_extract_chart():
     
     plt.tight_layout()
     return fig
+
+def get_token_count_data(metric='avg_token_count'):
+    """
+    Return processed token count data for use in notebooks
+    
+    Args:
+        metric (str): Which token metric to use ('avg_token_count' or 'median_token_count')
+    """
+    # Read the raw data
+    df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
+    
+    # Create experiment condition mapping
+    conditions = {
+        ('control', 'none'): 'control',
+        ('coordinate', 'none'): 'coordinate',
+        ('coordinate', 'step-by-step'): 'coordinate-COT'
+    }
+    df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
+    
+    # Remove 'other' experiments
+    df = df[df['experiment'] != 'other']
+    
+    # Group by model and experiment, calculate mean of the selected metric
+    token_data = df.groupby(['model_name', 'experiment'])[metric].mean().unstack()
+    
+    # Sort models by their token count in the coordinate condition
+    token_data = token_data.loc[token_data['coordinate'].sort_values(ascending=False).index]
+    
+    return token_data
+
+def create_token_count_chart(metric='avg_token_count'):
+    """
+    Create and return figure showing token counts across models and conditions
+    
+    Args:
+        metric (str): Which token metric to plot ('avg_token_count' or 'median_token_count')
+    """
+    token_data = get_token_count_data(metric)
+    
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot each model's data
+    for model in token_data.index:
+        ax.plot(token_data.columns, token_data.loc[model], marker='o', label=model)
+    
+    # Set plot properties
+    metric_name = 'Average' if metric == 'avg_token_count' else 'Median'
+    ax.set_title(f'{metric_name} Token Count by Model and Condition')
+    ax.set_xlabel('Condition')
+    ax.set_ylabel(f'{metric_name} Token Count')
+    ax.grid(True)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
