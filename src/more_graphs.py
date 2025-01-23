@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from prepare_graph_data import prepare_graph_data
 
 # Configure matplotlib to use a modern style
 mpl.rcParams.update({
