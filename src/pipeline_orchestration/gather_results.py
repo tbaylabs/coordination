@@ -1,6 +1,8 @@
 """
 Functions for gathering and summarizing results from the data collection pipeline.
 """
+import warnings
+warnings.filterwarnings("ignore", message="Valid config keys have changed in V2")
 
 import json
 from pathlib import Path
