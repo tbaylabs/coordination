@@ -109,6 +109,14 @@ def aggregate_trial_results(results_folder_path=None):
             min_token_count = token_stats.get("min_token_count", 0)
             max_token_count = token_stats.get("max_token_count", 0)
             total_token_count = token_stats.get("total_token_count", 0)
+            
+            # Get before-answer token statistics
+            before_answer_stats = results_summary.get("token_statistics_before_answer", {})
+            avg_before_answer_token_count = before_answer_stats.get("average_token_count", 0)
+            median_before_answer_token_count = before_answer_stats.get("median_token_count", 0)
+            min_before_answer_token_count = before_answer_stats.get("min_token_count", 0)
+            max_before_answer_token_count = before_answer_stats.get("max_token_count", 0)
+            total_before_answer_token_count = before_answer_stats.get("total_token_count", 0)
 
             # Get extraction counts from results summary
             extracted_by_rule_count = results_summary.get("extracted_by_rule_count", 0)
@@ -156,7 +164,12 @@ def aggregate_trial_results(results_folder_path=None):
                 "median_token_count": median_token_count,
                 "min_token_count": min_token_count,
                 "max_token_count": max_token_count,
-                "total_token_count": total_token_count
+                "total_token_count": total_token_count,
+                "avg_before_answer_token_count": avg_before_answer_token_count,
+                "median_before_answer_token_count": median_before_answer_token_count,
+                "min_before_answer_token_count": min_before_answer_token_count,
+                "max_before_answer_token_count": max_before_answer_token_count,
+                "total_before_answer_token_count": total_before_answer_token_count
             })
 
         except Exception as e:
