@@ -44,7 +44,7 @@ def create_charts_1_and_2():
     # Filter models - LLaMA models + GPT-4o
     selected_models = [
         'llama-31-405b', 'llama-31-70b', 'llama-31-8b',
-        'gpt-4o'
+        'llama-33-70b'
     ]
     
     # Prepare data for plotting
