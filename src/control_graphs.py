@@ -21,14 +21,17 @@ def calculate_reasoning_differences(models):
     # Filter for reasoning models
     metric_data = metric_data.loc[models]
     
-    # Calculate differences (only control vs coordinate)
+    # Calculate absolute and proportional differences
     differences = pd.DataFrame({
-        'control_coordinate_diff': metric_data['coordinate'] - metric_data['control']
+        'control_value': metric_data['control'],
+        'coordinate_value': metric_data['coordinate'],
+        'absolute_diff': metric_data['coordinate'] - metric_data['control'],
+        'proportional_change': (metric_data['coordinate'] - metric_data['control']) / metric_data['control']
     })
     
     # Add model names and sort by coordinate performance
     differences['model'] = differences.index
-    differences = differences.sort_values('control_coordinate_diff', ascending=False)
+    differences = differences.sort_values('absolute_diff', ascending=False)
     
     return differences
 
@@ -40,15 +43,20 @@ def calculate_standard_differences(models):
     # Filter for standard models
     metric_data = metric_data.loc[models]
     
-    # Calculate differences
+    # Calculate absolute and proportional differences
     differences = pd.DataFrame({
-        'control_coordinate_diff': metric_data['coordinate'] - metric_data['control'],
-        'control_cot_diff': metric_data['coordinate-COT'] - metric_data['control']
+        'control_value': metric_data['control'],
+        'coordinate_value': metric_data['coordinate'],
+        'coordinate_cot_value': metric_data['coordinate-COT'],
+        'absolute_diff_coordinate': metric_data['coordinate'] - metric_data['control'],
+        'absolute_diff_cot': metric_data['coordinate-COT'] - metric_data['control'],
+        'proportional_change_coordinate': (metric_data['coordinate'] - metric_data['control']) / metric_data['control'],
+        'proportional_change_cot': (metric_data['coordinate-COT'] - metric_data['control']) / metric_data['control']
     })
     
     # Add model names and sort by coordinate-COT performance
     differences['model'] = differences.index
-    differences = differences.sort_values('control_cot_diff', ascending=False)
+    differences = differences.sort_values('absolute_diff_cot', ascending=False)
     
     return differences
 
@@ -57,12 +65,16 @@ def print_reasoning_differences():
     reasoning_models = ['o1-mini', 'deepseek-r1']
     differences = calculate_reasoning_differences(reasoning_models)
     
-    # Format as percentages
+    # Format values
     formatted_diff = differences.copy()
-    formatted_diff['control_coordinate_diff'] = formatted_diff['control_coordinate_diff'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['control_value'] = formatted_diff['control_value'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['coordinate_value'] = formatted_diff['coordinate_value'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['absolute_diff'] = formatted_diff['absolute_diff'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['proportional_change'] = formatted_diff['proportional_change'].apply(lambda x: f"{x:.1%}")
     
     print("\nReasoning Models - Differences (positive = coordinate better than control):")
-    print_nice_dataframe(formatted_diff[['model', 'control_coordinate_diff']])
+    print_nice_dataframe(formatted_diff[['model', 'control_value', 'coordinate_value', 
+                                       'absolute_diff', 'proportional_change']])
 
 def print_standard_differences():
     """Print formatted table for standard models"""
@@ -72,13 +84,20 @@ def print_standard_differences():
     ]
     differences = calculate_standard_differences(standard_models)
     
-    # Format as percentages
+    # Format values
     formatted_diff = differences.copy()
-    formatted_diff['control_coordinate_diff'] = formatted_diff['control_coordinate_diff'].apply(lambda x: f"{x:.1%}")
-    formatted_diff['control_cot_diff'] = formatted_diff['control_cot_diff'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['control_value'] = formatted_diff['control_value'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['coordinate_value'] = formatted_diff['coordinate_value'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['coordinate_cot_value'] = formatted_diff['coordinate_cot_value'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['absolute_diff_coordinate'] = formatted_diff['absolute_diff_coordinate'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['absolute_diff_cot'] = formatted_diff['absolute_diff_cot'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['proportional_change_coordinate'] = formatted_diff['proportional_change_coordinate'].apply(lambda x: f"{x:.1%}")
+    formatted_diff['proportional_change_cot'] = formatted_diff['proportional_change_cot'].apply(lambda x: f"{x:.1%}")
     
     print("\nStandard Models - Differences (positive = coordinate better than control):")
-    print_nice_dataframe(formatted_diff[['model', 'control_coordinate_diff', 'control_cot_diff']])
+    print_nice_dataframe(formatted_diff[['model', 'control_value', 'coordinate_value', 'coordinate_cot_value',
+                                       'absolute_diff_coordinate', 'absolute_diff_cot',
+                                       'proportional_change_coordinate', 'proportional_change_cot']])
 
 def print_nice_dataframe(df, max_rows=20, show_index=False):
     """Generic function for nicely printing any DataFrame.
