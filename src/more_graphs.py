@@ -8,7 +8,7 @@ def prepare_graph_data():
     # Create experiment condition mapping with ordering
     conditions = {
         ('control', 'none'): 'control',
-        ('coordinate', 'none'): 'coordinate-none',
+        ('coordinate', 'none'): 'coordinate',
         ('coordinate', 'step-by-step'): 'coordinate-COT'
     }
     
@@ -19,7 +19,7 @@ def prepare_graph_data():
     df = df[df['experiment'] != 'other']
     
     # Create ordered category for experiment conditions
-    experiment_order = ['control', 'coordinate-none', 'coordinate-COT']
+    experiment_order = ['control', 'coordinate', 'coordinate-COT']
     df['experiment'] = pd.Categorical(df['experiment'], categories=experiment_order, ordered=True)
 
     # Calculate top_prop_answered
@@ -33,6 +33,13 @@ def prepare_graph_data():
     }
 
     return data
+
+### For reference, here are the column names: file_name,model_name,temperature,xml_prompt,task_instruction,task_reasoning,task_options,top_option_name,top_option_count,second_option_name,second_option_count,third_option_name,third_option_count,fourth_option_name,fourth_option_count,unanswered_count,answered_count,total_count,unanswered_prop,top_prop_all,second_prop_all,third_prop_all,fourth_prop_all,convergence_answered,convergence_all,extracted_by_rule_count,extracted_by_llm_count,extracted_by_human_count,extracted_by_rule_prop,extracted_by_llm_prop,extracted_by_human_prop
+### create a function to plot chart 1 and 2.
+### It should contain only llama-31-405b, llama-31-70b, llama-31-8b, claude-35-sonnet, llama-33-70b, o1-mini, deepseek-r1 (those are model_name values)
+### For o1-mini and deepseek-r1 it should only include the data for the control and coordinate conditions (not coordinate-COT)
+### I want the first chart to be top_prop_all and the second to use top_prop_answered. For each condition, get the average of the model across all the task_options.
+### Have a line graph where from left to right we have control, coordinate and coordinate-COT and a line showing the average performance on the metric for each model across the task options for that condition
 
 
 if __name__ == '__main__':
