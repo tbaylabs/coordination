@@ -102,6 +102,14 @@ def aggregate_trial_results(results_folder_path=None):
             else:
                 convergence_all = None
 
+            # Get token statistics from results summary
+            token_stats = results_summary.get("token_statistics", {})
+            avg_token_count = token_stats.get("average_token_count", 0)
+            median_token_count = token_stats.get("median_token_count", 0)
+            min_token_count = token_stats.get("min_token_count", 0)
+            max_token_count = token_stats.get("max_token_count", 0)
+            total_token_count = token_stats.get("total_token_count", 0)
+
             # Get extraction counts from results summary
             extracted_by_rule_count = results_summary.get("extracted_by_rule_count", 0)
             extracted_by_llm_count = results_summary.get("extracted_by_llm_count", 0)
@@ -143,7 +151,12 @@ def aggregate_trial_results(results_folder_path=None):
                 "extracted_by_human_count": extracted_by_human_count,
                 "extracted_by_rule_prop": extracted_by_rule_prop,
                 "extracted_by_llm_prop": extracted_by_llm_prop,
-                "extracted_by_human_prop": extracted_by_human_prop
+                "extracted_by_human_prop": extracted_by_human_prop,
+                "avg_token_count": avg_token_count,
+                "median_token_count": median_token_count,
+                "min_token_count": min_token_count,
+                "max_token_count": max_token_count,
+                "total_token_count": total_token_count
             })
 
         except Exception as e:
