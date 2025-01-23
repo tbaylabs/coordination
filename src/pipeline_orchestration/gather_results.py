@@ -82,7 +82,8 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             "extracted_answer": extracted_answer,
             "extracted_by": extracted_by,
             "extraction_attempt_id": answer_extraction_entry["extraction_attempt_id"],
-            "call_id": answer_extraction_entry["call_id"]
+            "call_id": answer_extraction_entry["call_id"],
+            "content_received": answer_extraction_entry.get("content_received")
         }
 
     # Process the answer_extraction_log
@@ -137,3 +138,33 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     # Save the updated results JSON file
     with open(results_file_path, 'w') as file:
         json.dump(results_data, file, indent=4)
+
+def refresh_results(results_file_path, n):
+    """
+    Refreshes the results by re-running gather_results using the associated answer extraction file.
+    
+    Args:
+        results_file_path (str): Path to the results JSON file to refresh
+        n (int): The maximum result_number to process (1 to n)
+    """
+    # Load the results file to get the answer extraction path
+    project_root = Path(__file__).parent.parent.parent
+    results_file_path = (project_root / Path(results_file_path)).resolve()
+    
+    if not results_file_path.exists():
+        raise FileNotFoundError(f"The file {results_file_path} does not exist.")
+
+    with open(results_file_path, 'r') as file:
+        results_data = json.load(file)
+    
+    # Get the answer extraction path from pipeline-paths
+    answer_extraction_path = results_data.get("pipeline-paths", {}).get("answer_extraction")
+    if not answer_extraction_path:
+        raise ValueError("Results file is missing required pipeline-paths.answer_extraction path")
+    
+    # Clear existing results and re-run gather_results
+    results_data["results"] = []
+    with open(results_file_path, 'w') as file:
+        json.dump(results_data, file, indent=4)
+    
+    gather_results(results_file_path, answer_extraction_path, n)
