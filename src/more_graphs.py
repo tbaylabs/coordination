@@ -7,8 +7,8 @@ def prepare_graph_data():
 
     # Create experiment condition mapping
     conditions = {
-        ('control', 'none'): '1-control',
         ('control', 'step-by-step'): '0-control-COT',
+        ('control', 'none'): '1-control',
         ('coordinate', 'none'): '2-coordinate-none',
         ('coordinate', 'step-by-step'): '3-coordinate-COT'
     }
