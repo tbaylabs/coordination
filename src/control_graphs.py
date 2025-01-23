@@ -1,4 +1,4 @@
-import tabulate
+from tabulate import tabulate
 import pandas as pd
 from prepare_graph_data import prepare_graph_data
 
