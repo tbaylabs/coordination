@@ -41,7 +41,7 @@ def create_charts_1_and_2():
     # Filter models and conditions
     selected_models = [
         'llama-31-405b', 'llama-31-70b', 'llama-31-8b', 
-        'claude-35-sonnet', 'llama-33-70b', 'o1-mini', 'deepseek-r1'
+        'claude-35-sonnet', 'o1-mini', 'deepseek-r1'
     ]
     
     # Prepare data for plotting
