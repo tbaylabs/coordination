@@ -60,6 +60,26 @@ def create_llm_extract_chart():
     plt.tight_layout()
     return fig
 
-if __name__ == "__main__":
-    fig = create_llm_extract_chart()
-    plt.show()
+def get_llm_extract_data():
+    """Return the processed LLM extract data for use in notebooks"""
+    # Read the raw data
+    df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
+    
+    # Create experiment condition mapping
+    conditions = {
+        ('control', 'none'): 'control',
+        ('coordinate', 'none'): 'coordinate',
+        ('coordinate', 'step-by-step'): 'coordinate-COT'
+    }
+    df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
+    
+    # Remove 'other' experiments
+    df = df[df['experiment'] != 'other']
+    
+    # Group by model and experiment, calculate mean LLM extract proportion
+    llm_data = df.groupby(['model_name', 'experiment'])['extracted_by_llm_prop'].mean().unstack()
+    
+    # Sort models by their LLM extract proportion in the coordinate condition
+    llm_data = llm_data.loc[llm_data['coordinate'].sort_values(ascending=False).index]
+    
+    return llm_data
