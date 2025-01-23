@@ -83,3 +83,25 @@ def get_llm_extract_data():
     llm_data = llm_data.loc[llm_data['coordinate'].sort_values(ascending=False).index]
     
     return llm_data
+
+def create_llm_extract_chart():
+    """Create and return figure showing LLM extract proportions across conditions"""
+    llm_data = get_llm_extract_data()
+    
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot each model's data
+    for model in llm_data.index:
+        ax.plot(llm_data.columns, llm_data.loc[model], marker='o', label=model)
+    
+    # Set plot properties
+    ax.set_title('LLM Extract Proportion by Model and Condition')
+    ax.set_xlabel('Condition')
+    ax.set_ylabel('LLM Extract Proportion')
+    ax.set_ylim(0, 1)
+    ax.grid(True)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
