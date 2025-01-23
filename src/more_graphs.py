@@ -78,8 +78,9 @@ def create_charts_1_and_2():
             if model in metric_data.index:
                 metric_data.loc[model, 'coordinate-COT'] = np.nan
         
-        # Sort models by their performance in the coordinate condition (descending)
-        sorted_models = metric_data['coordinate'].sort_values(ascending=False).index.tolist()
+        # Sort models by their performance in the coordinate condition (ascending)
+        # So highest performance is at top of legend
+        sorted_models = metric_data['coordinate'].sort_values(ascending=True).index.tolist()
                 
         # Plot each model's line in sorted order
         for model in sorted_models:
