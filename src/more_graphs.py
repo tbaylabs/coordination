@@ -2,8 +2,9 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def prepare_graph_data():
-    # Read CSV into DataFrame
+def create_charts_1_and_2():
+    """Create line charts for top_prop_all and top_prop_answered metrics"""
+    # Prepare the data
     df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
 
     # Create experiment condition mapping with ordering
@@ -33,9 +34,7 @@ def prepare_graph_data():
         'convergence_all': df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
     }
 
-    return data
-
-def create_charts_1_and_2(data):
+    # Now create the charts
     """Create line charts for top_prop_all and top_prop_answered metrics"""
     import numpy as np
     
@@ -82,7 +81,3 @@ def create_charts_1_and_2(data):
     return fig
 
 
-if __name__ == '__main__':
-    data = prepare_graph_data()
-    fig = create_charts_1_and_2(data)
-    plt.show()
