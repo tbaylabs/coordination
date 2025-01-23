@@ -4,6 +4,8 @@ Functions for gathering and summarizing results from the data collection pipelin
 
 import json
 from pathlib import Path
+from litellm import token_counter
+import statistics
 
 def gather_results(results_file_path, answer_extraction_file_path, n):
     """
@@ -77,13 +79,30 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             raise ValueError(f"Invalid extraction state for result_number {answer_extraction_entry['result_number']}")
 
         # Return the results entry
+        # Get model name for token counting
+        model_name = overview.get("model_name")
+        if not model_name:
+            raise ValueError("Model name not found in overview")
+            
+        # Get litellm model name from mapping
+        with open(project_root / "model_mapping.json", "r") as f:
+            model_mapping = json.load(f)
+        litellm_model_name = model_mapping.get(model_name)
+        if not litellm_model_name:
+            raise ValueError(f"Model {model_name} not found in model_mapping.json")
+            
+        # Calculate token count
+        content = answer_extraction_entry.get("content_received", "")
+        token_count = token_counter(model=litellm_model_name, text=content)
+
         return {
             "results_number": answer_extraction_entry["result_number"],
             "extracted_answer": extracted_answer,
             "extracted_by": extracted_by,
             "extraction_attempt_id": answer_extraction_entry["extraction_attempt_id"],
             "call_id": answer_extraction_entry["call_id"],
-            "content_received": answer_extraction_entry.get("content_received")
+            "content_received": content,
+            "content_received_token_count": token_count
         }
 
     # Process the answer_extraction_log
@@ -110,6 +129,9 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     options_list_with_unanswered = options_list + ["unanswered"]
     results_summary = {option: 0 for option in options_list_with_unanswered}
     
+    # Initialize token count tracking
+    token_counts = []
+    
     # Initialize extraction method counters
     extraction_counts = {
         "extracted_by_rule_count": 0,
@@ -131,6 +153,20 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             extraction_counts["extracted_by_llm_count"] += 1
         elif result["extracted_by"] == "human":
             extraction_counts["extracted_by_human_count"] += 1
+            
+        # Track token counts
+        if "content_received_token_count" in result:
+            token_counts.append(result["content_received_token_count"])
+
+    # Add token statistics to results-summary
+    if token_counts:
+        results_summary["token_statistics"] = {
+            "average_token_count": statistics.mean(token_counts),
+            "median_token_count": statistics.median(token_counts),
+            "min_token_count": min(token_counts),
+            "max_token_count": max(token_counts),
+            "total_token_count": sum(token_counts)
+        }
 
     # Create a new ordered dictionary with results-summary first
     ordered_data = {
