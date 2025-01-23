@@ -34,14 +34,55 @@ def prepare_graph_data():
 
     return data
 
-### For reference, here are the column names: file_name,model_name,temperature,xml_prompt,task_instruction,task_reasoning,task_options,top_option_name,top_option_count,second_option_name,second_option_count,third_option_name,third_option_count,fourth_option_name,fourth_option_count,unanswered_count,answered_count,total_count,unanswered_prop,top_prop_all,second_prop_all,third_prop_all,fourth_prop_all,convergence_answered,convergence_all,extracted_by_rule_count,extracted_by_llm_count,extracted_by_human_count,extracted_by_rule_prop,extracted_by_llm_prop,extracted_by_human_prop
-### create a function to plot chart 1 and 2.
-### It should contain only llama-31-405b, llama-31-70b, llama-31-8b, claude-35-sonnet, llama-33-70b, o1-mini, deepseek-r1 (those are model_name values)
-### For o1-mini and deepseek-r1 it should only include the data for the control and coordinate conditions (not coordinate-COT)
-### I want the first chart to be top_prop_all and the second to use top_prop_answered. For each condition, get the average of the model across all the task_options.
-### Have a line graph where from left to right we have control, coordinate and coordinate-COT and a line showing the average performance on the metric for each model across the task options for that condition
+def create_charts_1_and_2(data):
+    """Create line charts for top_prop_all and top_prop_answered metrics"""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    # Filter models and conditions
+    selected_models = [
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b', 
+        'claude-35-sonnet', 'llama-33-70b', 'o1-mini', 'deepseek-r1'
+    ]
+    
+    # Prepare data for plotting
+    metrics = {
+        'top_prop_all': 'Top Option Proportion (All Responses)',
+        'top_prop_answered': 'Top Option Proportion (Answered Responses)'
+    }
+    
+    # Create figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12))
+    
+    # Plot each metric
+    for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
+        # Get the metric data for selected models
+        metric_data = data[metric].loc[selected_models]
+        
+        # Remove coordinate-COT for o1-mini and deepseek-r1
+        for model in ['o1-mini', 'deepseek-r1']:
+            if model in metric_data.index:
+                metric_data.loc[model, 'coordinate-COT'] = np.nan
+        
+        # Plot each model's line
+        for model in selected_models:
+            if model in metric_data.index:
+                ax.plot(metric_data.columns, metric_data.loc[model], 
+                       marker='o', label=model)
+        
+        # Set plot properties
+        ax.set_title(title)
+        ax.set_xlabel('Condition')
+        ax.set_ylabel('Proportion')
+        ax.set_ylim(0, 1)
+        ax.grid(True)
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
 
 
 if __name__ == '__main__':
     data = prepare_graph_data()
-    # Data is now ready for any additional analysis or charting
+    fig = create_charts_1_and_2(data)
+    plt.show()
