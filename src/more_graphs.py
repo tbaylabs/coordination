@@ -228,9 +228,16 @@ def create_charts_7_and_8():
     import numpy as np
     
     # Filter models - LLaMA 33 70b, Sonnet and GPT-4o
-    selected_models = [
+    base_models = [
         'llama-33-70b', 'claude-35-sonnet', 'gpt-4o'
     ]
+    
+    # Sort models by their performance on coordinate condition
+    selected_models = sorted(
+        base_models,
+        key=lambda model: data['top_prop_all'].loc[model, 'coordinate'],
+        reverse=True  # Highest first
+    )
     
     # Prepare data for plotting
     metrics = {
