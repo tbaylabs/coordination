@@ -91,9 +91,14 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
         if not litellm_model_name:
             raise ValueError(f"Model {model_name} not found in model_mapping.json")
             
-        # Calculate token count
+        # Calculate token counts
         content = answer_extraction_entry.get("content_received", "")
-        token_count = token_counter(model=litellm_model_name, text=content)
+        full_token_count = token_counter(model=litellm_model_name, text=content)
+        
+        # Calculate tokens before answer
+        answer_pos = content.find(extracted_answer)
+        content_before_answer = content[:answer_pos] if answer_pos != -1 else content
+        before_answer_token_count = token_counter(model=litellm_model_name, text=content_before_answer)
 
         return {
             "results_number": answer_extraction_entry["result_number"],
@@ -102,7 +107,8 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             "extraction_attempt_id": answer_extraction_entry["extraction_attempt_id"],
             "call_id": answer_extraction_entry["call_id"],
             "content_received": content,
-            "content_received_token_count": token_count
+            "content_received_token_count": full_token_count,
+            "content_before_answer_token_count": before_answer_token_count
         }
 
     # Process the answer_extraction_log
@@ -131,6 +137,7 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     
     # Initialize token count tracking
     token_counts = []
+    before_answer_token_counts = []
     
     # Initialize extraction method counters
     extraction_counts = {
@@ -157,6 +164,8 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
         # Track token counts
         if "content_received_token_count" in result:
             token_counts.append(result["content_received_token_count"])
+        if "content_before_answer_token_count" in result:
+            before_answer_token_counts.append(result["content_before_answer_token_count"])
 
     # Add token statistics to results-summary
     if token_counts:
@@ -166,6 +175,15 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
             "min_token_count": min(token_counts),
             "max_token_count": max(token_counts),
             "total_token_count": sum(token_counts)
+        }
+        
+    if before_answer_token_counts:
+        results_summary["token_statistics_before_answer"] = {
+            "average_token_count": statistics.mean(before_answer_token_counts),
+            "median_token_count": statistics.median(before_answer_token_counts),
+            "min_token_count": min(before_answer_token_counts),
+            "max_token_count": max(before_answer_token_counts),
+            "total_token_count": sum(before_answer_token_counts)
         }
 
     # Create a new ordered dictionary with results-summary first
