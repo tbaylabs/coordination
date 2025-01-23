@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def prepare_graph_data():
     # Read CSV into DataFrame
@@ -36,7 +37,6 @@ def prepare_graph_data():
 
 def create_charts_1_and_2(data):
     """Create line charts for top_prop_all and top_prop_answered metrics"""
-    import matplotlib.pyplot as plt
     import numpy as np
     
     # Filter models and conditions
