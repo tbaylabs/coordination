@@ -139,7 +139,7 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     with open(results_file_path, 'w') as file:
         json.dump(results_data, file, indent=4)
 
-def refresh_results(results_file_path, n):
+def refresh_results(results_file_path, n=120):
     """
     Refreshes the results by re-running gather_results using the associated answer extraction file.
     
