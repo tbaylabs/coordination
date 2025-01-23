@@ -41,9 +41,9 @@ def prepare_graph_data():
 
     # Prepare data for different metrics
     data = {
-        'top_prop_answered': df.groupby(['model_name', 'experiment'])['top_prop_answered'].mean().unstack(),
-        'top_prop_all': df.groupby(['model_name', 'experiment'])['top_prop_all'].mean().unstack(),
-        'convergence_all': df.groupby(['model_name', 'experiment'])['convergence_all'].mean().unstack()
+        'top_prop_answered': df.groupby(['model_name', 'experiment'], observed=True)['top_prop_answered'].mean().unstack(),
+        'top_prop_all': df.groupby(['model_name', 'experiment'], observed=True)['top_prop_all'].mean().unstack(),
+        'convergence_all': df.groupby(['model_name', 'experiment'], observed=True)['convergence_all'].mean().unstack()
     }
     
     return data
