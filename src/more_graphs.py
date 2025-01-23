@@ -214,3 +214,52 @@ def create_charts_5_and_6():
     
     plt.tight_layout()
     return fig
+
+def create_charts_7_and_8():
+    """Create line charts for LLaMA models"""
+    data = prepare_graph_data()
+    import numpy as np
+    
+    # Filter models - LLaMA models only
+    selected_models = [
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
+    ]
+    
+    # Prepare data for plotting
+    metrics = {
+        'top_prop_all': 'Top Option Proportion (All Responses)',
+        'top_prop_answered': 'Top Option Proportion (Answered Responses)'
+    }
+    
+    # Create figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12))
+    
+    # Plot each metric
+    for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
+        # Get the metric data for selected models
+        metric_data = data[metric].loc[selected_models]
+        
+        # Plot each model's line
+        for model in selected_models:
+            if model in metric_data.index:
+                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                              marker='o', label=model,
+                              color=MODEL_COLORS[model])
+                
+                # Get the control value and draw horizontal dotted line across all conditions
+                control_value = metric_data.loc[model, 'control']
+                ax.hlines(y=control_value, 
+                         xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                         colors=line.get_color(), 
+                         linestyles='dotted')
+        
+        # Set plot properties
+        ax.set_title(title)
+        ax.set_xlabel('Condition')
+        ax.set_ylabel('Proportion')
+        ax.set_ylim(0.3, 0.7)
+        ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
