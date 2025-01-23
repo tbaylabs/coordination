@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 # Define consistent color palette for all models
 MODEL_COLORS = {
     'llama-31-405b': '#1f77b4',  # blue
-    'llama-31-70b': '#ff7f0e',   # orange
-    'llama-31-8b': '#2ca02c',    # green
-    'llama-33-70b': '#17becf',   # cyan
-    'gpt-4o': '#d62728',         # red
-    'claude-35-sonnet': '#9467bd',  # purple
-    'o1-mini': '#8c564b',        # brown
-    'deepseek-r1': '#e377c2'     # pink
+    'llama-31-70b': '#2ca02c',   # green
+    'llama-31-8b': '#d62728',    # red
+    'llama-33-70b': '#9467bd',   # purple
+    'gpt-4o': '#ff7f0e',         # orange
+    'claude-35-sonnet': '#8c564b',  # brown
+    'o1-mini': '#e377c2',        # pink
+    'deepseek-r1': '#17becf'     # cyan
 }
 
 def prepare_graph_data():
