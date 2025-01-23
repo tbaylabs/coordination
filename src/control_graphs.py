@@ -2,17 +2,6 @@ from tabulate import tabulate
 import pandas as pd
 from prepare_graph_data import prepare_graph_data
 
-## There should be two types of condition graphs created by seperate functions.
-## Each should be able to take a list of models and then filter only for those models.
-## One should be for reasoning models. In this case we are only comparing the difference between control and coordinate (none), but these should be labelled as control and coordinate
-## The other should be for standard models. In this case we use the differences we already have below.
-## The order the models from top to bottom on their performance on coordinate(COT) in the case of the standard models and coordinate in the case of the reasoning models
-## Then in execution, For the reasoning models function, call the function with r1 and o1-mini only. 
-## For the standard one, lets call it with llama 31 models, gpt 4o, and sonnet 
-## Call the reasoning one with o1-mini and r1
-
-##todo: include in the tables generated absolute differences (where you just deduct one percentage from the other) and proportional changes
-
 def calculate_reasoning_differences(models):
     """Calculate differences between control and coordinate for reasoning models"""
     data = prepare_graph_data()
