@@ -197,12 +197,16 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         # Plot each model's performance
         for model in models:
             if model in grouped.columns:
-                ax.plot(
-                    grouped.index,
-                    grouped[model][condition],
-                    marker='o',
-                    label=model
-                )
+                try:
+                    ax.plot(
+                        grouped.index,
+                        grouped[model][condition],
+                        marker='o',
+                        label=model
+                    )
+                except KeyError:
+                    print(f"Warning: Model '{model}' is missing data for '{condition}' condition. Skipping this model.")
+                    continue
         
         # Add labels and title
         ax.set(
