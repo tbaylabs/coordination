@@ -33,21 +33,25 @@ def plot_delta_scatter(df, metric='top_prop_all'):
     Args:
         df (pd.DataFrame): Raw experiment data
         metric (str): Metric to plot ('top_prop_all' or 'top_prop_answered')
+        
+    Returns:
+        matplotlib.figure.Figure: The figure object containing the plot
     """
     # Calculate deltas
     deltas = calculate_task_deltas(df, metric)
     
     # Set up plot
-    plt.figure(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 8))
     sns.set_style("whitegrid")
     
     # Create scatter plot
-    ax = sns.scatterplot(
+    sns.scatterplot(
         x='delta1', 
         y='delta2', 
         data=deltas,
         s=100,
-        alpha=0.8
+        alpha=0.8,
+        ax=ax
     )
     
     # Add labels and title
@@ -58,12 +62,12 @@ def plot_delta_scatter(df, metric='top_prop_all'):
     )
     
     # Add quadrant lines
-    plt.axhline(0, color='gray', linestyle='--', alpha=0.5)
-    plt.axvline(0, color='gray', linestyle='--', alpha=0.5)
+    ax.axhline(0, color='gray', linestyle='--', alpha=0.5)
+    ax.axvline(0, color='gray', linestyle='--', alpha=0.5)
     
     # Add task labels
     for task, row in deltas.iterrows():
-        plt.text(
+        ax.text(
             row['delta1'] + 0.005, 
             row['delta2'] + 0.005, 
             task,
@@ -71,27 +75,18 @@ def plot_delta_scatter(df, metric='top_prop_all'):
         )
     
     plt.tight_layout()
-    plt.show()
+    return fig
 
-def main():
+def get_filtered_data():
+    """
+    Get filtered experiment data without reasoning models.
+    
+    Returns:
+        pd.DataFrame: Filtered dataframe
+    """
     # Read data
     df = pd.read_csv('pipeline/4_analysis/trial_results_aggregated.csv')
     
     # Filter out reasoning models
     reasoning_models = ['o1', 'o1-mini', 'deepseek-r1']
-    df = df[~df['model_name'].isin(reasoning_models)]
-    
-    # Create plots for both metrics
-    plot_delta_scatter(df, metric='top_prop_all')
-    plot_delta_scatter(df, metric='top_prop_answered')
-
-if __name__ == '__main__':
-    main()
-
-
-# Create a plot with:
-
-# X-axis: Tasks (ordered by some metric)
-# Y-axis: Performance
-# Three lines for the conditions
-# This shows where conditions diverge most
+    return df[~df['model_name'].isin(reasoning_models)]
