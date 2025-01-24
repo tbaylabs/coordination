@@ -28,6 +28,9 @@ def add_experiment_conditions(df):
     experiment_order = ['control', 'coordinate', 'coordinate-COT']
     df['experiment'] = pd.Categorical(df['experiment'], categories=experiment_order, ordered=True)
     
+    # Calculate top_prop_answered
+    df['top_prop_answered'] = df['top_option_count'] / df['answered_count']
+    
     return df
 
 def prepare_graph_data(df=None):
@@ -45,9 +48,6 @@ def prepare_graph_data(df=None):
     if df is None:
         df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
         df = add_experiment_conditions(df)
-
-    # Calculate top_prop_answered
-    df['top_prop_answered'] = df['top_option_count'] / df['answered_count']
 
     # Prepare data for different metrics
     data = {
