@@ -210,7 +210,7 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         with open(Path(__file__).parent / '..' / 'prompts' / 'options_lists.json') as f:
             options_lists = json.load(f)
         
-        # Use fixed task ordering with emoji prefixes
+        # Use fixed task ordering with proper prefixes
         task_order = [
             "letters",
             "colours-text",
@@ -222,15 +222,15 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             "emoji-3-text",
             "emoji-2-text",
             "emoji-1-text",
-            " ".join(options_lists["emoji-1"]) + " emoji-1",
-            " ".join(options_lists["emoji-2"]) + " emoji-2",
-            " ".join(options_lists["emoji-3"]) + " emoji-3",
-            " ".join(options_lists["kanji-random"]) + " kanji-random",
-            " ".join(options_lists["kanji-nature"]) + " kanji-nature",
-            " ".join(options_lists["shapes-1-icon"]) + " shapes-1-icon",
-            " ".join(options_lists["shapes-2-icon"]) + " shapes-2-icon",
-            " ".join(options_lists["shapes-3-icon"]) + " shapes-3-icon",
-            " ".join(options_lists["colours"]) + " colours",
+            "emoji-1",
+            "emoji-2",
+            "emoji-3",
+            "kanji-random",
+            "kanji-nature",
+            "shapes-1-icon",
+            "shapes-2-icon",
+            "shapes-3-icon",
+            "colours",
             "numbers"
         ]
         
@@ -240,11 +240,18 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         # Create mapping from original task names to display names
         task_name_map = {}
         for task in task_data.index:
-            if task in options_lists and not task.endswith(('-text', '-english')):
-                # For icon tasks, prefix with emojis
-                task_name_map[task] = " ".join(options_lists[task]) + " " + task
+            if task in options_lists:
+                if task == 'letters':
+                    task_name_map[task] = ", ".join(options_lists[task]) + " " + task
+                elif task == 'numbers':
+                    task_name_map[task] = ", ".join(options_lists[task]) + " " + task
+                elif not task.endswith(('-text', '-english')):
+                    # For icon tasks, prefix with emojis
+                    task_name_map[task] = " ".join(options_lists[task]) + " " + task
+                else:
+                    # For text tasks, use original name
+                    task_name_map[task] = task
             else:
-                # For text tasks, use original name
                 task_name_map[task] = task
         
         # Reindex and rename tasks
