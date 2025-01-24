@@ -187,7 +187,6 @@ def plot_models_by_condition(df, metric='top_prop_all'):
     # Filter to only show selected models
     selected_models = [
         'gpt-4o',
-        'llama-31-405b',
         'claude-35-sonnet'
     ]
     models = [model for model in selected_models if model in df['model_name'].unique()]
