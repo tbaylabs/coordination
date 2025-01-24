@@ -180,12 +180,8 @@ def plot_models_by_condition(df, metric='top_prop_all'):
     # Prepare data
     df = add_experiment_conditions(df)
     
-    # Get unique models and tasks
+    # Get unique models
     models = df['model_name'].unique()
-    tasks = df['task_options'].unique()
-    
-    # Group data by task and model
-    grouped = df.groupby(['task_options', 'model_name', 'experiment'], observed=True)[metric].mean().unstack(level=1)
     
     # Create one plot per condition
     figures = []
@@ -194,26 +190,36 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         fig, ax = plt.subplots(figsize=(14, 8))
         sns.set_style("whitegrid")
         
+        # Group by task and model for this condition
+        task_data = df[df['experiment'] == condition].groupby(
+            ['task_options', 'model_name'], 
+            observed=True
+        )[metric].mean().unstack()
+        
+        # Sort tasks by control condition performance
+        control_data = df[df['experiment'] == 'control'].groupby(
+            'task_options', 
+            observed=True
+        )[metric].mean()
+        task_order = control_data.sort_values(ascending=False).index
+        task_data = task_data.reindex(task_order)
+        
         # Plot each model's performance
         for model in models:
-            if model in grouped.columns:
-                try:
-                    ax.plot(
-                        grouped.index,
-                        grouped[model][condition],
-                        marker='o',
-                        label=model
-                    )
-                except KeyError:
-                    print(f"Warning: Model '{model}' is missing data for '{condition}' condition. Skipping this model.")
-                    continue
+            if model in task_data.columns:
+                ax.plot(
+                    task_data.index,
+                    task_data[model],
+                    marker='o',
+                    label=model
+                )
         
         # Add labels and title
         ax.set(
-            xlabel='Tasks',
+            xlabel='Tasks (ordered by control performance)',
             ylabel=f'{metric.replace("_", " ").title()}',
             title=f'Model Performance Across Tasks - {condition} Condition',
-            xticks=range(len(grouped.index))
+            xticks=range(len(task_data.index))
         )
         
         # Rotate x-labels for readability
