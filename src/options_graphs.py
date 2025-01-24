@@ -155,8 +155,15 @@ def plot_all_models_condition_task_interaction(df, metric='top_prop_all'):
     Returns:
         list: List of matplotlib.figure.Figure objects
     """
-    # Get unique models
-    models = df['model_name'].unique()
+    # Filter to only show selected models
+    selected_models = [
+        'gpt-4o',
+        'llama-31-405b',
+        'claude-35-sonnet',
+        'llama-31-70b',
+        'llama-31-8b'
+    ]
+    models = [model for model in selected_models if model in df['model_name'].unique()]
     
     # Create a plot for each model
     figures = []
