@@ -295,7 +295,14 @@ def create_charts_7_and_8(task_type='all'):
                          linestyles='dotted')
         
         # Set plot properties
-        ax.set_title(title)
+        # Add task type to title
+        task_type_label = {
+            'all': 'All Options',
+            'text_only': 'Text Options',
+            'symbol_only': 'Symbol Options'
+        }.get(task_type, 'All Options')
+        
+        ax.set_title(f"{title} - {task_type_label}")
         ax.set_xlabel('Condition')
         ax.set_ylabel('Proportion')
         ax.set_ylim(0.25, 1)
