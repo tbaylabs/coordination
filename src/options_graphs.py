@@ -237,11 +237,15 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         # Only include tasks that exist in the data
         task_order = [task for task in task_order if task.split()[-1] in task_data.index]
         
-        # Create mapping from original task names to prefixed names
-        task_name_map = {
-            task: " ".join(options_lists[task]) + " " + task if task in options_lists else task
-            for task in task_data.index
-        }
+        # Create mapping from original task names to display names
+        task_name_map = {}
+        for task in task_data.index:
+            if task in options_lists and not task.endswith(('-text', '-english')):
+                # For icon tasks, prefix with emojis
+                task_name_map[task] = " ".join(options_lists[task]) + " " + task
+            else:
+                # For text tasks, use original name
+                task_name_map[task] = task
         
         # Reindex and rename tasks
         task_data = task_data.rename(index=task_name_map)
