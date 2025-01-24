@@ -158,7 +158,6 @@ def plot_all_models_condition_task_interaction(df, metric='top_prop_all'):
     # Filter to only show selected models
     selected_models = [
         'gpt-4o',
-        'llama-31-405b',
         'claude-35-sonnet'
     ]
     models = [model for model in selected_models if model in df['model_name'].unique()]
@@ -210,22 +209,22 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         task_order = [
             "letters",
             "colours-text",
-            "shapes-1-text",
-            "shapes-2-text",
             "shapes-3-text",
-            "emoji-1-text",
-            "emoji-2-text",
-            "emoji-3-text",
+            "shapes-2-text",
+            "shapes-1-text",
             "kanji-nature-english",
             "kanji-random-english",
+            "emoji-3-text",
+            "emoji-2-text",
+            "emoji-1-text",
+            "emoji-1",
+            "emoji-2",
+            "emoji-3",
             "kanji-random",
             "kanji-nature",
-            "emoji-3",
-            "emoji-2",
-            "emoji-1",
-            "shapes-3-icon",
-            "shapes-2-icon",
             "shapes-1-icon",
+            "shapes-2-icon",
+            "shapes-3-icon",
             "colours",
             "numbers"
         ]
