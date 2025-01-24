@@ -204,7 +204,12 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             observed=True
         )[metric].mean().unstack()
         
-        # Use fixed task ordering
+        # Load options lists
+        import json
+        with open(Path(__file__).parent / '..' / 'prompts' / 'options_lists.json') as f:
+            options_lists = json.load(f)
+        
+        # Use fixed task ordering with emoji prefixes
         task_order = [
             "letters",
             "colours-text",
@@ -216,20 +221,30 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             "emoji-3-text",
             "emoji-2-text",
             "emoji-1-text",
-            "emoji-1",
-            "emoji-2",
-            "emoji-3",
-            "kanji-random",
-            "kanji-nature",
-            "shapes-1-icon",
-            "shapes-2-icon",
-            "shapes-3-icon",
-            "colours",
+            " ".join(options_lists["emoji-1"]) + " emoji-1",
+            " ".join(options_lists["emoji-2"]) + " emoji-2",
+            " ".join(options_lists["emoji-3"]) + " emoji-3",
+            " ".join(options_lists["kanji-random"]) + " kanji-random",
+            " ".join(options_lists["kanji-nature"]) + " kanji-nature",
+            " ".join(options_lists["shapes-1-icon"]) + " shapes-1-icon",
+            " ".join(options_lists["shapes-2-icon"]) + " shapes-2-icon",
+            " ".join(options_lists["shapes-3-icon"]) + " shapes-3-icon",
+            " ".join(options_lists["colours"]) + " colours",
             "numbers"
         ]
+        
         # Only include tasks that exist in the data
-        task_order = [task for task in task_order if task in task_data.index]
-        task_data = task_data.reindex(task_order)
+        task_order = [task for task in task_order if task.split()[-1] in task_data.index]
+        
+        # Create mapping from original task names to prefixed names
+        task_name_map = {
+            task: " ".join(options_lists[task]) + " " + task if task in options_lists else task
+            for task in task_data.index
+        }
+        
+        # Reindex and rename tasks
+        task_data = task_data.rename(index=task_name_map)
+        task_data = task_data.reindex([t for t in task_order if t in task_data.index])
         
         # Plot each model's performance
         for model in models:
