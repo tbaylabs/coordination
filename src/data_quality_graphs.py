@@ -210,13 +210,13 @@ def create_before_answer_token_count_chart(metric='avg_before_answer_token_count
 def create_task_difficulty_chart():
     """
     Create and return figure showing relative difficulty of different option tasks
-    based on unanswered proportion across all models and conditions.
+    based on top proportion across all models and conditions.
     """
     # Read the raw data
     df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
     
-    # Group by task options and calculate mean unanswered proportion
-    task_difficulty = df.groupby('task_options')['unanswered_prop'].mean().sort_values(ascending=False)
+    # Group by task options and calculate mean top proportion (inverted for difficulty)
+    task_difficulty = df.groupby('task_options')['top_prop_all'].mean().sort_values()
     
     # Create the plot
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -225,8 +225,8 @@ def create_task_difficulty_chart():
     task_difficulty.plot(kind='barh', ax=ax, color='steelblue')
     
     # Set plot properties
-    ax.set_title('Relative Difficulty of Option Tasks (by Unanswered Proportion)')
-    ax.set_xlabel('Average Unanswered Proportion')
+    ax.set_title('Relative Difficulty of Option Tasks (by Top Proportion)')
+    ax.set_xlabel('Average Top Proportion')
     ax.set_ylabel('Task Options')
     ax.grid(True)
     
