@@ -112,9 +112,13 @@ def create_charts_1_and_2(task_type='all'):
     plt.tight_layout()
     return fig
 
-def create_charts_3_and_4():
-    """Create line charts for Sonnet, reasoning models and GPT-4o"""
-    data = prepare_graph_data()
+def create_charts_3_and_4(task_type='all'):
+    """Create line charts for Sonnet, reasoning models and GPT-4o
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
     # Filter models - Sonnet + reasoning models + GPT-4o
