@@ -166,3 +166,63 @@ def plot_all_models_condition_task_interaction(df, metric='top_prop_all'):
     
     return figures
 
+def plot_models_by_condition(df, metric='top_prop_all'):
+    """
+    Create three plots showing model performance across tasks for each condition.
+    
+    Args:
+        df (pd.DataFrame): Raw experiment data
+        metric (str): Metric to plot ('top_prop_all' or 'top_prop_answered')
+        
+    Returns:
+        list: List of matplotlib.figure.Figure objects (one per condition)
+    """
+    # Prepare data
+    df = add_experiment_conditions(df)
+    
+    # Get unique models and tasks
+    models = df['model_name'].unique()
+    tasks = df['task_options'].unique()
+    
+    # Group data by task and model
+    grouped = df.groupby(['task_options', 'model_name', 'experiment'], observed=True)[metric].mean().unstack(level=1)
+    
+    # Create one plot per condition
+    figures = []
+    for condition in ['control', 'coordinate', 'coordinate-COT']:
+        # Set up plot
+        fig, ax = plt.subplots(figsize=(14, 8))
+        sns.set_style("whitegrid")
+        
+        # Plot each model's performance
+        for model in models:
+            if model in grouped.columns:
+                ax.plot(
+                    grouped.index,
+                    grouped[model][condition],
+                    marker='o',
+                    label=model
+                )
+        
+        # Add labels and title
+        ax.set(
+            xlabel='Tasks',
+            ylabel=f'{metric.replace("_", " ").title()}',
+            title=f'Model Performance Across Tasks - {condition} Condition',
+            xticks=range(len(grouped.index))
+        )
+        
+        # Rotate x-labels for readability
+        plt.xticks(rotation=90)
+        
+        # Add legend
+        ax.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left')
+        
+        # Add grid lines
+        ax.grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        figures.append(fig)
+    
+    return figures
+
