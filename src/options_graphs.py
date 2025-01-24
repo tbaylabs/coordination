@@ -77,3 +77,54 @@ def plot_delta_scatter(df, metric='top_prop_all'):
     plt.tight_layout()
     return fig
 
+def plot_condition_task_interaction(df, metric='top_prop_all'):
+    """
+    Create interaction plot showing condition effects across tasks.
+    
+    Args:
+        df (pd.DataFrame): Raw experiment data
+        metric (str): Metric to plot ('top_prop_all' or 'top_prop_answered')
+        
+    Returns:
+        matplotlib.figure.Figure: The figure object containing the plot
+    """
+    # Prepare data
+    df = add_experiment_conditions(df)
+    task_data = df.groupby(['task_options', 'experiment'], observed=True)[metric].mean().unstack()
+    
+    # Sort tasks by control condition performance
+    task_data = task_data.sort_values('control', ascending=False)
+    
+    # Set up plot
+    fig, ax = plt.subplots(figsize=(14, 8))
+    sns.set_style("whitegrid")
+    
+    # Plot lines for each condition
+    for condition in ['control', 'coordinate', 'coordinate-COT']:
+        ax.plot(
+            task_data.index,
+            task_data[condition],
+            marker='o',
+            label=condition
+        )
+    
+    # Add labels and title
+    ax.set(
+        xlabel='Tasks (ordered by control performance)',
+        ylabel=f'{metric.replace("_", " ").title()}',
+        title='Condition-Task Interaction Plot',
+        xticks=range(len(task_data.index))
+    )
+    
+    # Rotate x-labels for readability
+    plt.xticks(rotation=90)
+    
+    # Add legend
+    ax.legend(title='Condition')
+    
+    # Add grid lines
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    return fig
+
