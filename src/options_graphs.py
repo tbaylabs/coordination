@@ -249,8 +249,8 @@ def plot_models_by_condition(df, metric='top_prop_all'):
                     # For text tasks, use original name
                     task_name_map[task] = task
                 else:
-                    # For icon tasks, use original name (we'll handle emojis separately)
-                    task_name_map[task] = task
+                    # For icon tasks, prefix with emojis
+                    task_name_map[task] = " ".join(options_lists[task]) + " " + task
             else:
                 task_name_map[task] = task
         
