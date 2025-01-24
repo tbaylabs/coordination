@@ -77,20 +77,28 @@ def plot_delta_scatter(df, metric='top_prop_all'):
     plt.tight_layout()
     return fig
 
-def plot_condition_task_interaction(df, metric='top_prop_all'):
+def plot_condition_task_interaction(df, metric='top_prop_all', model_name=None):
     """
     Create interaction plot showing condition effects across tasks.
     
     Args:
         df (pd.DataFrame): Raw experiment data
         metric (str): Metric to plot ('top_prop_all' or 'top_prop_answered')
+        model_name (str, optional): Specific model to plot. If None, plots all models.
         
     Returns:
         matplotlib.figure.Figure: The figure object containing the plot
     """
     # Prepare data
     df = add_experiment_conditions(df)
-    task_data = df.groupby(['task_options', 'experiment'], observed=True)[metric].mean().unstack()
+    
+    # Filter for specific model if provided
+    if model_name:
+        df = df[df['model_name'] == model_name]
+    
+    # Group by task, experiment, and optionally model
+    group_cols = ['task_options', 'experiment']
+    task_data = df.groupby(group_cols, observed=True)[metric].mean().unstack()
     
     # Sort tasks by control condition performance
     task_data = task_data.sort_values('control', ascending=False)
@@ -109,10 +117,14 @@ def plot_condition_task_interaction(df, metric='top_prop_all'):
         )
     
     # Add labels and title
+    title = 'Condition-Task Interaction Plot'
+    if model_name:
+        title = f'{title} - {model_name}'
+    
     ax.set(
         xlabel='Tasks (ordered by control performance)',
         ylabel=f'{metric.replace("_", " ").title()}',
-        title='Condition-Task Interaction Plot',
+        title=title,
         xticks=range(len(task_data.index))
     )
     
@@ -127,4 +139,26 @@ def plot_condition_task_interaction(df, metric='top_prop_all'):
     
     plt.tight_layout()
     return fig
+
+def plot_all_models_condition_task_interaction(df, metric='top_prop_all'):
+    """
+    Create condition-task interaction plots for each model.
+    
+    Args:
+        df (pd.DataFrame): Raw experiment data
+        metric (str): Metric to plot ('top_prop_all' or 'top_prop_answered')
+        
+    Returns:
+        list: List of matplotlib.figure.Figure objects
+    """
+    # Get unique models
+    models = df['model_name'].unique()
+    
+    # Create a plot for each model
+    figures = []
+    for model in models:
+        fig = plot_condition_task_interaction(df, metric=metric, model_name=model)
+        figures.append(fig)
+    
+    return figures
 
