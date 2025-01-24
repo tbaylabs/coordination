@@ -108,7 +108,7 @@ def plot_condition_task_interaction(df, metric='top_prop_all', model_name=None):
     sns.set_style("whitegrid")
     
     # Plot lines for each condition using the correct column names
-    for condition in ['control', 'coordinate-no-reasoning', 'coordinate-COT']:
+    for condition in ['control', 'coordinate', 'coordinate-COT']:
         ax.plot(
             task_data.index,
             task_data[condition],
