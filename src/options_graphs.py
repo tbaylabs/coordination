@@ -207,6 +207,7 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         # Use fixed task ordering
         task_order = [
             "letters",
+            "numbers-text",
             "colours-text",
             "shapes-3-text",
             "shapes-2-text",
