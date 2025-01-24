@@ -196,8 +196,8 @@ def gather_results(results_file_path, answer_extraction_file_path, n):
     }
 
     # Save the updated results JSON file with ordered structure
-    with open(results_file_path, 'w') as file:
-        json.dump(ordered_data, file, indent=4)
+    with open(results_file_path, 'w', encoding='utf-8') as file:
+        json.dump(ordered_data, file, indent=4, ensure_ascii=False)
 
 def refresh_results(results_file_path, n=120):
     """
