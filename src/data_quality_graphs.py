@@ -3,6 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import json
+from matplotlib import font_manager
+
+# Configure matplotlib to use a font that supports emoji
+font_path = font_manager.findfont(font_manager.FontProperties(family=['DejaVu Sans', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji']))
+mpl.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
 from src.prepare_graph_data import prepare_graph_data
 
 # Configure matplotlib to use a modern style
