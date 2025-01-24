@@ -109,6 +109,10 @@ def plot_condition_task_interaction(df, metric='top_prop_all', model_name=None):
     
     # Plot lines for each condition using the correct column names
     for condition in ['control', 'coordinate', 'coordinate-COT']:
+        if condition not in task_data.columns:
+            print(f"Warning: Condition '{condition}' not found in data for model '{model_name}'. Skipping this condition.")
+            continue
+            
         ax.plot(
             task_data.index,
             task_data[condition],
