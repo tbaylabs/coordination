@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from prepare_graph_data import add_experiment_conditions
+from src.prepare_graph_data import add_experiment_conditions
 
 def calculate_task_deltas(df, metric='top_prop_all'):
     """
