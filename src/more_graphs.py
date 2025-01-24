@@ -33,9 +33,13 @@ MODEL_COLORS = {
 }
 
 
-def create_charts_1_and_2():
-    """Create line charts for LLaMA models and GPT-4o"""
-    data = prepare_graph_data()
+def create_charts_1_and_2(task_type='all'):
+    """Create line charts for LLaMA models and GPT-4o
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
     # Filter models - LLaMA models + GPT-4o
@@ -85,7 +89,14 @@ def create_charts_1_and_2():
                                  linestyles='dotted')
         
         # Set plot properties
-        ax.set_title(title)
+        # Add task type to title
+        task_type_label = {
+            'all': 'All Options',
+            'text_only': 'Text Options',
+            'symbol_only': 'Symbol Options'
+        }.get(task_type, 'All Options')
+        
+        ax.set_title(f"{title} - {task_type_label}")
         ax.set_xlabel('Condition')
         ax.set_ylabel('Proportion')
         ax.set_ylim(0, 1)
@@ -153,7 +164,14 @@ def create_charts_3_and_4():
                                  linestyles='dotted')
         
         # Set plot properties
-        ax.set_title(title)
+        # Add task type to title
+        task_type_label = {
+            'all': 'All Options',
+            'text_only': 'Text Options',
+            'symbol_only': 'Symbol Options'
+        }.get(task_type, 'All Options')
+        
+        ax.set_title(f"{title} - {task_type_label}")
         ax.set_xlabel('Condition')
         ax.set_ylabel('Proportion')
         ax.set_ylim(0, 1)
@@ -215,9 +233,13 @@ def create_charts_5_and_6():
     plt.tight_layout()
     return fig
 
-def create_charts_7_and_8():
-    """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o"""
-    data = prepare_graph_data()
+def create_charts_7_and_8(task_type='all'):
+    """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
     # Filter models - LLaMA 33 70b, Sonnet and GPT-4o
