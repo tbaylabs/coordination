@@ -1,4 +1,3 @@
-from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -205,12 +204,7 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             observed=True
         )[metric].mean().unstack()
         
-        # Load options lists
-        import json
-        with open(Path(__file__).parent / '..' / 'prompts' / 'options_lists.json') as f:
-            options_lists = json.load(f)
-        
-        # Use fixed task ordering with proper prefixes
+        # Use fixed task ordering
         task_order = [
             "letters",
             "colours-text",
@@ -233,36 +227,9 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             "colours",
             "numbers"
         ]
-        
         # Only include tasks that exist in the data
-        task_order = [task for task in task_order if task.split()[-1] in task_data.index]
-        
-        # Create mapping from original task names to display names
-        task_name_map = {}
-        for task in task_data.index:
-            if task in options_lists:
-                if task == 'letters':
-                    task_name_map[task] = ", ".join(options_lists[task]) + " " + task
-                elif task == 'numbers':
-                    task_name_map[task] = ", ".join(options_lists[task]) + " " + task
-                elif task.endswith(('-text', '-english')):
-                    # For text tasks, use original name
-                    task_name_map[task] = task
-                else:
-                    # For icon tasks, prefix with emojis
-                    task_name_map[task] = " ".join(options_lists[task]) + " " + task
-            else:
-                task_name_map[task] = task
-        
-        # Create display names for all tasks in order
-        display_order = []
-        for task in task_order:
-            if task in task_name_map:
-                display_order.append(task_name_map[task])
-        
-        # Reindex using original task names but set display names
-        task_data = task_data.reindex([t for t in task_order if t in task_data.index])
-        task_data.index = [task_name_map[t] for t in task_data.index]
+        task_order = [task for task in task_order if task in task_data.index]
+        task_data = task_data.reindex(task_order)
         
         # Plot each model's performance
         for model in models:
