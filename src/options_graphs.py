@@ -245,18 +245,24 @@ def plot_models_by_condition(df, metric='top_prop_all'):
                     task_name_map[task] = ", ".join(options_lists[task]) + " " + task
                 elif task == 'numbers':
                     task_name_map[task] = ", ".join(options_lists[task]) + " " + task
-                elif not task.endswith(('-text', '-english')):
-                    # For icon tasks, prefix with emojis
-                    task_name_map[task] = " ".join(options_lists[task]) + " " + task
-                else:
+                elif task.endswith(('-text', '-english')):
                     # For text tasks, use original name
+                    task_name_map[task] = task
+                else:
+                    # For icon tasks, use original name (we'll handle emojis separately)
                     task_name_map[task] = task
             else:
                 task_name_map[task] = task
         
-        # Reindex and rename tasks
-        task_data = task_data.rename(index=task_name_map)
+        # Create display names for all tasks in order
+        display_order = []
+        for task in task_order:
+            if task in task_name_map:
+                display_order.append(task_name_map[task])
+        
+        # Reindex using original task names but set display names
         task_data = task_data.reindex([t for t in task_order if t in task_data.index])
+        task_data.index = [task_name_map[t] for t in task_data.index]
         
         # Plot each model's performance
         for model in models:
