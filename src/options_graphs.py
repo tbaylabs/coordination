@@ -210,12 +210,31 @@ def plot_models_by_condition(df, metric='top_prop_all'):
             observed=True
         )[metric].mean().unstack()
         
-        # Sort tasks by control condition performance
-        control_data = df[df['experiment'] == 'control'].groupby(
-            'task_options', 
-            observed=True
-        )[metric].mean()
-        task_order = control_data.sort_values(ascending=False).index
+        # Use fixed task ordering
+        task_order = [
+            "letters",
+            "colours-text",
+            "shapes-1-text",
+            "shapes-2-text",
+            "shapes-3-text",
+            "emoji-1-text",
+            "emoji-2-text",
+            "emoji-3-text",
+            "kanji-nature-english",
+            "kanji-random-english",
+            "kanji-random",
+            "kanji-nature",
+            "emoji-3",
+            "emoji-2",
+            "emoji-1",
+            "shapes-3-icon",
+            "shapes-2-icon",
+            "shapes-1-icon",
+            "colours",
+            "numbers"
+        ]
+        # Only include tasks that exist in the data
+        task_order = [task for task in task_order if task in task_data.index]
         task_data = task_data.reindex(task_order)
         
         # Plot each model's performance
