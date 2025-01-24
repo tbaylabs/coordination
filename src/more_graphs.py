@@ -182,9 +182,13 @@ def create_charts_3_and_4(task_type='all'):
     plt.tight_layout()
     return fig
 
-def create_charts_5_and_6():
-    """Create line charts for LLaMA models"""
-    data = prepare_graph_data()
+def create_charts_5_and_6(task_type='all'):
+    """Create line charts for LLaMA models
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
     # Filter models - LLaMA models only
@@ -261,9 +265,6 @@ def create_charts_7_and_8(task_type='all'):
         key=lambda model: data['top_prop_all'].loc[model, 'coordinate'],
         reverse=True  # Highest first
     )
-    
-    # Ensure we have the filtered data
-    metric_data = data[metric].loc[selected_models]
     
     # Prepare data for plotting
     metrics = {
