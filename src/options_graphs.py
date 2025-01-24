@@ -159,9 +159,7 @@ def plot_all_models_condition_task_interaction(df, metric='top_prop_all'):
     selected_models = [
         'gpt-4o',
         'llama-31-405b',
-        'claude-35-sonnet',
-        'llama-31-70b',
-        'llama-31-8b'
+        'claude-35-sonnet'
     ]
     models = [model for model in selected_models if model in df['model_name'].unique()]
     
