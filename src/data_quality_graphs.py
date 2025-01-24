@@ -210,13 +210,45 @@ def create_before_answer_token_count_chart(metric='avg_before_answer_token_count
 def create_task_difficulty_chart():
     """
     Create and return figure showing relative difficulty of different option tasks
-    based on top proportion across all models and conditions.
+    based on the change in top proportion between control and coordinate conditions
+    for non-reasoning models.
     """
     # Read the raw data
     df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
     
-    # Group by task options and calculate mean top proportion (inverted for difficulty)
-    task_difficulty = df.groupby('task_options')['top_prop_all'].mean().sort_values()
+    # Define non-reasoning models
+    non_reasoning_models = [
+        "claude-3-haiku", "llama-31-405b", "llama-31-70b", "llama-31-8b", 
+        "llama-32-3b", "llama-32-1b", "claude-35-haiku", "claude-35-sonnet", 
+        "llama-33-70b", "gpt-4o", "gemini", "gemini-flash"
+    ]
+    
+    # Filter for non-reasoning models
+    df = df[df['model_name'].isin(non_reasoning_models)]
+    
+    # Create experiment condition mapping
+    conditions = {
+        ('control', 'none'): 'control',
+        ('coordinate', 'none'): 'coordinate',
+        ('coordinate', 'step-by-step'): 'coordinate-COT'
+    }
+    df['experiment'] = df.apply(lambda row: conditions.get((row['task_instruction'], row['task_reasoning']), 'other'), axis=1)
+    
+    # Remove 'other' experiments
+    df = df[df['experiment'] != 'other']
+    
+    # Pivot to get control and coordinate conditions side by side
+    pivot_df = df.pivot_table(
+        index=['task_options', 'model_name'],
+        columns='experiment',
+        values='top_prop_all'
+    ).reset_index()
+    
+    # Calculate delta between coordinate and control
+    pivot_df['delta'] = pivot_df['coordinate'] - pivot_df['control']
+    
+    # Group by task options and calculate mean delta
+    task_difficulty = pivot_df.groupby('task_options')['delta'].mean().sort_values()
     
     # Create the plot
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -225,14 +257,18 @@ def create_task_difficulty_chart():
     task_difficulty.plot(kind='barh', ax=ax, color='steelblue')
     
     # Set plot properties
-    ax.set_title('Relative Difficulty of Option Tasks (by Top Proportion)')
-    ax.set_xlabel('Average Top Proportion')
+    ax.set_title('Relative Difficulty of Option Tasks\n(Change in Top Proportion: Coordinate vs Control)')
+    ax.set_xlabel('Average Change in Top Proportion\n(Coordinate - Control)')
     ax.set_ylabel('Task Options')
     ax.grid(True)
     
     # Add value labels
     for i, v in enumerate(task_difficulty):
-        ax.text(v + 0.01, i, f"{v:.2f}", color='black', va='center')
+        ax.text(v + (0.01 if v >= 0 else -0.03), i, f"{v:.2f}", 
+                color='black', va='center', ha='right' if v < 0 else 'left')
+    
+    # Add vertical line at zero
+    ax.axvline(0, color='black', linestyle='--', linewidth=0.8)
     
     plt.tight_layout()
     return fig
