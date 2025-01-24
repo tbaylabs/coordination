@@ -262,11 +262,6 @@ def create_task_difficulty_chart():
     ax.set_ylabel('Task Options')
     ax.grid(True)
     
-    # Add value labels
-    for i, v in enumerate(task_difficulty):
-        ax.text(v + (0.01 if v >= 0 else -0.03), i, f"{v:.2f}", 
-                color='black', va='center', ha='right' if v < 0 else 'left')
-    
     # Add vertical line at zero
     ax.axvline(0, color='black', linestyle='--', linewidth=0.8)
     
