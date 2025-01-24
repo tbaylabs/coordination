@@ -256,10 +256,15 @@ def create_task_difficulty_chart():
     task_difficulty = pivot_df.groupby('task_options')['delta'].mean().sort_values()
     
     # Create labels showing the options
-    labels = [
-        f"{task}\n({', '.join(options_lists[task])})"
-        for task in task_difficulty.index
-    ]
+    labels = []
+    for task in task_difficulty.index:
+        options = options_lists[task]
+        # For text options, just show first option followed by "..."
+        if any(c.isalpha() for c in ''.join(options)):  # Check if any option contains letters
+            label = f"{task}\n({options[0]}...)"
+        else:
+            label = f"{task}\n({', '.join(options)})"
+        labels.append(label)
     
     # Create the plot
     fig, ax = plt.subplots(figsize=(12, 10))
