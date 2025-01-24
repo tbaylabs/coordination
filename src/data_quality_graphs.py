@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import json
 from src.prepare_graph_data import prepare_graph_data
 
 # Configure matplotlib to use a modern style
@@ -247,19 +248,33 @@ def create_task_difficulty_chart():
     # Calculate delta between coordinate and control
     pivot_df['delta'] = pivot_df['coordinate'] - pivot_df['control']
     
+    # Load options lists
+    with open(Path(__file__).parent / '..' / 'prompts' / 'options_lists.json', 'r') as f:
+        options_lists = json.load(f)
+    
     # Group by task options and calculate mean delta
     task_difficulty = pivot_df.groupby('task_options')['delta'].mean().sort_values()
     
+    # Create labels showing the options
+    labels = [
+        f"{task}\n({', '.join(options_lists[task])})"
+        for task in task_difficulty.index
+    ]
+    
     # Create the plot
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(12, 10))
     
     # Create horizontal bar plot
     task_difficulty.plot(kind='barh', ax=ax, color='steelblue')
     
+    # Set y-tick labels with options
+    ax.set_yticks(range(len(labels)))
+    ax.set_yticklabels(labels)
+    
     # Set plot properties
     ax.set_title('Relative Difficulty of Option Tasks\n(Change in Top Proportion: Coordinate vs Control)')
     ax.set_xlabel('Average Change in Top Proportion\n(Coordinate - Control)')
-    ax.set_ylabel('Task Options')
+    ax.set_ylabel('Task Options and Choices')
     ax.grid(True)
     
     # Add vertical line at zero
