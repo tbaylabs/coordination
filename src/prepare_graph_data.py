@@ -1,6 +1,20 @@
 from pathlib import Path
 import pandas as pd
 
+def get_filtered_data():
+    """
+    Get filtered experiment data without reasoning models.
+    
+    Returns:
+        pd.DataFrame: Filtered dataframe
+    """
+    # Read data using consistent path handling
+    df = pd.read_csv(Path(__file__).parent / '..' / 'pipeline' / '4_analysis' / 'trial_results_aggregated.csv')
+    
+    # Filter out reasoning models
+    reasoning_models = ['o1', 'o1-mini', 'deepseek-r1']
+    return df[~df['model_name'].isin(reasoning_models)]
+
 def add_experiment_conditions(df):
     """
     Add experiment conditions to the dataframe and filter out 'other' experiments.

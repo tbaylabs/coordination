@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src.prepare_graph_data import add_experiment_conditions
+from src.prepare_graph_data import add_experiment_conditions, get_filtered_data
 
 def calculate_task_deltas(df, metric='top_prop_all'):
     """
@@ -77,16 +77,3 @@ def plot_delta_scatter(df, metric='top_prop_all'):
     plt.tight_layout()
     return fig
 
-def get_filtered_data():
-    """
-    Get filtered experiment data without reasoning models.
-    
-    Returns:
-        pd.DataFrame: Filtered dataframe
-    """
-    # Read data
-    df = pd.read_csv('pipeline/4_analysis/trial_results_aggregated.csv')
-    
-    # Filter out reasoning models
-    reasoning_models = ['o1', 'o1-mini', 'deepseek-r1']
-    return df[~df['model_name'].isin(reasoning_models)]
