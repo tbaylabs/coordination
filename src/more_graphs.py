@@ -81,12 +81,12 @@ def create_charts_1_and_2(task_type='all'):
         # Set plot properties
         # Add task type to title
         task_type_label = {
-            'all': 'All Options',
-            'text_only': 'Text Options',
-            'symbol_only': 'Symbol Options'
-        }.get(task_type, 'All Options')
+            'all': 'All Task Variants',
+            'text_only': 'Text Task Variants',
+            'symbol_only': 'Symbol Task Variants'
+        }.get(task_type, 'All Task Variants')
         
-        ax.set_title(f"{title} - {task_type_label}")
+        ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion)")
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
@@ -164,12 +164,12 @@ def create_charts_3_and_4(task_type='all'):
         # Set plot properties
         # Add task type to title
         task_type_label = {
-            'all': 'All Options',
-            'text_only': 'Text Options',
-            'symbol_only': 'Symbol Options'
-        }.get(task_type, 'All Options')
+            'all': 'All Task Variants',
+            'text_only': 'Text Task Variants',
+            'symbol_only': 'Symbol Task Variants'
+        }.get(task_type, 'All Task Variants')
         
-        ax.set_title(f"{title} - {task_type_label}")
+        ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion)")
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
