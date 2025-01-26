@@ -195,6 +195,14 @@ def create_chart_10(task_type='all'):
     ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
+    # Add note box below legend
+    ax.text(1.05, 0.82,  # Adjusted position to be below legend
+           '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
+           transform=ax.transAxes,
+           bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
+           fontsize=11,
+           verticalalignment='top')
+    
     plt.tight_layout()
     return fig
 
