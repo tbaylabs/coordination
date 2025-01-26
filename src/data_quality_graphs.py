@@ -51,9 +51,18 @@ def create_llm_extract_chart():
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Plot each model's data
+    # Filter to only show specified models
+    models_to_show = [
+        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
+    ]
+    llm_data = llm_data[llm_data.index.isin(models_to_show)]
+    
+    # Plot each model's data with consistent colors
     for model in llm_data.index:
-        ax.plot(llm_data.columns, llm_data.loc[model], marker='o', label=model)
+        ax.plot(llm_data.columns, llm_data.loc[model], 
+                marker='o', label=model,
+                color=MODEL_COLORS[model])
     
     # Set plot properties
     ax.set_title('LLM Extract Proportion by Model and Condition')
@@ -153,9 +162,18 @@ def create_token_count_chart(metric='avg_token_count'):
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Plot each model's data
+    # Filter to only show specified models
+    models_to_show = [
+        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
+    ]
+    token_data = token_data[token_data.index.isin(models_to_show)]
+    
+    # Plot each model's data with consistent colors
     for model in token_data.index:
-        ax.plot(token_data.columns, token_data.loc[model], marker='o', label=model)
+        ax.plot(token_data.columns, token_data.loc[model], 
+                marker='o', label=model,
+                color=MODEL_COLORS[model])
     
     # Set plot properties
     metric_name = 'Average' if metric == 'avg_token_count' else 'Median'
@@ -198,9 +216,18 @@ def create_before_answer_token_count_chart(metric='avg_before_answer_token_count
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Plot each model's data
+    # Filter to only show specified models
+    models_to_show = [
+        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
+        'llama-31-405b', 'llama-31-70b', 'llama-31-8b'
+    ]
+    token_data = token_data[token_data.index.isin(models_to_show)]
+    
+    # Plot each model's data with consistent colors
     for model in token_data.index:
-        ax.plot(token_data.columns, token_data.loc[model], marker='o', label=model)
+        ax.plot(token_data.columns, token_data.loc[model], 
+                marker='o', label=model,
+                color=MODEL_COLORS[model])
     
     # Set plot properties
     metric_name = 'Average' if metric == 'avg_before_answer_token_count' else 'Median'
