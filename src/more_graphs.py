@@ -99,9 +99,6 @@ def create_charts_1_and_2(task_type='all'):
         ax.set_ylim(0, 1)
         ax.grid(True)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        # Add chart number in top right
-        ax.text(1.02, 1.02, '#1' if metric == 'top_prop_all' else '#2', 
-               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
     
     plt.tight_layout()
     return fig
@@ -322,9 +319,6 @@ def create_charts_7_and_8(task_type='all'):
         ax.set_ylim(0.25, 1)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        # Add chart number in top right
-        ax.text(1.02, 1.02, '#7' if metric == 'top_prop_all' else '#8', 
-               transform=ax.transAxes, ha='left', va='bottom', fontsize=12)
     
     plt.tight_layout()
     return fig
