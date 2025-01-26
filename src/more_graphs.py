@@ -384,12 +384,8 @@ def create_chart_7(task_type='all'):
                        fmt='none', ecolor=MODEL_COLORS[model],
                        capsize=5, alpha=0.5)
             
-            # Get the control value and draw horizontal dotted line across all conditions
-            control_value = metric_data.loc[model, 'control']
-            ax.hlines(y=control_value, 
-                     xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
-                     colors=line.get_color(), 
-                     linestyles='dotted')
+            # No horizontal dotted lines for this chart
+            pass
     
     # Set plot properties
     task_type_label = {
