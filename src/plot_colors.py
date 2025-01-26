@@ -4,7 +4,7 @@ MODEL_COLORS = {
     'gpt-4o': '#000000',  # Black
     
     # Claude models
-    'claude-35-sonnet': '#FFA500',  # Orange
+    'claude-35-sonnet': '#c37351',  # Muted terracotta
     
     # Deepseek models
     'deepseek-v3': '#0000FF',  # Blue
