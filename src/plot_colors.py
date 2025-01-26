@@ -23,6 +23,6 @@ MODEL_COLORS = {
     'gemini-flash': '#17becf',   # Cyan
     
     # Additional models for chart 10
-    'deepseek-r1': '#C44E52',    # Muted red
+    'deepseek-r1': '#D9534F',    # Slightly brighter muted red
     'o1-mini': '#ff7f0e',        # Orange
 }

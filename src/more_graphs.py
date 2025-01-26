@@ -101,7 +101,7 @@ def create_chart_1(task_type='all'):
     
     # Add note box below legend
     ax.text(1.05, 0.85,  # Original position
-           '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
+           '* deepseek-r1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
@@ -171,9 +171,16 @@ def create_chart_10(task_type='all'):
                          colors=MODEL_COLORS[model], 
                          linestyles='dotted')
                 # Add asterisk above coordinate point
+                # Add asterisk above deepseek-r1 point
                 ax.text(0.96, coord_value - 0.01, '*',
-                       color=MODEL_COLORS['deepseek-r1'],  # Use deepseek-r1's muted red
+                       color=MODEL_COLORS['deepseek-r1'],
                        ha='center', va='bottom', fontsize=14)
+                
+                # Add cross below deepseek-v3 point
+                v3_value = metric_data.loc['deepseek-v3', 'coordinate']
+                ax.text(0.94, v3_value + 0.01, '†',
+                       color=MODEL_COLORS['deepseek-v3'],
+                       ha='center', va='top', fontsize=14)
     
     # Set plot properties
     task_type_label = {
