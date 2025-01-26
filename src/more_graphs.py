@@ -196,7 +196,7 @@ def create_chart_10(task_type='all'):
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     # Add note box below legend
-    ax.text(1.05, 0.67,  # Moved further down below legend
+    ax.text(1.05, 0.4,  # Moved further down below legend
            '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
