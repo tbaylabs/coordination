@@ -154,7 +154,7 @@ def create_chart_10(task_type='all'):
                 
                 # Plot as dotted line connecting two points with markers
                 line, = ax.plot(x_points, means, 
-                              marker='o', markersize=8,  # Match other markers
+                              marker='o', markersize=6,  # Smaller marker for deepseek-r1
                               linestyle='dotted',  # Add dotted line
                               color=MODEL_COLORS[model], 
                               label=f"{model}*",
@@ -203,13 +203,14 @@ def create_chart_10(task_type='all'):
     ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
-    # Add note box below legend
+    # Add note box below legend with constrained width
     ax.text(1.05, 0.4,  # Moved further down below legend
            '* deepseek-r1 uses chain-of-thought by default,\nso coordinate-CoT uses coordinate value',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
-           verticalalignment='top')
+           verticalalignment='top',
+           wrap=True)  # Enable text wrapping to match legend width
     
     plt.tight_layout()
     return fig
