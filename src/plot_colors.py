@@ -10,9 +10,9 @@ MODEL_COLORS = {
     'deepseek-v3': '#4D5BEF',  # Deep blue
     
     # LLaMA 3.1 models
-    'llama-31-405b': '#e377c2',  # Pink
-    'llama-31-70b': '#2ca02c',   # Muted green
-    'llama-31-8b': '#d62728',    # Muted red
+    'llama-31-405b': '#FF69B4',  # Vibrant hot pink
+    'llama-31-70b': '#9370DB',   # Deep purple
+    'llama-31-8b': '#20B2AA',    # Teal
     
     # LLaMA 3.3 models
     'llama-33-70b': '#9467bd',   # Muted purple
