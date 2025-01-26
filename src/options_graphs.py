@@ -107,17 +107,24 @@ def plot_condition_task_interaction(df, metric='top_prop_all', model_name=None):
     fig, ax = plt.subplots(figsize=(14, 8))
     sns.set_style("whitegrid")
     
-    # Plot lines for each condition using the correct column names
+    # Plot lines for each condition using the correct column names and consistent colors
+    condition_colors = {
+        'control': '#1f77b4',  # Blue
+        'coordinate': '#ff7f0e',  # Orange
+        'coordinate-COT': '#2ca02c'  # Green
+    }
+        
     for condition in ['control', 'coordinate', 'coordinate-COT']:
         if condition not in task_data.columns:
             print(f"Warning: Condition '{condition}' not found in data for model '{model_name}'. Skipping this condition.")
             continue
-            
+                
         ax.plot(
             task_data.index,
             task_data[condition],
             marker='o',
-            label=condition
+            label=condition,
+            color=condition_colors[condition]
         )
     
     # Add labels and title
@@ -232,14 +239,15 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         task_order = [task for task in task_order if task in task_data.index]
         task_data = task_data.reindex(task_order)
         
-        # Plot each model's performance
+        # Plot each model's performance with consistent colors
         for model in models:
             if model in task_data.columns:
                 ax.plot(
                     task_data.index,
                     task_data[model],
                     marker='o',
-                    label=model
+                    label=model,
+                    color=MODEL_COLORS[model]
                 )
         
         # Add labels and title
