@@ -341,8 +341,8 @@ def create_charts_5_and_6(task_type='all'):
     plt.tight_layout()
     return fig
 
-def create_charts_7_and_8(task_type='all'):
-    """Create line charts for LLaMA 33 70b, Sonnet and GPT-4o
+def create_chart_7(task_type='all'):
+    """Create line chart for Deepseek V3, Sonnet and GPT-4o - Top Option Proportion (All Responses)
     
     Args:
         task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
@@ -362,63 +362,127 @@ def create_charts_7_and_8(task_type='all'):
         reverse=True  # Highest first
     )
     
-    # Prepare data for plotting
-    metrics = {
-        'top_prop_all': 'Top Option Proportion (All Responses)',
-        'top_prop_answered': 'Top Option Proportion (Answered Responses)'
-    }
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Create figure with two subplots
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12))
+    # Get the metric data for selected models (using _mean suffix)
+    metric = 'top_prop_all'
+    metric_data = data[f'{metric}_mean'].loc[selected_models]
     
-    # Plot each metric
-    for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
-        # Get the metric data for selected models (using _mean suffix)
-        metric_data = data[f'{metric}_mean'].loc[selected_models]
-        
-        # Plot each model's line
-        for model in selected_models:
-            if model in metric_data.index:
-                # Get mean and SEM values
-                means = metric_data.loc[model]
-                sems = data[f'{metric}_sem'].loc[model]
-                
-                # Plot with error bars
-                line, = ax.plot(means.index, means, 
-                              marker='o', label=model,
-                              color=MODEL_COLORS[model])
-                ax.errorbar(means.index, means, yerr=sems,
-                           fmt='none', ecolor=MODEL_COLORS[model],
-                           capsize=5, alpha=0.5)
-                
-                # Get the control value and draw horizontal dotted line across all conditions
-                control_value = metric_data.loc[model, 'control']
-                ax.hlines(y=control_value, 
-                         xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
-                         colors=line.get_color(), 
-                         linestyles='dotted')
-        
-        # Set plot properties
-        # Add task type to title
-        task_type_label = {
-            'all': 'All Options',
-            'text_only': 'Text Options',
-            'symbol_only': 'Symbol Options'
-        }.get(task_type, 'All Options')
-        
-        ax.set_title(f"{title} - {task_type_label}")
-        # Set custom x-axis labels with line breaks and more spacing
-        ax.set_xticks([0, 1, 2])
-        ax.set_xticklabels([
-            'control\n(No Coordination)', 
-            'coordinate\n(Elicit Answer Only)', 
-            'coordinate-CoT\n(Elicit CoT)'
-        ], linespacing=1.5)
-        ax.set_xlabel('Condition and Context Type', labelpad=15)
-        ax.set_ylabel('Proportion')
-        ax.set_ylim(0.25, 1)
-        ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    # Plot each model's line
+    for model in selected_models:
+        if model in metric_data.index:
+            # Get mean and SEM values
+            means = metric_data.loc[model]
+            sems = data[f'{metric}_sem'].loc[model]
+            
+            # Plot with error bars
+            line, = ax.plot(means.index, means, 
+                          marker='o', label=model,
+                          color=MODEL_COLORS[model])
+            ax.errorbar(means.index, means, yerr=sems,
+                       fmt='none', ecolor=MODEL_COLORS[model],
+                       capsize=5, alpha=0.5)
+            
+            # Get the control value and draw horizontal dotted line across all conditions
+            control_value = metric_data.loc[model, 'control']
+            ax.hlines(y=control_value, 
+                     xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                     colors=line.get_color(), 
+                     linestyles='dotted')
+    
+    # Set plot properties
+    task_type_label = {
+        'all': 'All Options',
+        'text_only': 'Text Options',
+        'symbol_only': 'Symbol Options'
+    }.get(task_type, 'All Options')
+    
+    ax.set_title(f"Top Option Proportion (All Responses) - {task_type_label}")
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels([
+        'control\n(No Coordination)', 
+        'coordinate\n(Elicit Answer Only)', 
+        'coordinate-CoT\n(Elicit CoT)'
+    ], linespacing=1.5)
+    ax.set_xlabel('Condition and Context Type', labelpad=15)
+    ax.set_ylabel('Proportion')
+    ax.set_ylim(0.25, 1)
+    ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
+
+def create_chart_8(task_type='all'):
+    """Create line chart for Deepseek V3, Sonnet and GPT-4o - Top Option Proportion (Answered Responses)
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
+    import numpy as np
+    
+    # Filter models - Deepseek V3, Sonnet and GPT-4o
+    base_models = [
+        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
+    ]
+    
+    # Sort models by their performance on coordinate condition using _mean suffix
+    selected_models = sorted(
+        base_models,
+        key=lambda model: data['top_prop_all_mean'].loc[model, 'coordinate'],
+        reverse=True  # Highest first
+    )
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Get the metric data for selected models (using _mean suffix)
+    metric = 'top_prop_answered'
+    metric_data = data[f'{metric}_mean'].loc[selected_models]
+    
+    # Plot each model's line
+    for model in selected_models:
+        if model in metric_data.index:
+            # Get mean and SEM values
+            means = metric_data.loc[model]
+            sems = data[f'{metric}_sem'].loc[model]
+            
+            # Plot with error bars
+            line, = ax.plot(means.index, means, 
+                          marker='o', label=model,
+                          color=MODEL_COLORS[model])
+            ax.errorbar(means.index, means, yerr=sems,
+                       fmt='none', ecolor=MODEL_COLORS[model],
+                       capsize=5, alpha=0.5)
+            
+            # Get the control value and draw horizontal dotted line across all conditions
+            control_value = metric_data.loc[model, 'control']
+            ax.hlines(y=control_value, 
+                     xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                     colors=line.get_color(), 
+                     linestyles='dotted')
+    
+    # Set plot properties
+    task_type_label = {
+        'all': 'All Options',
+        'text_only': 'Text Options',
+        'symbol_only': 'Symbol Options'
+    }.get(task_type, 'All Options')
+    
+    ax.set_title(f"Top Option Proportion (Answered Responses) - {task_type_label}")
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels([
+        'control\n(No Coordination)', 
+        'coordinate\n(Elicit Answer Only)', 
+        'coordinate-CoT\n(Elicit CoT)'
+    ], linespacing=1.5)
+    ax.set_xlabel('Condition and Context Type', labelpad=15)
+    ax.set_ylabel('Proportion')
+    ax.set_ylim(0.25, 1)
+    ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     plt.tight_layout()
     return fig
