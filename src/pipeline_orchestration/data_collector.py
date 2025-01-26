@@ -142,11 +142,11 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
 
                 content_received = response["choices"][0]["message"]["content"]
 
-                # Extract only needed response details for o1 family models
+                # Extract response details based on model type
                 response_details = {}
                 if model_name in ["o1", "o1-mini", "o1-preview"]:
                     if hasattr(response, 'usage'):
-                        # Safely extract token details
+                        # Safely extract token details for o1 family
                         token_details = {}
                         if hasattr(response.usage, 'completion_tokens_details'):
                             try:
@@ -171,6 +171,21 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                                 "completion_tokens_details": token_details
                             }
                         }
+                elif model_name == "deepseek-r1":
+                    # Extract reasoning content for deepseek-r1
+                    reasoning_content = None
+                    try:
+                        if hasattr(response.choices[0].message, 'reasoning_content'):
+                            reasoning_content = response.choices[0].message.reasoning_content
+                    except AttributeError:
+                        print(f"Warning: Could not extract reasoning_content for {model_name}")
+                    
+                    response_details = {
+                        "id": response.id if hasattr(response, 'id') else None,
+                        "created": response.created if hasattr(response, 'created') else None,
+                        "reasoning_content": reasoning_content,
+                        "usage": response.usage._asdict() if hasattr(response, 'usage') else {}
+                    }
 
                 # Update log entry for success
                 log_entry.update({
