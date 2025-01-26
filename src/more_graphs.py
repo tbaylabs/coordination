@@ -87,14 +87,14 @@ def create_charts_1_and_2(task_type='all'):
         }.get(task_type, 'All Options')
         
         ax.set_title(f"{title} - {task_type_label}")
-        # Set custom x-axis labels with line breaks
+        # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
-            'control\n(no coordination)', 
-            'coordinate\n(out-of-context)', 
-            'coordinate-CoT\n(in-context)'
-        ])
-        ax.set_xlabel('Condition and Context Type')
+            'control\n(coordination not elicited)', 
+            'coordinate\n(CoT not elicited)', 
+            'coordinate-CoT\n(CoT elicited)'
+        ], linespacing=1.5)
+        ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
         ax.set_ylim(0, 1)
         ax.grid(True)
@@ -170,7 +170,14 @@ def create_charts_3_and_4(task_type='all'):
         }.get(task_type, 'All Options')
         
         ax.set_title(f"{title} - {task_type_label}")
-        ax.set_xlabel('Condition')
+        # Set custom x-axis labels with line breaks and more spacing
+        ax.set_xticks([0, 1, 2])
+        ax.set_xticklabels([
+            'control\n(coordination not elicited)', 
+            'coordinate\n(CoT not elicited)', 
+            'coordinate-CoT\n(CoT elicited)'
+        ], linespacing=1.5)
+        ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
         ax.set_ylim(0, 1)
         ax.grid(True)
@@ -226,7 +233,14 @@ def create_charts_5_and_6(task_type='all'):
         }.get(task_type, 'All Options')
         
         ax.set_title(f"{title} - {task_type_label}")
-        ax.set_xlabel('Condition')
+        # Set custom x-axis labels with line breaks and more spacing
+        ax.set_xticks([0, 1, 2])
+        ax.set_xticklabels([
+            'control\n(coordination not elicited)', 
+            'coordinate\n(CoT not elicited)', 
+            'coordinate-CoT\n(CoT elicited)'
+        ], linespacing=1.5)
+        ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
         ax.set_ylim(0.3, 0.7)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
@@ -296,7 +310,14 @@ def create_charts_7_and_8(task_type='all'):
         }.get(task_type, 'All Options')
         
         ax.set_title(f"{title} - {task_type_label}")
-        ax.set_xlabel('Condition')
+        # Set custom x-axis labels with line breaks and more spacing
+        ax.set_xticks([0, 1, 2])
+        ax.set_xticklabels([
+            'control\n(coordination not elicited)', 
+            'coordinate\n(CoT not elicited)', 
+            'coordinate-CoT\n(CoT elicited)'
+        ], linespacing=1.5)
+        ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
         ax.set_ylim(0.25, 1)
         ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
