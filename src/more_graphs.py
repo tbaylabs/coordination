@@ -96,7 +96,16 @@ def create_chart_1(task_type='all'):
     ax.set_ylabel('Proportion')
     ax.set_ylim(0, 1)
     ax.grid(True)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    # Add legend with note about deepseek-r1
+    legend = ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Add note box below legend
+    ax.text(1.05, 0.85, 
+           '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
+           transform=ax.transAxes,
+           bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'),
+           fontsize=10,
+           verticalalignment='top')
     
     plt.tight_layout()
     return fig
@@ -152,6 +161,19 @@ def create_chart_10(task_type='all'):
                          xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
                          colors=MODEL_COLORS[model], 
                          linestyles='dotted')
+            
+            # Add horizontal dotted line and annotation for deepseek-r1
+            if model == 'deepseek-r1':
+                coord_value = metric_data.loc[model, 'coordinate']
+                # Draw dotted line from coordinate to coordinate-COT
+                ax.hlines(y=coord_value, 
+                         xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
+                         colors=MODEL_COLORS[model], 
+                         linestyles='dotted')
+                # Add asterisk above coordinate point
+                ax.text(1, coord_value + 0.02, '*', 
+                       color=MODEL_COLORS[model], 
+                       ha='center', va='bottom', fontsize=12)
     
     # Set plot properties
     task_type_label = {
