@@ -23,92 +23,92 @@ mpl.rcParams.update({
 from src.plot_colors import MODEL_COLORS
 
 
-def create_chart_1(task_type='all'):
-    """Create line chart for LLaMA models - Top Option Proportion (All Responses)
+# def create_chart_1(task_type='all'):
+#     """Create line chart for LLaMA models - Top Option Proportion (All Responses)
     
-    Args:
-        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
-    """
-    data = prepare_graph_data(task_type=task_type)
-    import numpy as np
+#     Args:
+#         task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+#     """
+#     data = prepare_graph_data(task_type=task_type)
+#     import numpy as np
     
-    # Filter models - LLaMA models
-    selected_models = [
-        'llama-31-405b', 'llama-31-70b', 'llama-31-8b',
-    ]
+#     # Filter models - LLaMA models
+#     selected_models = [
+#         'llama-31-405b', 'llama-31-70b', 'llama-31-8b',
+#     ]
     
-    # Create figure
-    fig, ax = plt.subplots(figsize=(10, 6))
+#     # Create figure
+#     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Get the metric data for selected models (using _mean suffix)
-    metric = 'top_prop_all'
-    metric_data = data[f'{metric}_mean'].loc[selected_models]
+#     # Get the metric data for selected models (using _mean suffix)
+#     metric = 'top_prop_all'
+#     metric_data = data[f'{metric}_mean'].loc[selected_models]
     
-    # Remove coordinate-COT for o1-mini and deepseek-r1
-    for model in ['o1-mini', 'deepseek-r1']:
-        if model in metric_data.index:
-            metric_data.loc[model, 'coordinate-COT'] = np.nan
+#     # Remove coordinate-COT for o1-mini and deepseek-r1
+#     for model in ['o1-mini', 'deepseek-r1']:
+#         if model in metric_data.index:
+#             metric_data.loc[model, 'coordinate-COT'] = np.nan
     
-    # Sort models by their performance in the coordinate-CoT condition (descending)
-    sorted_models = metric_data['coordinate-COT'].sort_values(ascending=False).index.tolist()
+#     # Sort models by their performance in the coordinate-CoT condition (descending)
+#     sorted_models = metric_data['coordinate-COT'].sort_values(ascending=False).index.tolist()
             
-    # Plot each model's line in sorted order
-    for model in sorted_models:
-        if model in selected_models and model in metric_data.index:
-            # Get mean and SEM values
-            means = metric_data.loc[model]
-            sems = data[f'{metric}_sem'].loc[model]
+#     # Plot each model's line in sorted order
+#     for model in sorted_models:
+#         if model in selected_models and model in metric_data.index:
+#             # Get mean and SEM values
+#             means = metric_data.loc[model]
+#             sems = data[f'{metric}_sem'].loc[model]
             
-            # Plot with error bars
-            line, = ax.plot(means.index, means, 
-                          marker='o', label=model,
-                          color=MODEL_COLORS[model])
-            ax.errorbar(means.index, means, yerr=sems,
-                       fmt='none', ecolor=MODEL_COLORS[model],
-                       capsize=5, alpha=0.5)
+#             # Plot with error bars
+#             line, = ax.plot(means.index, means, 
+#                           marker='o', label=model,
+#                           color=MODEL_COLORS[model])
+#             ax.errorbar(means.index, means, yerr=sems,
+#                        fmt='none', ecolor=MODEL_COLORS[model],
+#                        capsize=5, alpha=0.5)
             
-            # Add horizontal dotted line for reasoning models
-            if model in ['o1-mini', 'deepseek-r1']:
-                # Get the coordinate value
-                coord_value = metric_data.loc[model, 'coordinate']
-                if not pd.isna(coord_value):
-                    # Draw dotted line from coordinate to coordinate-COT
-                    ax.hlines(y=coord_value, 
-                             xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
-                             colors=line.get_color(), 
-                             linestyles='dotted')
+#             # Add horizontal dotted line for reasoning models
+#             if model in ['o1-mini', 'deepseek-r1']:
+#                 # Get the coordinate value
+#                 coord_value = metric_data.loc[model, 'coordinate']
+#                 if not pd.isna(coord_value):
+#                     # Draw dotted line from coordinate to coordinate-COT
+#                     ax.hlines(y=coord_value, 
+#                              xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
+#                              colors=line.get_color(), 
+#                              linestyles='dotted')
     
-    # Set plot properties
-    task_type_label = {
-        'all': 'All Task Variants',
-        'text_only': 'Text Task Variants',
-        'symbol_only': 'Symbol Task Variants'
-    }.get(task_type, 'All Task Variants')
+#     # Set plot properties
+#     task_type_label = {
+#         'all': 'All Task Variants',
+#         'text_only': 'Text Task Variants',
+#         'symbol_only': 'Symbol Task Variants'
+#     }.get(task_type, 'All Task Variants')
     
-    ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - All Responses)")
-    ax.set_xticks([0, 1, 2])
-    ax.set_xticklabels([
-        'control\n(No Coordination)', 
-        'coordinate\n(Elicit Answer Only)', 
-        'coordinate CoT\n(Elicit CoT)'
-    ], linespacing=1.5)
-    ax.set_xlabel('Condition and Context Type', labelpad=15)
-    ax.set_ylabel('Proportion')
-    ax.set_ylim(0, 1)
-    ax.grid(True)
-    # Add legend with note about deepseek-r1
-    legend = ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+#     ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - All Responses)")
+#     ax.set_xticks([0, 1, 2])
+#     ax.set_xticklabels([
+#         'control\n(No Coordination)', 
+#         'coordinate\n(Elicit Answer Only)', 
+#         'coordinate CoT\n(Elicit CoT)'
+#     ], linespacing=1.5)
+#     ax.set_xlabel('Condition and Context Type', labelpad=15)
+#     ax.set_ylabel('Proportion')
+#     ax.set_ylim(0, 1)
+#     ax.grid(True)
+#     # Add legend with note about deepseek-r1
+#     legend = ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
-    # Add note box below legend
-    ax.text(1.05, 0.85,  # Original position
-           '* deepseek-r1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
-           transform=ax.transAxes,
-           bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
-           fontsize=11,
-           verticalalignment='top')
+#     # Add note box below legend
+#     ax.text(1.05, 0.85,  # Original position
+#            '* deepseek-r1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
+#            transform=ax.transAxes,
+#            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
+#            fontsize=11,
+#            verticalalignment='top')
     
-    plt.tight_layout()
-    return fig
+#     plt.tight_layout()
+#     return fig
 
 def create_chart_10(task_type='all'):
     """Create line chart comparing multiple models - Top Option Proportion (Answered Responses)
@@ -204,7 +204,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
+           '* deepseek-r1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
