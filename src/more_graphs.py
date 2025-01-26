@@ -90,7 +90,7 @@ def create_chart_1(task_type='all'):
     ax.set_xticklabels([
         'control\n(No Coordination)', 
         'coordinate\n(Elicit Answer Only)', 
-        'coordinate-CoT\n(Elicit CoT)'
+        'coordinate CoT\n(Elicit CoT)'
     ], linespacing=1.5)
     ax.set_xlabel('Condition and Context Type', labelpad=15)
     ax.set_ylabel('Proportion')
@@ -389,10 +389,10 @@ def create_chart_7(task_type='all'):
     
     # Set plot properties
     task_type_label = {
-        'all': 'All Options',
-        'text_only': 'Text Options',
-        'symbol_only': 'Symbol Options'
-    }.get(task_type, 'All Options')
+        'all': 'All Task Variants',
+        'text_only': 'Text Task Variants',
+        'symbol_only': 'Symbol Task Variants'
+    }.get(task_type, 'All Task Variants')
     
     ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - All Responses)")
     ax.set_xticks([0, 1, 2])

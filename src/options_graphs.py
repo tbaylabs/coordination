@@ -254,7 +254,7 @@ def plot_models_by_condition(df, metric='top_prop_all'):
         ax.set(
             xlabel='Tasks (ordered by control performance)',
             ylabel=f'{metric.replace("_", " ").title()}',
-            title=f'Model Performance Across Tasks - {condition} Condition',
+            title=f'Model Performance Across Task Variants - {condition} Condition',
             xticks=range(len(task_data.index))
         )
         
