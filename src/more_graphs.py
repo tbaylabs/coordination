@@ -193,7 +193,7 @@ def create_chart_10(task_type='all'):
         'symbol_only': 'Symbol Task Variants'
     }.get(task_type, 'All Task Variants')
     
-    ax.set_title(f"SA0 Benchmark: LLM Coordination Across Isolated Instances - {task_type_label}\n(Top Response Proportion - All Responses)")
+    ax.set_title(f"SA0 Benchmark: LLM Coordination Across Isolated Instances\n({task_type_label} | Top Response Proportion | All Responses)")
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels([
         'control\n(No Coordination)', 
