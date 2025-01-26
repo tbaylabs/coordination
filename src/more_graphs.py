@@ -162,25 +162,27 @@ def create_chart_10(task_type='all'):
                          colors=MODEL_COLORS[model], 
                          linestyles='dotted')
             
-            # Add horizontal dotted line and annotation for deepseek-r1
-            if model == 'deepseek-r1':
+            # Special handling for reasoning models (o1-mini and deepseek-r1)
+            if model in ['o1-mini', 'deepseek-r1']:
+                # Use coordinate value for coordinate-CoT point
                 coord_value = metric_data.loc[model, 'coordinate']
-                # Draw dotted line from coordinate to coordinate-COT
-                ax.hlines(y=coord_value, 
-                         xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
-                         colors=MODEL_COLORS[model], 
-                         linestyles='dotted')
-                # Add asterisk above coordinate point
-                # Add asterisk above deepseek-r1 point
-                ax.text(0.96, coord_value - 0.01, '*',
-                       color=MODEL_COLORS[model],  # Use model's color from loop
-                       ha='center', va='bottom', fontsize=14)
+                means[2] = coord_value  # coordinate-CoT is index 2
+                
+                # Plot with dotted line style
+                line, = ax.plot(means.index, means, 
+                              marker='o', label=f"{model}*",
+                              color=MODEL_COLORS[model],
+                              linestyle='dotted')
+                ax.errorbar(means.index, means, yerr=sems,
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
                 
                 # Add cross below deepseek-v3 point
-                v3_value = metric_data.loc['deepseek-v3', 'coordinate']
-                ax.text(0.94, v3_value + 0.01, '†',
-                       color=MODEL_COLORS['deepseek-v3'],  # Explicit color reference remains OK here
-                       ha='center', va='top', fontsize=14)
+                if model == 'deepseek-r1':
+                    v3_value = metric_data.loc['deepseek-v3', 'coordinate']
+                    ax.text(0.94, v3_value + 0.01, '†',
+                           color=MODEL_COLORS['deepseek-v3'],
+                           ha='center', va='top', fontsize=14)
     
     # Set plot properties
     task_type_label = {
@@ -204,7 +206,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* deepseek-r1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
+           '* no data for condition where\nreasoning models coordinate\nwithout CoT\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
