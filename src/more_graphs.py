@@ -121,7 +121,7 @@ def create_chart_10(task_type='all'):
     
     # Filter models - expanded set
     base_models = [
-        'gpt-4o', 'claude-35-sonnet', 'llama-31-8b'
+        'gpt-4o', 'claude-35-sonnet', 'llama-31-8b', 'deepseek-r1'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
@@ -145,7 +145,28 @@ def create_chart_10(task_type='all'):
             means = metric_data.loc[model]
             sems = data[f'{metric}_sem'].loc[model]
             
-            # Plot with error bars
+            # Special handling for deepseek-r1
+            if model == 'deepseek-r1':
+                # Only plot control and coordinate-CoT (using coordinate value)
+                means = means[['control', 'coordinate-COT']].copy()
+                means['coordinate-COT'] = metric_data.loc[model, 'coordinate']  # Use coordinate value for COT
+                x_points = [0, 2]  # Only plot control (0) and coordinate-CoT (2)
+                
+                # Plot as individual points instead of connected line
+                ax.scatter(x_points, means, 
+                          marker='o', s=100,
+                          color=MODEL_COLORS[model], 
+                          label=f"{model}*",
+                          zorder=3)
+                
+                # Plot error bars only for existing points
+                ax.errorbar(x_points, means, 
+                           yerr=sems[x_points], 
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
+                continue  # Skip normal line plotting
+            
+            # Plot with error bars for other models
             line, = ax.plot(means.index, means, 
                           marker='o', label=model,
                           color=MODEL_COLORS[model])
@@ -160,28 +181,6 @@ def create_chart_10(task_type='all'):
                          xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
                          colors=MODEL_COLORS[model], 
                          linestyles='dotted')
-            
-            # Special handling for reasoning models (o1-mini and deepseek-r1)
-            if model in ['o1-mini', 'deepseek-r1']:
-                # Use coordinate value for coordinate-CoT point
-                coord_value = metric_data.loc[model, 'coordinate']
-                means[2] = coord_value  # coordinate-CoT is index 2
-                
-                # Plot with dotted line style
-                line, = ax.plot(means.index, means, 
-                              marker='o', label=f"{model}*",
-                              color=MODEL_COLORS[model],
-                              linestyle='dotted')
-                ax.errorbar(means.index, means, yerr=sems,
-                           fmt='none', ecolor=MODEL_COLORS[model],
-                           capsize=5, alpha=0.5)
-                
-                # Add cross below deepseek-v3 point
-                if model == 'deepseek-r1':
-                    v3_value = metric_data.loc['deepseek-v3', 'coordinate']
-                    ax.text(0.94, v3_value + 0.01, '†',
-                           color=MODEL_COLORS['deepseek-v3'],
-                           ha='center', va='top', fontsize=14)
     
     # Set plot properties
     task_type_label = {
@@ -205,7 +204,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* no data for condition where\nreasoning models coordinate\nwithout CoT\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
+           '* deepseek-r1 uses chain-of-thought by default,\nso coordinate-CoT uses coordinate value\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
