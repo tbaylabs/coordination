@@ -20,5 +20,9 @@ MODEL_COLORS = {
     # Other models
     'claude-35-haiku': '#8c564b',  # Brown
     'gemini': '#e377c2',         # Pink
-    'gemini-flash': '#17becf'    # Cyan
+    'gemini-flash': '#17becf',   # Cyan
+    
+    # Additional models for chart 10
+    'deepseek-r1': '#2ca02c',    # Green
+    'o1-mini': '#ff7f0e',        # Orange
 }

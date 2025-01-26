@@ -629,7 +629,7 @@ def create_chart_8(task_type='all'):
     return fig
 
 def create_chart_10(task_type='all'):
-    """Create line chart for Deepseek V3, Sonnet and GPT-4o - Top Option Proportion (Answered Responses)
+    """Create line chart comparing multiple models - Top Option Proportion (Answered Responses)
     
     Args:
         task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
@@ -637,15 +637,16 @@ def create_chart_10(task_type='all'):
     data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
-    # Filter models - Deepseek V3, Sonnet and GPT-4o
+    # Filter models - expanded set
     base_models = [
-        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
+        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
+        'deepseek-r1', 'o1-mini', 'llama-31-8b'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
     selected_models = sorted(
         base_models,
-        key=lambda model: data['top_prop_all_mean'].loc[model, 'coordinate'],
+        key=lambda model: data['top_prop_answered_mean'].loc[model, 'coordinate'],
         reverse=True  # Highest first
     )
     
@@ -671,17 +672,22 @@ def create_chart_10(task_type='all'):
                        fmt='none', ecolor=MODEL_COLORS[model],
                        capsize=5, alpha=0.5)
             
-            # No horizontal dotted lines for this chart
-            pass
+            # Add horizontal dotted line for GPT-4o in text_only condition
+            if model == 'gpt-4o' and task_type == 'text_only':
+                control_value = metric_data.loc[model, 'control']
+                ax.hlines(y=control_value, 
+                         xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                         colors=MODEL_COLORS[model], 
+                         linestyles='dotted')
     
     # Set plot properties
     task_type_label = {
-        'all': 'All Options',
-        'text_only': 'Text Options',
-        'symbol_only': 'Symbol Options'
-    }.get(task_type, 'All Options')
+        'all': 'All Task Variants',
+        'text_only': 'Text Task Variants',
+        'symbol_only': 'Symbol Task Variants'
+    }.get(task_type, 'All Task Variants')
     
-    ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - Answered Responses)")
+    ax.set_title(f"Model Comparison - {task_type_label}\n(Top Response Proportion - Answered Responses)")
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels([
         'control\n(No Coordination)', 
