@@ -48,8 +48,8 @@ def create_charts_1_and_2(task_type='all'):
     
     # Plot each metric
     for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
-        # Get the metric data for selected models
-        metric_data = data[metric].loc[selected_models]
+        # Get the metric data for selected models (using _mean suffix)
+        metric_data = data[f'{metric}_mean'].loc[selected_models]
         
         # Remove coordinate-COT for o1-mini and deepseek-r1
         for model in ['o1-mini', 'deepseek-r1']:
@@ -137,8 +137,8 @@ def create_charts_3_and_4(task_type='all'):
     
     # Plot each metric
     for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
-        # Get the metric data for selected models
-        metric_data = data[metric].loc[selected_models]
+        # Get the metric data for selected models (using _mean suffix)
+        metric_data = data[f'{metric}_mean'].loc[selected_models]
         
         # Remove coordinate-COT for o1-mini and deepseek-r1
         for model in ['o1-mini', 'deepseek-r1']:
@@ -224,8 +224,8 @@ def create_charts_5_and_6(task_type='all'):
     
     # Plot each metric
     for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
-        # Get the metric data for selected models
-        metric_data = data[metric].loc[selected_models]
+        # Get the metric data for selected models (using _mean suffix)
+        metric_data = data[f'{metric}_mean'].loc[selected_models]
         
         # Plot each model's line
         for model in selected_models:
@@ -305,8 +305,8 @@ def create_charts_7_and_8(task_type='all'):
     
     # Plot each metric
     for ax, (metric, title) in zip([ax1, ax2], metrics.items()):
-        # Get the metric data for selected models
-        metric_data = data[metric].loc[selected_models]
+        # Get the metric data for selected models (using _mean suffix)
+        metric_data = data[f'{metric}_mean'].loc[selected_models]
         
         # Plot each model's line
         for model in selected_models:
