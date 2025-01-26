@@ -83,9 +83,12 @@ def filter_by_task_type(df, task_type='all'):
     else:
         raise ValueError(f"Unknown task_type: {task_type}. Valid options are: 'all', 'text_only', 'symbol_only', 'numbers', 'letters'")
 
+from pathlib import Path
+import pandas as pd
+
 def prepare_graph_data(df=None, task_type='all'):
     """
-    Prepare and return the processed data for chart creation.
+    Prepare and return the processed data for chart creation with SEM.
     
     Args:
         df (pd.DataFrame, optional): Preprocessed dataframe with experiment conditions.
@@ -93,7 +96,7 @@ def prepare_graph_data(df=None, task_type='all'):
         task_type (str): Type of tasks to include. See filter_by_task_type() for options.
                                      
     Returns:
-        dict: Dictionary of DataFrames with mean metrics for visualization
+        dict: Dictionary of DataFrames with mean metrics and SEM for visualization
     """
     # Read data if not provided
     if df is None:
@@ -103,11 +106,17 @@ def prepare_graph_data(df=None, task_type='all'):
     # Apply task type filter
     df = filter_by_task_type(df, task_type)
 
-    # Prepare data for different metrics
-    data = {
-        'top_prop_answered': df.groupby(['model_name', 'experiment'], observed=True)['top_prop_answered'].mean().unstack(),
-        'top_prop_all': df.groupby(['model_name', 'experiment'], observed=True)['top_prop_all'].mean().unstack(),
-        'convergence_all': df.groupby(['model_name', 'experiment'], observed=True)['convergence_all'].mean().unstack()
-    }
+    # Prepare data for different metrics with mean and SEM
+    data = {}
+    metrics = ['top_prop_answered', 'top_prop_all', 'convergence_all']
+    
+    for metric in metrics:
+        # Calculate mean across tasks
+        mean_df = df.groupby(['model_name', 'experiment'], observed=True)[metric].mean().unstack()
+        data[f'{metric}_mean'] = mean_df
+        
+        # Calculate standard error of the mean (SEM) across tasks
+        sem_df = df.groupby(['model_name', 'experiment'], observed=True)[metric].sem().unstack()
+        data[f'{metric}_sem'] = sem_df
     
     return data

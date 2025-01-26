@@ -1,9 +1,5 @@
-"""
-Functions for collecting data from LLMs and managing the collection process.
-"""
-
-from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from datetime import datetime, timezone, timedelta
 import json
 import time
 from litellm import completion
@@ -173,19 +169,55 @@ def collect_data(file_path, n, model_mapping_file="model_mapping.json"):
                         }
                 elif model_name == "deepseek-r1":
                     # Extract reasoning content for deepseek-r1
-                    reasoning_content = None
                     try:
-                        if hasattr(response.choices[0].message, 'reasoning_content'):
-                            reasoning_content = response.choices[0].message.reasoning_content
-                    except AttributeError:
-                        print(f"Warning: Could not extract reasoning_content for {model_name}")
-                    
-                    response_details = {
-                        "id": response.id if hasattr(response, 'id') else None,
-                        "created": response.created if hasattr(response, 'created') else None,
-                        "reasoning_content": reasoning_content,
-                        "usage": response.usage._asdict() if hasattr(response, 'usage') else {}
-                    }
+                        message = response.choices[0].message
+                        
+                        # Try multiple ways to get reasoning content
+                        reasoning_content = None
+                        
+                        # Try provider_specific_fields first (newer LiteLLM versions)
+                        if hasattr(message, 'provider_specific_fields'):
+                            reasoning_content = message.provider_specific_fields.get('reasoning_content')
+                        
+                        # Try direct access next (original DeepSeek format)
+                        if reasoning_content is None and hasattr(message, 'reasoning_content'):
+                            reasoning_content = message.reasoning_content
+                            
+                        # Try dictionary access (in case message is a dict)
+                        if reasoning_content is None and isinstance(message, dict):
+                            reasoning_content = message.get('reasoning_content')
+                            
+                        print(f"Debug - Reasoning tokens found: {len(str(reasoning_content)) if reasoning_content else 0}")
+                            
+                        response_details = {
+                            "id": response.id if hasattr(response, 'id') else None,
+                            "created": response.created if hasattr(response, 'created') else None,
+                            "message": {
+                                "role": message.get("role", "assistant") if isinstance(message, dict) else getattr(message, "role", "assistant"),
+                                "content": message.get("content", "") if isinstance(message, dict) else getattr(message, "content", ""),
+                                "reasoning_content": reasoning_content
+                            }
+                        }
+                        
+                        # Handle usage info safely
+                        if hasattr(response, 'usage'):
+                            usage_dict = {}
+                            if hasattr(response.usage, 'prompt_tokens'):
+                                usage_dict['prompt_tokens'] = response.usage.prompt_tokens
+                            if hasattr(response.usage, 'completion_tokens'):
+                                usage_dict['completion_tokens'] = response.usage.completion_tokens
+                            if hasattr(response.usage, 'total_tokens'):
+                                usage_dict['total_tokens'] = response.usage.total_tokens
+                            response_details['usage'] = usage_dict
+                            
+                    except Exception as e:
+                        print(f"Warning: Error processing DeepSeek response: {str(e)}")
+                        response_details = {
+                            "message": {
+                                "role": "assistant",
+                                "content": content_received
+                            }
+                        }
 
                 # Update log entry for success
                 log_entry.update({
