@@ -127,7 +127,7 @@ def create_chart_10(task_type='all'):
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Get the metric data for selected models (using _mean suffix)
-    metric = 'top_prop_answered'
+    metric = 'top_prop_all'
     metric_data = data[f'{metric}_mean'].loc[selected_models]
     
     # Plot each model's line
@@ -160,7 +160,7 @@ def create_chart_10(task_type='all'):
         'symbol_only': 'Symbol Task Variants'
     }.get(task_type, 'All Task Variants')
     
-    ax.set_title(f"Model Comparison - {task_type_label}\n(Top Response Proportion - Answered Responses)")
+    ax.set_title(f"Model Comparison - {task_type_label}\n(Top Response Proportion - All Responses)")
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels([
         'control\n(No Coordination)', 
