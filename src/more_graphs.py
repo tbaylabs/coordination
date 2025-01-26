@@ -287,10 +287,10 @@ def create_charts_7_and_8(task_type='all'):
         'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
     ]
     
-    # Sort models by their performance on coordinate condition
+    # Sort models by their performance on coordinate condition using _mean suffix
     selected_models = sorted(
         base_models,
-        key=lambda model: data['top_prop_all'].loc[model, 'coordinate'],
+        key=lambda model: data['top_prop_all_mean'].loc[model, 'coordinate'],
         reverse=True  # Highest first
     )
     
