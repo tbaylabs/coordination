@@ -152,6 +152,9 @@ def create_chart_10(task_type='all'):
                 means['coordinate-COT'] = metric_data.loc[model, 'coordinate']  # Use coordinate value for COT
                 x_points = [0, 2]  # Only plot control (0) and coordinate-CoT (2)
                 
+                # Get SEM values for these points
+                sem_values = [sems[0], sems[1]]  # control and coordinate SEMs
+                
                 # Plot as dotted line connecting two points with markers
                 line, = ax.plot(x_points, means, 
                               marker='o', markersize=6,  # Smaller marker for deepseek-r1
@@ -160,9 +163,9 @@ def create_chart_10(task_type='all'):
                               label=f"{model}*",
                               zorder=3)
                 
-                # Plot error bars only for existing points
+                # Plot error bars with proper SEM values
                 ax.errorbar(x_points, means, 
-                           yerr=sems[x_points], 
+                           yerr=sem_values, 
                            fmt='none', ecolor=MODEL_COLORS[model],
                            capsize=5, alpha=0.5)
                 continue  # Skip normal line plotting
