@@ -178,68 +178,6 @@ def create_chart_2(task_type='all'):
     
     plt.tight_layout()
     return fig
-        # Get the metric data for selected models (using _mean suffix)
-        metric_data = data[f'{metric}_mean'].loc[selected_models]
-        
-        # Remove coordinate-COT for o1-mini and deepseek-r1
-        for model in ['o1-mini', 'deepseek-r1']:
-            if model in metric_data.index:
-                metric_data.loc[model, 'coordinate-COT'] = np.nan
-        
-        # Sort models by their performance in the coordinate-CoT condition (descending)
-        # So highest performance is at top of legend
-        sorted_models = metric_data['coordinate-COT'].sort_values(ascending=False).index.tolist()
-                
-        # Plot each model's line in sorted order
-        for model in sorted_models:
-            if model in selected_models and model in metric_data.index:
-                # Get mean and SEM values
-                means = metric_data.loc[model]
-                sems = data[f'{metric}_sem'].loc[model]
-                
-                # Plot with error bars
-                line, = ax.plot(means.index, means, 
-                              marker='o', label=model,
-                              color=MODEL_COLORS[model])
-                ax.errorbar(means.index, means, yerr=sems,
-                           fmt='none', ecolor=MODEL_COLORS[model],
-                           capsize=5, alpha=0.5)
-                
-                # Add horizontal dotted line for reasoning models
-                if model in ['o1-mini', 'deepseek-r1']:
-                    # Get the coordinate value
-                    coord_value = metric_data.loc[model, 'coordinate']
-                    if not pd.isna(coord_value):
-                        # Draw dotted line from coordinate to coordinate-COT
-                        ax.hlines(y=coord_value, 
-                                 xmin=1, xmax=2,  # coordinate is index 1, coordinate-COT is index 2
-                                 colors=line.get_color(), 
-                                 linestyles='dotted')
-        
-        # Set plot properties
-        # Add task type to title
-        task_type_label = {
-            'all': 'All Task Variants',
-            'text_only': 'Text Task Variants',
-            'symbol_only': 'Symbol Task Variants'
-        }.get(task_type, 'All Task Variants')
-        
-        ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion)")
-        # Set custom x-axis labels with line breaks and more spacing
-        ax.set_xticks([0, 1, 2])
-        ax.set_xticklabels([
-            'control\n(No Coordination)', 
-            'coordinate\n(Elicit Answer Only)', 
-            'coordinate-CoT\n(Elicit CoT)'
-        ], linespacing=1.5)
-        ax.set_xlabel('Condition and Context Type', labelpad=15)
-        ax.set_ylabel('Proportion')
-        ax.set_ylim(0, 1)
-        ax.grid(True)
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    
-    plt.tight_layout()
-    return fig
 
 def create_charts_3_and_4(task_type='all'):
     """Create line charts for Sonnet, reasoning models and GPT-4o
