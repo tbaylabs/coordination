@@ -240,9 +240,9 @@ def create_charts_7_and_8(task_type='all'):
     data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
-    # Filter models - LLaMA 33 70b, Sonnet and GPT-4o
+    # Filter models - Deepseek V3, Sonnet and GPT-4o
     base_models = [
-        'llama-33-70b', 'claude-35-sonnet', 'gpt-4o'
+        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
     ]
     
     # Sort models by their performance on coordinate condition
