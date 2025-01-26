@@ -173,13 +173,13 @@ def create_chart_10(task_type='all'):
                 # Add asterisk above coordinate point
                 # Add asterisk above deepseek-r1 point
                 ax.text(0.96, coord_value - 0.01, '*',
-                       color=MODEL_COLORS['deepseek-r1'],
+                       color=MODEL_COLORS[model],  # Use model's color from loop
                        ha='center', va='bottom', fontsize=14)
                 
                 # Add cross below deepseek-v3 point
                 v3_value = metric_data.loc['deepseek-v3', 'coordinate']
                 ax.text(0.94, v3_value + 0.01, '†',
-                       color=MODEL_COLORS['deepseek-v3'],
+                       color=MODEL_COLORS['deepseek-v3'],  # Explicit color reference remains OK here
                        ha='center', va='top', fontsize=14)
     
     # Set plot properties
