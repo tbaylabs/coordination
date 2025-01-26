@@ -90,9 +90,9 @@ def create_charts_1_and_2(task_type='all'):
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
-            'control\n(coordination not elicited)', 
-            'coordinate\n(CoT not elicited)', 
-            'coordinate-CoT\n(CoT elicited)'
+            'control\n(No Coordination)', 
+            'coordinate\n(Elicit Answer Only)', 
+            'coordinate-CoT\n(Elicit CoT)'
         ], linespacing=1.5)
         ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
@@ -173,9 +173,9 @@ def create_charts_3_and_4(task_type='all'):
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
-            'control\n(coordination not elicited)', 
-            'coordinate\n(CoT not elicited)', 
-            'coordinate-CoT\n(CoT elicited)'
+            'control\n(No Coordination)', 
+            'coordinate\n(Elicit Answer Only)', 
+            'coordinate-CoT\n(Elicit CoT)'
         ], linespacing=1.5)
         ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
@@ -236,9 +236,9 @@ def create_charts_5_and_6(task_type='all'):
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
-            'control\n(coordination not elicited)', 
-            'coordinate\n(CoT not elicited)', 
-            'coordinate-CoT\n(CoT elicited)'
+            'control\n(No Coordination)', 
+            'coordinate\n(Elicit Answer Only)', 
+            'coordinate-CoT\n(Elicit CoT)'
         ], linespacing=1.5)
         ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
@@ -313,9 +313,9 @@ def create_charts_7_and_8(task_type='all'):
         # Set custom x-axis labels with line breaks and more spacing
         ax.set_xticks([0, 1, 2])
         ax.set_xticklabels([
-            'control\n(coordination not elicited)', 
-            'coordinate\n(CoT not elicited)', 
-            'coordinate-CoT\n(CoT elicited)'
+            'control\n(No Coordination)', 
+            'coordinate\n(Elicit Answer Only)', 
+            'coordinate-CoT\n(Elicit CoT)'
         ], linespacing=1.5)
         ax.set_xlabel('Condition and Context Type', labelpad=15)
         ax.set_ylabel('Proportion')
