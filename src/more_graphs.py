@@ -63,9 +63,17 @@ def create_charts_1_and_2(task_type='all'):
         # Plot each model's line in sorted order
         for model in sorted_models:
             if model in selected_models and model in metric_data.index:
-                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                # Get mean and SEM values
+                means = metric_data.loc[model]
+                sems = data[f'{metric}_sem'].loc[model]
+                
+                # Plot with error bars
+                line, = ax.plot(means.index, means, 
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
+                ax.errorbar(means.index, means, yerr=sems,
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
                 
                 # Add horizontal dotted line for reasoning models
                 if model in ['o1-mini', 'deepseek-r1']:
@@ -143,9 +151,17 @@ def create_charts_3_and_4(task_type='all'):
         # Plot each model's line in sorted order
         for model in sorted_models:
             if model in selected_models and model in metric_data.index:
-                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                # Get mean and SEM values
+                means = metric_data.loc[model]
+                sems = data[f'{metric}_sem'].loc[model]
+                
+                # Plot with error bars
+                line, = ax.plot(means.index, means, 
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
+                ax.errorbar(means.index, means, yerr=sems,
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
                 
                 # Add horizontal dotted line for reasoning models
                 if model in ['o1-mini', 'deepseek-r1']:
@@ -214,9 +230,17 @@ def create_charts_5_and_6(task_type='all'):
         # Plot each model's line
         for model in selected_models:
             if model in metric_data.index:
-                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                # Get mean and SEM values
+                means = metric_data.loc[model]
+                sems = data[f'{metric}_sem'].loc[model]
+                
+                # Plot with error bars
+                line, = ax.plot(means.index, means, 
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
+                ax.errorbar(means.index, means, yerr=sems,
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
                 
                 # Just plot the line without horizontal dotted lines
                 pass
@@ -287,9 +311,17 @@ def create_charts_7_and_8(task_type='all'):
         # Plot each model's line
         for model in selected_models:
             if model in metric_data.index:
-                line, = ax.plot(metric_data.columns, metric_data.loc[model], 
+                # Get mean and SEM values
+                means = metric_data.loc[model]
+                sems = data[f'{metric}_sem'].loc[model]
+                
+                # Plot with error bars
+                line, = ax.plot(means.index, means, 
                               marker='o', label=model,
                               color=MODEL_COLORS[model])
+                ax.errorbar(means.index, means, yerr=sems,
+                           fmt='none', ecolor=MODEL_COLORS[model],
+                           capsize=5, alpha=0.5)
                 
                 # Get the control value and draw horizontal dotted line across all conditions
                 control_value = metric_data.loc[model, 'control']
