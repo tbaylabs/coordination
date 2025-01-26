@@ -87,7 +87,14 @@ def create_charts_1_and_2(task_type='all'):
         }.get(task_type, 'All Options')
         
         ax.set_title(f"{title} - {task_type_label}")
-        ax.set_xlabel('Condition')
+        # Set custom x-axis labels with line breaks
+        ax.set_xticks([0, 1, 2])
+        ax.set_xticklabels([
+            'control\n(no coordination)', 
+            'coordinate\n(out-of-context)', 
+            'coordinate-CoT\n(in-context)'
+        ])
+        ax.set_xlabel('Condition and Context Type')
         ax.set_ylabel('Proportion')
         ax.set_ylim(0, 1)
         ax.grid(True)
