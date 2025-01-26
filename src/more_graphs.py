@@ -172,7 +172,7 @@ def create_chart_10(task_type='all'):
                          linestyles='dotted')
                 # Add asterisk above coordinate point
                 ax.text(0.96, coord_value - 0.01, '*',
-                       color=MODEL_COLORS['deepseek-r1'],
+                       color=MODEL_COLORS['deepseek-r1'],  # Use deepseek-r1's muted red
                        ha='center', va='bottom', fontsize=14)
     
     # Set plot properties
