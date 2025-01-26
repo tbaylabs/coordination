@@ -100,11 +100,11 @@ def create_chart_1(task_type='all'):
     legend = ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
     # Add note box below legend
-    ax.text(1.05, 0.75,  # Moved down to avoid legend overlap
+    ax.text(1.05, 0.65,  # Moved further down
            '* Deepseek-R1 does not support\nchain-of-thought prompting,\nso coordinate-CoT uses the\nsame value as coordinate',
            transform=ax.transAxes,
-           bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'),
-           fontsize=10,
+           bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
+           fontsize=11,
            verticalalignment='top')
     
     plt.tight_layout()
@@ -171,9 +171,9 @@ def create_chart_10(task_type='all'):
                          colors=MODEL_COLORS[model], 
                          linestyles='dotted')
                 # Add asterisk above coordinate point
-                ax.text(0.98, coord_value + 0.01, '*',  # Slightly left and closer to point
+                ax.text(0.96, coord_value - 0.01, '*',  # Further left and lower
                        color=MODEL_COLORS[model], 
-                       ha='center', va='bottom', fontsize=12)
+                       ha='center', va='bottom', fontsize=14)
     
     # Set plot properties
     task_type_label = {
