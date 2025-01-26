@@ -152,12 +152,13 @@ def create_chart_10(task_type='all'):
                 means['coordinate-COT'] = metric_data.loc[model, 'coordinate']  # Use coordinate value for COT
                 x_points = [0, 2]  # Only plot control (0) and coordinate-CoT (2)
                 
-                # Plot as individual points instead of connected line
-                ax.scatter(x_points, means, 
-                          marker='o', s=100,
-                          color=MODEL_COLORS[model], 
-                          label=f"{model}*",
-                          zorder=3)
+                # Plot as dotted line connecting two points with markers
+                line, = ax.plot(x_points, means, 
+                              marker='o', markersize=8,  # Match other markers
+                              linestyle='dotted',  # Add dotted line
+                              color=MODEL_COLORS[model], 
+                              label=f"{model}*",
+                              zorder=3)
                 
                 # Plot error bars only for existing points
                 ax.errorbar(x_points, means, 
@@ -204,7 +205,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* deepseek-r1 uses chain-of-thought by default,\nso coordinate-CoT uses coordinate value\n\n† deepseek-v3 shows unusually\nlow coordination in the\ncoordinate condition',
+           '* deepseek-r1 uses chain-of-thought by default,\nso coordinate-CoT uses coordinate value',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
