@@ -101,6 +101,81 @@ def create_chart_1(task_type='all'):
     plt.tight_layout()
     return fig
 
+def create_chart_10(task_type='all'):
+    """Create line chart comparing multiple models - Top Option Proportion (Answered Responses)
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
+    import numpy as np
+    
+    # Filter models - expanded set
+    base_models = [
+        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
+        'deepseek-r1', 'o1-mini', 'llama-31-8b'
+    ]
+    
+    # Sort models by their performance on coordinate condition using _mean suffix
+    selected_models = sorted(
+        base_models,
+        key=lambda model: data['top_prop_answered_mean'].loc[model, 'coordinate'],
+        reverse=True  # Highest first
+    )
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Get the metric data for selected models (using _mean suffix)
+    metric = 'top_prop_answered'
+    metric_data = data[f'{metric}_mean'].loc[selected_models]
+    
+    # Plot each model's line
+    for model in selected_models:
+        if model in metric_data.index:
+            # Get mean and SEM values
+            means = metric_data.loc[model]
+            sems = data[f'{metric}_sem'].loc[model]
+            
+            # Plot with error bars
+            line, = ax.plot(means.index, means, 
+                          marker='o', label=model,
+                          color=MODEL_COLORS[model])
+            ax.errorbar(means.index, means, yerr=sems,
+                       fmt='none', ecolor=MODEL_COLORS[model],
+                       capsize=5, alpha=0.5)
+            
+            # Add horizontal dotted line for GPT-4o in text_only condition
+            if model == 'gpt-4o' and task_type == 'text_only':
+                control_value = metric_data.loc[model, 'control']
+                ax.hlines(y=control_value, 
+                         xmin=0, xmax=2,  # From control (0) to coordinate-COT (2)
+                         colors=MODEL_COLORS[model], 
+                         linestyles='dotted')
+    
+    # Set plot properties
+    task_type_label = {
+        'all': 'All Task Variants',
+        'text_only': 'Text Task Variants',
+        'symbol_only': 'Symbol Task Variants'
+    }.get(task_type, 'All Task Variants')
+    
+    ax.set_title(f"Model Comparison - {task_type_label}\n(Top Response Proportion - Answered Responses)")
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels([
+        'control\n(No Coordination)', 
+        'coordinate\n(Elicit Answer Only)', 
+        'coordinate-CoT\n(Elicit CoT)'
+    ], linespacing=1.5)
+    ax.set_xlabel('Condition and Context Type', labelpad=15)
+    ax.set_ylabel('Proportion')
+    ax.set_ylim(0.25, 1)
+    ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
+
 def create_chart_9(task_type='all'):
     """Create line chart comparing GPT-4o and Claude Sonnet - Top Option Proportion (Answered Responses)
     
@@ -485,6 +560,75 @@ def create_chart_7(task_type='all'):
     return fig
 
 def create_chart_8(task_type='all'):
+    """Create line chart for Deepseek V3, Sonnet and GPT-4o - Top Option Proportion (Answered Responses)
+    
+    Args:
+        task_type (str): Type of tasks included ('all', 'text_only', 'symbol_only')
+    """
+    data = prepare_graph_data(task_type=task_type)
+    import numpy as np
+    
+    # Filter models - Deepseek V3, Sonnet and GPT-4o
+    base_models = [
+        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
+    ]
+    
+    # Sort models by their performance on coordinate condition using _mean suffix
+    selected_models = sorted(
+        base_models,
+        key=lambda model: data['top_prop_all_mean'].loc[model, 'coordinate'],
+        reverse=True  # Highest first
+    )
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Get the metric data for selected models (using _mean suffix)
+    metric = 'top_prop_answered'
+    metric_data = data[f'{metric}_mean'].loc[selected_models]
+    
+    # Plot each model's line
+    for model in selected_models:
+        if model in metric_data.index:
+            # Get mean and SEM values
+            means = metric_data.loc[model]
+            sems = data[f'{metric}_sem'].loc[model]
+            
+            # Plot with error bars
+            line, = ax.plot(means.index, means, 
+                          marker='o', label=model,
+                          color=MODEL_COLORS[model])
+            ax.errorbar(means.index, means, yerr=sems,
+                       fmt='none', ecolor=MODEL_COLORS[model],
+                       capsize=5, alpha=0.5)
+            
+            # No horizontal dotted lines for this chart
+            pass
+    
+    # Set plot properties
+    task_type_label = {
+        'all': 'All Options',
+        'text_only': 'Text Options',
+        'symbol_only': 'Symbol Options'
+    }.get(task_type, 'All Options')
+    
+    ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - Answered Responses)")
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels([
+        'control\n(No Coordination)', 
+        'coordinate\n(Elicit Answer Only)', 
+        'coordinate-CoT\n(Elicit CoT)'
+    ], linespacing=1.5)
+    ax.set_xlabel('Condition and Context Type', labelpad=15)
+    ax.set_ylabel('Proportion')
+    ax.set_ylim(0.25, 1)
+    ax.grid(True, which='both', axis='y', linestyle='--', alpha=0.5)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    plt.tight_layout()
+    return fig
+
+def create_chart_10(task_type='all'):
     """Create line chart for Deepseek V3, Sonnet and GPT-4o - Top Option Proportion (Answered Responses)
     
     Args:
