@@ -121,7 +121,7 @@ def create_chart_10(task_type='all'):
     
     # Filter models - expanded set
     base_models = [
-        'gpt-4o', 'claude-35-sonnet', 'llama-31-8b', 'deepseek-r1'
+        'gpt-4o', 'claude-35-sonnet', 'llama-31-8b', 'deepseek-r1', 'o1-mini'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
@@ -145,8 +145,8 @@ def create_chart_10(task_type='all'):
             means = metric_data.loc[model]
             sems = data[f'{metric}_sem'].loc[model]
             
-            # Special handling for deepseek-r1
-            if model == 'deepseek-r1':
+            # Special handling for reasoning models
+            if model in ['deepseek-r1', 'o1-mini']:
                 # Only plot control and coordinate-CoT (using coordinate value)
                 means = means[['control', 'coordinate-COT']].copy()
                 means['coordinate-COT'] = metric_data.loc[model, 'coordinate']  # Use coordinate value for COT
@@ -205,7 +205,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend with constrained width
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* deepseek-r1 uses chain-of-thought by default,\nso coordinate-CoT uses coordinate value',
+           '* deepseek-r1 and o1-mini use chain-of-thought by default,\nso coordinate-CoT uses coordinate value',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
