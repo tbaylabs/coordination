@@ -1,7 +1,7 @@
 # Consistent color definitions for all plots
 MODEL_COLORS = {
     # GPT models
-    'gpt-4o': '#9E9E9E',  # Gray
+    'gpt-4o': '#393939',  # Dark gray
     
     # Claude models
     'claude-35-sonnet': '#c37351',  # Muted terracotta
