@@ -1,13 +1,13 @@
 # Consistent color definitions for all plots
 MODEL_COLORS = {
     # GPT models
-    'gpt-4o': '#000000',  # Black
+    'gpt-4o': '#9E9E9E',  # Gray
     
     # Claude models
     'claude-35-sonnet': '#c37351',  # Muted terracotta
     
     # Deepseek models
-    'deepseek-v3': '#0000FF',  # Blue
+    'deepseek-v3': '#4D5BEF',  # Deep blue
     
     # LLaMA 3.1 models
     'llama-31-405b': '#e377c2',  # Pink
