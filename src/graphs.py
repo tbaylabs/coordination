@@ -135,3 +135,4 @@ def write_graphs():
 
 if __name__ == '__main__':
     write_graphs()
+from src.plot_colors import MODEL_COLORS

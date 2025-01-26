@@ -292,3 +292,4 @@ def create_task_difficulty_chart():
     
     plt.tight_layout()
     return fig
+from src.plot_colors import MODEL_COLORS
