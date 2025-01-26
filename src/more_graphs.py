@@ -121,8 +121,7 @@ def create_chart_10(task_type='all'):
     
     # Filter models - expanded set
     base_models = [
-        'gpt-4o', 'claude-35-sonnet', 'deepseek-v3',
-        'deepseek-r1', 'o1-mini', 'llama-31-8b'
+        'gpt-4o', 'claude-35-sonnet', 'llama-31-8b'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
@@ -376,10 +375,9 @@ def create_charts_3_and_4(task_type='all'):
     data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
-    # Filter models - Sonnet + reasoning models + GPT-4o
+    # Filter models - Sonnet + GPT-4o
     selected_models = [
-        'claude-35-sonnet', 'o1-mini', 'deepseek-r1',
-        'gpt-4o'
+        'claude-35-sonnet', 'gpt-4o'
     ]
     
     # Prepare data for plotting
@@ -538,9 +536,9 @@ def create_chart_7(task_type='all'):
     data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
-    # Filter models - Deepseek V3, Sonnet and GPT-4o
+    # Filter models - Sonnet and GPT-4o
     base_models = [
-        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
+        'claude-35-sonnet', 'gpt-4o'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
@@ -607,9 +605,9 @@ def create_chart_8(task_type='all'):
     data = prepare_graph_data(task_type=task_type)
     import numpy as np
     
-    # Filter models - Deepseek V3, Sonnet and GPT-4o
+    # Filter models - Sonnet and GPT-4o
     base_models = [
-        'deepseek-v3', 'claude-35-sonnet', 'gpt-4o'
+        'claude-35-sonnet', 'gpt-4o'
     ]
     
     # Sort models by their performance on coordinate condition using _mean suffix
