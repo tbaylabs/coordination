@@ -394,7 +394,7 @@ def create_chart_7(task_type='all'):
         'symbol_only': 'Symbol Options'
     }.get(task_type, 'All Options')
     
-    ax.set_title(f"Top Option Proportion (All Responses) - {task_type_label}")
+    ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - All Responses)")
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels([
         'control\n(No Coordination)', 
@@ -463,7 +463,7 @@ def create_chart_8(task_type='all'):
         'symbol_only': 'Symbol Options'
     }.get(task_type, 'All Options')
     
-    ax.set_title(f"Top Option Proportion (Answered Responses) - {task_type_label}")
+    ax.set_title(f"Mean Response Coordination of {task_type_label}\n(Top Response Proportion - Answered Responses)")
     ax.set_xticks([0, 1, 2])
     ax.set_xticklabels([
         'control\n(No Coordination)', 
