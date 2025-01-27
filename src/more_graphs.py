@@ -208,7 +208,7 @@ def create_chart_10(task_type='all'):
     
     # Add note box below legend with constrained width
     ax.text(1.05, 0.4,  # Moved further down below legend
-           '* deepseek-r1 and o1-mini use chain-of-thought by default,\nso coordinate-CoT uses coordinate value',
+           '* Only control and coordinate-CoT data collected for reasoning models',
            transform=ax.transAxes,
            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round', alpha=0.9),
            fontsize=11,
