@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-from tabulate import tabulate
 from pathlib import Path
 
 def build_benchmark_data(df, model_name):
@@ -61,20 +60,35 @@ def build_benchmark_data(df, model_name):
     return model_df
 
 def print_nice_dataframe(df, max_rows=120, show_index=False):
-    """Generic function for nicely printing any DataFrame.
+    """Generic function for nicely printing any DataFrame in a terminal-friendly format.
     
     Args:
         df (pd.DataFrame): DataFrame to display
         max_rows (int): Maximum number of rows to display
         show_index (bool): Whether to show the index in the output
     """
+    # Set display options for better terminal output
+    pd.set_option('display.max_rows', max_rows)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    pd.set_option('display.max_colwidth', None)
+    
     if len(df) > max_rows:
-        print(f"Displaying first {max_rows} rows (total: {len(df)}):\n")
-        print(tabulate(df.head(max_rows), headers='keys', 
-                     tablefmt='grid', showindex=show_index))
+        print(f"\nDisplaying first {max_rows} rows (total: {len(df)}):\n")
+        display_df = df.head(max_rows)
     else:
-        print(tabulate(df, headers='keys', tablefmt='grid', 
-                     showindex=show_index))
+        display_df = df
+    
+    if not show_index:
+        print(display_df.to_string(index=False))
+    else:
+        print(display_df.to_string())
+    
+    # Reset display options to defaults
+    pd.reset_option('display.max_rows')
+    pd.reset_option('display.max_columns')
+    pd.reset_option('display.width')
+    pd.reset_option('display.max_colwidth')
 
 def main():
     """
