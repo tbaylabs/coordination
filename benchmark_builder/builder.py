@@ -161,20 +161,32 @@ def build_benchmark_data(df, model_name):
     ]
     model_df = model_df[columns_to_keep]
     
-    # Pivot the data to wide format
+    # Get unique task combinations
+    task_combinations = model_df[['task_options_name', 'task_options_type']].drop_duplicates()
+    
+    # Create wide format DataFrame
     wide_df = pd.DataFrame()
-    wide_df['model_name'] = model_df['model_name'].unique()
-    wide_df['task_options_name'] = model_df['task_options_name']
-    wide_df['task_options_type'] = model_df['task_options_type']
+    wide_df['model_name'] = [model_df['model_name'].iloc[0]] * len(task_combinations)
+    wide_df['task_options_name'] = task_combinations['task_options_name']
+    wide_df['task_options_type'] = task_combinations['task_options_type']
     
     # Create columns for each metric and condition
     for condition in ['control', 'coordinate', 'coordinate-COT']:
         condition_df = model_df[model_df['condition'] == condition]
         
-        # Add columns for each metric
-        wide_df[f'top_prop_all_{condition}'] = condition_df['top_prop_all'].values
-        wide_df[f'top_prop_answered_{condition}'] = condition_df['top_prop_answered'].values
-        wide_df[f'avg_token_count_{condition}'] = condition_df['avg_token_count'].values
+        # Merge the condition data with task combinations
+        for task_name, task_type in zip(task_combinations['task_options_name'], task_combinations['task_options_type']):
+            mask = (condition_df['task_options_name'] == task_name) & (condition_df['task_options_type'] == task_type)
+            row = condition_df[mask]
+            
+            # Add columns for each metric
+            wide_df.loc[
+                (wide_df['task_options_name'] == task_name) & 
+                (wide_df['task_options_type'] == task_type),
+                [f'top_prop_all_{condition}', 
+                 f'top_prop_answered_{condition}', 
+                 f'avg_token_count_{condition}']
+            ] = row[['top_prop_all', 'top_prop_answered', 'avg_token_count']].values if not row.empty else [None, None, None]
     
     # Replace model_df with wide_df for saving
     model_df = wide_df
