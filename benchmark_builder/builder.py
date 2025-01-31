@@ -367,29 +367,33 @@ def build_benchmark_data(df, model_name):
     for task_set in ['all', 'symbol', 'text']:
         task_idx = summary_stats[summary_stats['task_set'] == task_set].index[0]
         
-        metrics_data.append({
-            'model': model_name,
-            'task_set': task_set,
-            # Control performance
-            'control_top_prop_all': summary_stats.loc[task_idx, 'mean_top_prop_all_control'],
-            'control_top_prop_answered': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'],
-            # Coordinate performance
-            'coordinate_top_prop_all': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'],
-            'coordinate_top_prop_answered': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'],
-            # Coordinate-COT performance
-            'coordinate_cot_top_prop_all': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'],
-            'coordinate_cot_top_prop_answered': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'],
-            # Percent differences
-            'coordinate_percent_diff_all': summary_stats.loc[task_idx, 'mean_top_prop_all_coord_diff_percent'],
-            'coordinate_percent_diff_answered': summary_stats.loc[task_idx, 'mean_top_prop_answered_coord_diff_percent'],
-            'coordinate_cot_percent_diff_all': summary_stats.loc[task_idx, 'mean_top_prop_all_cot_diff_percent'],
-            'coordinate_cot_percent_diff_answered': summary_stats.loc[task_idx, 'mean_top_prop_answered_cot_diff_percent'],
-            # P-values
-            'coordinate_p_all': summary_stats.loc[task_idx, 'top_prop_all_coord_diff_percent_vs0_p'],
-            'coordinate_p_answered': summary_stats.loc[task_idx, 'top_prop_answered_coord_diff_percent_vs0_p'],
-            'coordinate_cot_p_all': summary_stats.loc[task_idx, 'top_prop_all_cot_diff_percent_vs0_p'],
-            'coordinate_cot_p_answered': summary_stats.loc[task_idx, 'top_prop_answered_cot_diff_percent_vs0_p']
-        })
+        # Create rows for 'all' metrics
+        metrics_data.extend([
+            {
+                'model': model_name,
+                'task_set': task_set,
+                'metric': 'all',
+                'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_control'],
+                'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'],
+                'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'],
+                'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_coord_diff_percent'],
+                'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_cot_diff_percent'],
+                'coordinate_p': summary_stats.loc[task_idx, 'top_prop_all_coord_diff_percent_vs0_p'],
+                'coordinate_cot_p': summary_stats.loc[task_idx, 'top_prop_all_cot_diff_percent_vs0_p']
+            },
+            {
+                'model': model_name,
+                'task_set': task_set,
+                'metric': 'answered',
+                'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'],
+                'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'],
+                'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'],
+                'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_coord_diff_percent'],
+                'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_cot_diff_percent'],
+                'coordinate_p': summary_stats.loc[task_idx, 'top_prop_answered_coord_diff_percent_vs0_p'],
+                'coordinate_cot_p': summary_stats.loc[task_idx, 'top_prop_answered_cot_diff_percent_vs0_p']
+            }
+        ])
     
     # Create DataFrame from collected metrics
     key_summary = pd.DataFrame(metrics_data)
