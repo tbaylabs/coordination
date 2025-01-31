@@ -1,5 +1,7 @@
+import sys
 import pandas as pd
 from tabulate import tabulate
+from pathlib import Path
 
 def build_benchmark_data(df, model_name):
     """
@@ -73,3 +75,41 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
     else:
         print(tabulate(df, headers='keys', tablefmt='grid', 
                      showindex=show_index))
+
+def main():
+    """
+    Command line interface for building benchmark data.
+    Usage: python -m benchmark_builder.builder <model_name>
+    """
+    if len(sys.argv) != 2:
+        print("Usage: python -m benchmark_builder.builder <model_name>")
+        sys.exit(1)
+    
+    model_name = sys.argv[1]
+    
+    # Get the project root directory (2 levels up from this file)
+    project_root = Path(__file__).parent.parent
+    
+    # Load the aggregated results
+    results_file = project_root / "pipeline" / "4_analysis" / "trial_results_aggregated.csv"
+    
+    if not results_file.exists():
+        print(f"Error: Could not find results file at {results_file}")
+        print("Please run aggregate_trial_results.py first")
+        sys.exit(1)
+        
+    try:
+        df = pd.read_csv(results_file)
+        if model_name not in df['model_name'].unique():
+            print(f"Error: Model '{model_name}' not found in results")
+            print("Available models:", ", ".join(df['model_name'].unique()))
+            sys.exit(1)
+            
+        build_benchmark_data(df, model_name)
+        
+    except Exception as e:
+        print(f"Error processing results: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
