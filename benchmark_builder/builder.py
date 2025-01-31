@@ -289,7 +289,7 @@ def build_benchmark_data(df, model_name):
         
             return t_stat, one_tailed_p, d
 
-        # Calculate statistical tests
+        # Calculate statistical tests for this task set
         for condition_col, control_col in metrics_to_test:
             metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
             t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
@@ -299,18 +299,6 @@ def build_benchmark_data(df, model_name):
             summary_stats.loc[idx, f'{metric_name}_tstat'] = t_stat
             summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)  # Round to 4 decimal places
             summary_stats.loc[idx, f'{metric_name}_cohens_d'] = d
-    
-    # Calculate statistics for each comparison
-    
-    for condition_col, control_col in metrics_to_test:
-        metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
-        t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
-            model_df[condition_col], 
-            model_df[control_col]
-        )
-        summary_stats[f'{metric_name}_tstat'] = t_stat
-        summary_stats[f'{metric_name}_p'] = p_val
-        summary_stats[f'{metric_name}_cohens_d'] = d
     
     # Save summary statistics
     summary_stats.to_csv(summary_output_file, index=False)
