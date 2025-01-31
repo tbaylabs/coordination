@@ -161,32 +161,40 @@ def build_benchmark_data(df, model_name):
     ]
     model_df = model_df[columns_to_keep]
     
-    # Get unique task combinations
-    task_combinations = model_df[['task_options_name', 'task_options_type']].drop_duplicates()
-    
-    # Create wide format DataFrame
-    wide_df = pd.DataFrame()
-    wide_df['model_name'] = [model_df['model_name'].iloc[0]] * len(task_combinations)
-    wide_df['task_options_name'] = task_combinations['task_options_name']
-    wide_df['task_options_type'] = task_combinations['task_options_type']
-    
-    # Create columns for each metric and condition
-    for condition in ['control', 'coordinate', 'coordinate-COT']:
-        condition_df = model_df[model_df['condition'] == condition]
-        
-        # Merge the condition data with task combinations
-        for task_name, task_type in zip(task_combinations['task_options_name'], task_combinations['task_options_type']):
-            mask = (condition_df['task_options_name'] == task_name) & (condition_df['task_options_type'] == task_type)
-            row = condition_df[mask]
-            
-            # Add columns for each metric
-            wide_df.loc[
-                (wide_df['task_options_name'] == task_name) & 
-                (wide_df['task_options_type'] == task_type),
-                [f'top_prop_all_{condition}', 
-                 f'top_prop_answered_{condition}', 
-                 f'avg_token_count_{condition}']
-            ] = row[['top_prop_all', 'top_prop_answered', 'avg_token_count']].values if not row.empty else [None, None, None]
+    # Pivot the data to wide format using pandas pivot
+    wide_df = pd.pivot_table(
+        model_df,
+        index=['task_options_name', 'task_options_type'],
+        columns='condition',
+        values=['top_prop_all', 'top_prop_answered', 'avg_token_count'],
+        aggfunc='first'
+    ).reset_index()
+
+    # Flatten column names
+    wide_df.columns = [
+        f"{col[0]}_{col[1]}" if col[1] else col[0] 
+        for col in wide_df.columns
+    ]
+
+    # Add model name column
+    wide_df.insert(0, 'model_name', model_df['model_name'].iloc[0])
+
+    # Reorder columns to match desired format
+    column_order = [
+        'model_name',
+        'task_options_name',
+        'task_options_type',
+        'top_prop_all_control',
+        'top_prop_answered_control',
+        'avg_token_count_control',
+        'top_prop_all_coordinate',
+        'top_prop_answered_coordinate',
+        'avg_token_count_coordinate',
+        'top_prop_all_coordinate-COT',
+        'top_prop_answered_coordinate-COT',
+        'avg_token_count_coordinate-COT'
+    ]
+    wide_df = wide_df[column_order]
     
     # Replace model_df with wide_df for saving
     model_df = wide_df
