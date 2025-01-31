@@ -146,6 +146,20 @@ def build_benchmark_data(df, model_name):
             for _, row in removed_rows.iterrows():
                 print(f"- {row['task_options_name']} ({row['task_options_type']})")
             model_df = model_df[~duplicates]
+    else:
+        print("\nAll data quality checks passed successfully!")
+
+    # Keep only the essential columns
+    columns_to_keep = [
+        'model_name',
+        'condition',
+        'task_options_name',
+        'task_options_type',
+        'top_prop_all',
+        'top_prop_answered',
+        'top_option_name'
+    ]
+    model_df = model_df[columns_to_keep]
     
     # Save to CSV, overwriting if it exists
     model_df.to_csv(output_file, index=False)
