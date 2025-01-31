@@ -161,6 +161,24 @@ def build_benchmark_data(df, model_name):
     ]
     model_df = model_df[columns_to_keep]
     
+    # Pivot the data to wide format
+    wide_df = pd.DataFrame()
+    wide_df['model_name'] = model_df['model_name'].unique()
+    wide_df['task_options_name'] = model_df['task_options_name']
+    wide_df['task_options_type'] = model_df['task_options_type']
+    
+    # Create columns for each metric and condition
+    for condition in ['control', 'coordinate', 'coordinate-COT']:
+        condition_df = model_df[model_df['condition'] == condition]
+        
+        # Add columns for each metric
+        wide_df[f'top_prop_all_{condition}'] = condition_df['top_prop_all'].values
+        wide_df[f'top_prop_answered_{condition}'] = condition_df['top_prop_answered'].values
+        wide_df[f'avg_token_count_{condition}'] = condition_df['avg_token_count'].values
+    
+    # Replace model_df with wide_df for saving
+    model_df = wide_df
+    
     # Save to CSV, overwriting if it exists
     model_df.to_csv(output_file, index=False)
     print(f"\nBenchmark data for model '{model_name}' saved to: {output_file}")
