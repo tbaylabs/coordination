@@ -268,6 +268,27 @@ def build_benchmark_data(df, model_name):
                     summary_stats.loc[idx, f'mean_{col_name}'] = task_df[col_name].mean()
                     summary_stats.loc[idx, f'sem_{col_name}'] = task_df[col_name].sem()
         
+        # Define metrics to test
+        metrics_to_test = [
+            ('top_prop_all_coordinate', 'top_prop_all_control'),
+            ('top_prop_all_coordinate-COT', 'top_prop_all_control'),
+            ('top_prop_answered_coordinate', 'top_prop_answered_control'),
+            ('top_prop_answered_coordinate-COT', 'top_prop_answered_control')
+        ]
+
+        # Define statistical test function
+        from scipy import stats
+        def one_tailed_ttest_and_cohens_d(condition_values, control_values):
+            # Paired t-test
+            t_stat, p_value = stats.ttest_rel(condition_values, control_values)
+            # Convert to one-tailed p-value if t-statistic is positive (condition > control)
+            one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
+        
+            # Cohen's d for paired samples
+            d = (condition_values - control_values).mean() / (condition_values - control_values).std()
+        
+            return t_stat, one_tailed_p, d
+
         # Calculate statistical tests
         for condition_col, control_col in metrics_to_test:
             metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
@@ -279,27 +300,7 @@ def build_benchmark_data(df, model_name):
             summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)  # Round to 4 decimal places
             summary_stats.loc[idx, f'{metric_name}_cohens_d'] = d
     
-    # Calculate statistical tests for summary
-    from scipy import stats
-    
-    def one_tailed_ttest_and_cohens_d(condition_values, control_values):
-        # Paired t-test
-        t_stat, p_value = stats.ttest_rel(condition_values, control_values)
-        # Convert to one-tailed p-value if t-statistic is positive (condition > control)
-        one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
-        
-        # Cohen's d for paired samples
-        d = (condition_values - control_values).mean() / (condition_values - control_values).std()
-        
-        return t_stat, one_tailed_p, d
-    
     # Calculate statistics for each comparison
-    metrics_to_test = [
-        ('top_prop_all_coordinate', 'top_prop_all_control'),
-        ('top_prop_all_coordinate-COT', 'top_prop_all_control'),
-        ('top_prop_answered_coordinate', 'top_prop_answered_control'),
-        ('top_prop_answered_coordinate-COT', 'top_prop_answered_control')
-    ]
     
     for condition_col, control_col in metrics_to_test:
         metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
