@@ -82,12 +82,15 @@ def build_benchmark_data(df, model_name):
     # Reorder the DataFrame
     model_df = model_df[columns_order]
     
-    # Create benchmark_results directory if it doesn't exist
-    output_dir = Path(__file__).parent / "benchmark_results"
-    output_dir.mkdir(exist_ok=True)
+    # Create benchmark_results and wide_tables directories if they don't exist
+    base_output_dir = Path(__file__).parent / "benchmark_results"
+    wide_tables_dir = base_output_dir / "wide_tables"
+    base_output_dir.mkdir(exist_ok=True)
+    wide_tables_dir.mkdir(exist_ok=True)
     
-    # Create output file path
-    output_file = output_dir / f"{model_name}.csv"
+    # Create output file paths
+    wide_output_file = wide_tables_dir / f"{model_name}.csv"
+    summary_output_file = base_output_dir / f"{model_name}.csv"
     
     # Create condition column
     def get_condition(row):
@@ -219,9 +222,47 @@ def build_benchmark_data(df, model_name):
     # Replace model_df with wide_df for saving
     model_df = wide_df
     
-    # Save to CSV, overwriting if it exists
-    model_df.to_csv(output_file, index=False)
-    print(f"\nBenchmark data for model '{model_name}' saved to: {output_file}")
+    # Save wide format table
+    model_df.to_csv(wide_output_file, index=False)
+    print(f"\nWide format benchmark data for model '{model_name}' saved to: {wide_output_file}")
+    
+    # Create summary statistics
+    summary_stats = pd.DataFrame()
+    summary_stats['model'] = [model_name]
+    summary_stats['task_set'] = ['all']
+    
+    # Calculate means and SEMs for all relevant columns
+    metric_prefixes = [
+        'top_prop_all',
+        'top_prop_answered',
+        'top_prop_all_coord_diff_abs',
+        'top_prop_all_cot_diff_abs',
+        'top_prop_answered_coord_diff_abs',
+        'top_prop_answered_cot_diff_abs',
+        'top_prop_all_coord_diff_percent',
+        'top_prop_all_cot_diff_percent',
+        'top_prop_answered_coord_diff_percent',
+        'top_prop_answered_cot_diff_percent'
+    ]
+    
+    conditions = ['control', 'coordinate', 'coordinate-COT']
+    
+    # Add means
+    for prefix in metric_prefixes:
+        if prefix.endswith('_diff_abs') or prefix.endswith('_diff_percent'):
+            # These are already difference columns
+            summary_stats[f'mean_{prefix}'] = model_df[prefix].mean()
+            summary_stats[f'sem_{prefix}'] = model_df[prefix].sem()
+        else:
+            # These need to be calculated for each condition
+            for condition in conditions:
+                col_name = f'{prefix}_{condition}'
+                summary_stats[f'mean_{col_name}'] = model_df[col_name].mean()
+                summary_stats[f'sem_{col_name}'] = model_df[col_name].sem()
+    
+    # Save summary statistics
+    summary_stats.to_csv(summary_output_file, index=False)
+    print(f"Summary statistics for model '{model_name}' saved to: {summary_output_file}")
     
     return model_df
 
