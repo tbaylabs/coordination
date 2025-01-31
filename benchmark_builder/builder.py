@@ -194,33 +194,6 @@ def build_benchmark_data(df, model_name):
     wide_df['top_prop_answered_coord_diff_percent'] = ((wide_df['top_prop_answered_coordinate'] - wide_df['top_prop_answered_control']) / wide_df['top_prop_answered_control']) * 100
     wide_df['top_prop_answered_cot_diff_percent'] = ((wide_df['top_prop_answered_coordinate-COT'] - wide_df['top_prop_answered_control']) / wide_df['top_prop_answered_control']) * 100
 
-    # Calculate one-tailed paired t-tests
-    from scipy import stats
-    
-    def one_tailed_ttest(condition_values, control_values):
-        t_stat, p_value = stats.ttest_rel(condition_values, control_values)
-        # Convert to one-tailed p-value if t-statistic is positive (condition > control)
-        one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
-        return t_stat, one_tailed_p
-    
-    # For coordinate vs control
-    t_stat, p_val = one_tailed_ttest(wide_df['top_prop_all_coordinate'], wide_df['top_prop_all_control'])
-    wide_df['top_prop_all_coord_tstat'] = t_stat
-    wide_df['top_prop_all_coord_p'] = p_val
-    
-    t_stat, p_val = one_tailed_ttest(wide_df['top_prop_answered_coordinate'], wide_df['top_prop_answered_control'])
-    wide_df['top_prop_answered_coord_tstat'] = t_stat
-    wide_df['top_prop_answered_coord_p'] = p_val
-    
-    # For coordinate-COT vs control
-    t_stat, p_val = one_tailed_ttest(wide_df['top_prop_all_coordinate-COT'], wide_df['top_prop_all_control'])
-    wide_df['top_prop_all_cot_tstat'] = t_stat
-    wide_df['top_prop_all_cot_p'] = p_val
-    
-    t_stat, p_val = one_tailed_ttest(wide_df['top_prop_answered_coordinate-COT'], wide_df['top_prop_answered_control'])
-    wide_df['top_prop_answered_cot_tstat'] = t_stat
-    wide_df['top_prop_answered_cot_p'] = p_val
-
     # Reorder columns to match desired format
     column_order = [
         'model_name',
@@ -242,15 +215,7 @@ def build_benchmark_data(df, model_name):
         'top_prop_all_coord_diff_percent',
         'top_prop_all_cot_diff_percent',
         'top_prop_answered_coord_diff_percent',
-        'top_prop_answered_cot_diff_percent',
-        'top_prop_all_coord_tstat',
-        'top_prop_all_coord_p',
-        'top_prop_all_cot_tstat',
-        'top_prop_all_cot_p',
-        'top_prop_answered_coord_tstat',
-        'top_prop_answered_coord_p',
-        'top_prop_answered_cot_tstat',
-        'top_prop_answered_cot_p'
+        'top_prop_answered_cot_diff_percent'
     ]
     wide_df = wide_df[column_order]
     
@@ -294,6 +259,38 @@ def build_benchmark_data(df, model_name):
                 col_name = f'{prefix}_{condition}'
                 summary_stats[f'mean_{col_name}'] = model_df[col_name].mean()
                 summary_stats[f'sem_{col_name}'] = model_df[col_name].sem()
+    
+    # Calculate statistical tests for summary
+    from scipy import stats
+    
+    def one_tailed_ttest_and_cohens_d(condition_values, control_values):
+        # Paired t-test
+        t_stat, p_value = stats.ttest_rel(condition_values, control_values)
+        # Convert to one-tailed p-value if t-statistic is positive (condition > control)
+        one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
+        
+        # Cohen's d for paired samples
+        d = (condition_values - control_values).mean() / (condition_values - control_values).std()
+        
+        return t_stat, one_tailed_p, d
+    
+    # Calculate statistics for each comparison
+    metrics_to_test = [
+        ('top_prop_all_coordinate', 'top_prop_all_control'),
+        ('top_prop_all_coordinate-COT', 'top_prop_all_control'),
+        ('top_prop_answered_coordinate', 'top_prop_answered_control'),
+        ('top_prop_answered_coordinate-COT', 'top_prop_answered_control')
+    ]
+    
+    for condition_col, control_col in metrics_to_test:
+        metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
+        t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
+            model_df[condition_col], 
+            model_df[control_col]
+        )
+        summary_stats[f'{metric_name}_tstat'] = t_stat
+        summary_stats[f'{metric_name}_p'] = p_val
+        summary_stats[f'{metric_name}_cohens_d'] = d
     
     # Save summary statistics
     summary_stats.to_csv(summary_output_file, index=False)
