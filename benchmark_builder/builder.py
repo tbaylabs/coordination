@@ -132,7 +132,13 @@ def build_benchmark_data(df, model_name):
         return group
 
     # Apply the calculations for each task_options_name group
-    model_df = model_df.groupby('task_options_name', group_keys=False).apply(calculate_differences)
+    grouped = model_df.groupby('task_options_name')
+    result_dfs = []
+    
+    for name, group in grouped:
+        result_dfs.append(calculate_differences(group))
+    
+    model_df = pd.concat(result_dfs, axis=0)
     
     # Save to CSV, overwriting if it exists
     model_df.to_csv(output_file, index=False)
