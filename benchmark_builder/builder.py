@@ -321,7 +321,11 @@ def build_benchmark_data(df, model_name):
             'top_prop_all_coord_diff_abs',
             'top_prop_all_cot_diff_abs',
             'top_prop_answered_coord_diff_abs',
-            'top_prop_answered_cot_diff_abs'
+            'top_prop_answered_cot_diff_abs',
+            'top_prop_all_coord_diff_percent',
+            'top_prop_all_cot_diff_percent',
+            'top_prop_answered_coord_diff_percent',
+            'top_prop_answered_cot_diff_percent'
         ]
         
         def one_tailed_rm_ttest_against_zero(values, task_names):
@@ -351,6 +355,30 @@ def build_benchmark_data(df, model_name):
     # Save summary statistics
     summary_stats.to_csv(summary_output_file, index=False)
     print(f"Summary statistics for model '{model_name}' saved to: {summary_output_file}")
+    
+    # Create focused statistical results for coordinate condition only
+    coord_stats = pd.DataFrame()
+    coord_stats['model'] = summary_stats['model']
+    coord_stats['task_set'] = summary_stats['task_set']
+    
+    # Add only coordinate-related t-tests and p-values
+    coord_metrics = [
+        'top_prop_all_coord',
+        'top_prop_answered_coord',
+        'top_prop_all_coord_diff_abs',
+        'top_prop_answered_coord_diff_abs',
+        'top_prop_all_coord_diff_percent',
+        'top_prop_answered_coord_diff_percent'
+    ]
+    
+    for metric in coord_metrics:
+        coord_stats[f'{metric}_tstat'] = summary_stats[f'{metric}_tstat']
+        coord_stats[f'{metric}_p'] = summary_stats[f'{metric}_p']
+    
+    # Save focused statistical results
+    coord_stats_file = base_output_dir / f"{model_name}_coord_stats.csv"
+    coord_stats.to_csv(coord_stats_file, index=False)
+    print(f"Coordinate-only statistical results saved to: {coord_stats_file}")
     
     return model_df
 
