@@ -80,6 +80,12 @@ def aggregate_trial_results(results_folder_path=None):
             fourth_prop_all = (fourth_option_count / total_count) if total_count > 0 else 0
             unanswered_prop = (unanswered_count / total_count) if total_count > 0 else 0
 
+            # Calculate proportions of answered responses
+            top_prop_answered = (top_option_count / answered_count) if answered_count > 0 else 0
+            second_prop_answered = (second_option_count / answered_count) if answered_count > 0 else 0
+            third_prop_answered = (third_option_count / answered_count) if answered_count > 0 else 0
+            fourth_prop_answered = (fourth_option_count / answered_count) if answered_count > 0 else 0
+
             if answered_count > 0:
                 p_values_answered = [
                     top_option_count / answered_count,
@@ -152,6 +158,10 @@ def aggregate_trial_results(results_folder_path=None):
                 "second_prop_all": second_prop_all,
                 "third_prop_all": third_prop_all,
                 "fourth_prop_all": fourth_prop_all,
+                "top_prop_answered": top_prop_answered,
+                "second_prop_answered": second_prop_answered,
+                "third_prop_answered": third_prop_answered,
+                "fourth_prop_answered": fourth_prop_answered,
                 "convergence_answered": convergence_answered,
                 "convergence_all": convergence_all,
                 "extracted_by_rule_count": extracted_by_rule_count,
