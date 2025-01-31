@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+from tabulate import tabulate
 
 def get_filtered_data():
     """
@@ -120,3 +121,19 @@ def prepare_graph_data(df=None, task_type='all'):
         data[f'{metric}_sem'] = sem_df
     
     return data
+
+def print_nice_dataframe(df, max_rows=120, show_index=False):
+    """Generic function for nicely printing any DataFrame.
+    
+    Args:
+        df (pd.DataFrame): DataFrame to display
+        max_rows (int): Maximum number of rows to display
+        show_index (bool): Whether to show the index in the output
+    """
+    if len(df) > max_rows:
+        print(f"Displaying first {max_rows} rows (total: {len(df)}):\n")
+        print(tabulate(df.head(max_rows), headers='keys', 
+                     tablefmt='grid', showindex=show_index))
+    else:
+        print(tabulate(df, headers='keys', tablefmt='grid', 
+                     showindex=show_index))
