@@ -290,6 +290,7 @@ def build_benchmark_data(df, model_name):
             return t_stat, one_tailed_p, d
 
         # Calculate statistical tests for this task set
+        # First the paired tests between conditions
         for condition_col, control_col in metrics_to_test:
             metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
             t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
@@ -299,6 +300,29 @@ def build_benchmark_data(df, model_name):
             summary_stats.loc[idx, f'{metric_name}_tstat'] = t_stat
             summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)  # Round to 4 decimal places
             summary_stats.loc[idx, f'{metric_name}_cohens_d'] = d
+        
+        # Then test if the difference metrics are greater than 0
+        difference_metrics = [
+            'top_prop_all_coord_diff_abs',
+            'top_prop_all_cot_diff_abs',
+            'top_prop_answered_coord_diff_abs',
+            'top_prop_answered_cot_diff_abs'
+        ]
+        
+        def one_tailed_ttest_against_zero(values):
+            # One-sample t-test against 0
+            t_stat, p_value = stats.ttest_1samp(values, 0)
+            # Convert to one-tailed p-value if t-statistic is positive
+            one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
+            # Cohen's d for one-sample test
+            d = values.mean() / values.std() if len(values) > 1 else float('nan')
+            return t_stat, one_tailed_p, d
+        
+        for metric in difference_metrics:
+            t_stat, p_val, d = one_tailed_ttest_against_zero(task_df[metric])
+            summary_stats.loc[idx, f'{metric}_vs0_tstat'] = t_stat
+            summary_stats.loc[idx, f'{metric}_vs0_p'] = p_val.round(4)
+            summary_stats.loc[idx, f'{metric}_vs0_cohens_d'] = d
     
     # Save summary statistics
     summary_stats.to_csv(summary_output_file, index=False)
