@@ -226,10 +226,10 @@ def build_benchmark_data(df, model_name):
     model_df.to_csv(wide_output_file, index=False)
     print(f"\nWide format benchmark data for model '{model_name}' saved to: {wide_output_file}")
     
-    # Create summary statistics
+    # Create summary statistics for all data and task subsets
     summary_stats = pd.DataFrame()
-    summary_stats['model'] = [model_name]
-    summary_stats['task_set'] = ['all']
+    summary_stats['model'] = [model_name] * 3
+    summary_stats['task_set'] = ['all', 'symbol', 'text']
     
     # Calculate means and SEMs for all relevant columns
     metric_prefixes = [
@@ -247,18 +247,37 @@ def build_benchmark_data(df, model_name):
     
     conditions = ['control', 'coordinate', 'coordinate-COT']
     
-    # Add means
-    for prefix in metric_prefixes:
-        if prefix.endswith('_diff_abs') or prefix.endswith('_diff_percent'):
-            # These are already difference columns
-            summary_stats[f'mean_{prefix}'] = model_df[prefix].mean()
-            summary_stats[f'sem_{prefix}'] = model_df[prefix].sem()
+    # Calculate statistics for each task set
+    for idx, task_set in enumerate(['all', 'symbol', 'text']):
+        # Filter data for task set
+        if task_set == 'all':
+            task_df = model_df
         else:
-            # These need to be calculated for each condition
-            for condition in conditions:
-                col_name = f'{prefix}_{condition}'
-                summary_stats[f'mean_{col_name}'] = model_df[col_name].mean()
-                summary_stats[f'sem_{col_name}'] = model_df[col_name].sem()
+            task_df = model_df[model_df['task_options_type'] == task_set]
+        
+        # Add means and SEMs
+        for prefix in metric_prefixes:
+            if prefix.endswith('_diff_abs') or prefix.endswith('_diff_percent'):
+                # These are already difference columns
+                summary_stats.loc[idx, f'mean_{prefix}'] = task_df[prefix].mean()
+                summary_stats.loc[idx, f'sem_{prefix}'] = task_df[prefix].sem()
+            else:
+                # These need to be calculated for each condition
+                for condition in conditions:
+                    col_name = f'{prefix}_{condition}'
+                    summary_stats.loc[idx, f'mean_{col_name}'] = task_df[col_name].mean()
+                    summary_stats.loc[idx, f'sem_{col_name}'] = task_df[col_name].sem()
+        
+        # Calculate statistical tests
+        for condition_col, control_col in metrics_to_test:
+            metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
+            t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
+                task_df[condition_col], 
+                task_df[control_col]
+            )
+            summary_stats.loc[idx, f'{metric_name}_tstat'] = t_stat
+            summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)  # Round to 4 decimal places
+            summary_stats.loc[idx, f'{metric_name}_cohens_d'] = d
     
     # Calculate statistical tests for summary
     from scipy import stats
