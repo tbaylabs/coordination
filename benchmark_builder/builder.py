@@ -53,6 +53,35 @@ def build_benchmark_data(df, model_name):
     assert (name_type_counts == 2).all(), \
         "Some task options don't have both symbol and text variants"
     
+    # Remove file_name column
+    model_df = model_df.drop('file_name', axis=1)
+    
+    # Reorder columns
+    columns_order = [
+        'model_name', 'temperature', 'xml_prompt', 'task_instruction', 
+        'task_reasoning', 'task_options_name', 'task_options_type',
+        'top_option_name', 'top_option_count', 'second_option_name', 
+        'second_option_count', 'third_option_name', 'third_option_count',
+        'fourth_option_name', 'fourth_option_count', 'unanswered_count',
+        'answered_count', 'total_count', 'unanswered_prop', 'top_prop_all',
+        'second_prop_all', 'third_prop_all', 'fourth_prop_all',
+        'convergence_answered', 'convergence_all', 'extracted_by_rule_count',
+        'extracted_by_llm_count', 'extracted_by_human_count',
+        'extracted_by_rule_prop', 'extracted_by_llm_prop',
+        'extracted_by_human_prop', 'avg_token_count', 'median_token_count',
+        'min_token_count', 'max_token_count', 'total_token_count',
+        'avg_before_answer_token_count', 'median_before_answer_token_count',
+        'min_before_answer_token_count', 'max_before_answer_token_count',
+        'total_before_answer_token_count'
+    ]
+    
+    # Get all remaining columns that aren't explicitly ordered
+    remaining_columns = [col for col in model_df.columns if col not in columns_order]
+    columns_order.extend(remaining_columns)
+    
+    # Reorder the DataFrame
+    model_df = model_df[columns_order]
+    
     # Create benchmark_results directory if it doesn't exist
     output_dir = Path(__file__).parent / "benchmark_results"
     output_dir.mkdir(exist_ok=True)
