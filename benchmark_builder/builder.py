@@ -5,7 +5,7 @@ from pathlib import Path
 def build_benchmark_data(df, model_name):
     """
     Builds a benchmark dataset for a specific model by transforming task options
-    and filtering results.
+    and filtering results. Saves results to a CSV file.
     
     Args:
         df (pd.DataFrame): DataFrame from aggregate_trial_results
@@ -53,9 +53,20 @@ def build_benchmark_data(df, model_name):
     assert (name_type_counts == 2).all(), \
         "Some task options don't have both symbol and text variants"
     
-    # Print the results
-    print(f"\nBenchmark data for model: {model_name}")
-    print_nice_dataframe(model_df)
+    # Create benchmark_results directory if it doesn't exist
+    output_dir = Path(__file__).parent / "benchmark_results"
+    output_dir.mkdir(exist_ok=True)
+    
+    # Create output file path
+    output_file = output_dir / f"{model_name}.csv"
+    
+    # Save to CSV, overwriting if it exists
+    model_df.to_csv(output_file, index=False)
+    print(f"\nBenchmark data for model '{model_name}' saved to: {output_file}")
+    
+    # Print preview of the results
+    print("\nPreview of saved data:")
+    print_nice_dataframe(model_df.head(5))
     
     return model_df
 
