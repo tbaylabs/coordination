@@ -362,18 +362,20 @@ def build_benchmark_data(df, model_name):
     coord_stats['task_set'] = summary_stats['task_set']
     
     # Add only coordinate-related t-tests and p-values
-    coord_metrics = [
-        'top_prop_all_coord',
-        'top_prop_answered_coord',
-        'top_prop_all_coord_diff_abs',
-        'top_prop_answered_coord_diff_abs',
-        'top_prop_all_coord_diff_percent',
-        'top_prop_answered_coord_diff_percent'
+    coord_pairs = [
+        # Direct comparison t-tests
+        ('top_prop_all_coord', 'top_prop_all_coordinate'),
+        ('top_prop_answered_coord', 'top_prop_answered_coordinate'),
+        # Difference from zero t-tests
+        ('top_prop_all_coord_diff_abs_vs0', 'top_prop_all_coord_diff_abs'),
+        ('top_prop_answered_coord_diff_abs_vs0', 'top_prop_answered_coord_diff_abs'),
+        ('top_prop_all_coord_diff_percent_vs0', 'top_prop_all_coord_diff_percent'),
+        ('top_prop_answered_coord_diff_percent_vs0', 'top_prop_answered_coord_diff_percent')
     ]
     
-    for metric in coord_metrics:
-        coord_stats[f'{metric}_tstat'] = summary_stats[f'{metric}_tstat']
-        coord_stats[f'{metric}_p'] = summary_stats[f'{metric}_p']
+    for new_prefix, old_prefix in coord_pairs:
+        coord_stats[f'{new_prefix}_tstat'] = summary_stats[f'{old_prefix}_tstat']
+        coord_stats[f'{new_prefix}_p'] = summary_stats[f'{old_prefix}_p']
     
     # Save focused statistical results
     coord_stats_file = base_output_dir / f"{model_name}_coord_stats.csv"
