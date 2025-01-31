@@ -109,6 +109,31 @@ def build_benchmark_data(df, model_name):
         print("Unique instruction/reasoning pairs in 'other' category:")
         print(other_rows[['task_instruction', 'task_reasoning']].drop_duplicates())
     
+    # Calculate differences between conditions for each task_options_name
+    def calculate_differences(group):
+        control_val = group[group['condition'] == 'control'].iloc[0]
+        coordinate_val = group[group['condition'] == 'coordinate'].iloc[0]
+        coordinate_cot_val = group[group['condition'] == 'coordinate-COT'].iloc[0]
+        
+        # Absolute differences
+        group['top_prop_all_coord_diff'] = coordinate_val['top_prop_all'] - control_val['top_prop_all']
+        group['top_prop_all_cot_diff'] = coordinate_cot_val['top_prop_all'] - control_val['top_prop_all']
+        
+        group['top_prop_answered_coord_diff'] = coordinate_val['top_prop_answered'] - control_val['top_prop_answered']
+        group['top_prop_answered_cot_diff'] = coordinate_cot_val['top_prop_answered'] - control_val['top_prop_answered']
+        
+        # Proportional differences (relative to control value)
+        group['top_prop_all_coord_prop_diff'] = (coordinate_val['top_prop_all'] - control_val['top_prop_all']) / control_val['top_prop_all'] if control_val['top_prop_all'] != 0 else float('inf')
+        group['top_prop_all_cot_prop_diff'] = (coordinate_cot_val['top_prop_all'] - control_val['top_prop_all']) / control_val['top_prop_all'] if control_val['top_prop_all'] != 0 else float('inf')
+        
+        group['top_prop_answered_coord_prop_diff'] = (coordinate_val['top_prop_answered'] - control_val['top_prop_answered']) / control_val['top_prop_answered'] if control_val['top_prop_answered'] != 0 else float('inf')
+        group['top_prop_answered_cot_prop_diff'] = (coordinate_cot_val['top_prop_answered'] - control_val['top_prop_answered']) / control_val['top_prop_answered'] if control_val['top_prop_answered'] != 0 else float('inf')
+        
+        return group
+
+    # Apply the calculations for each task_options_name group
+    model_df = model_df.groupby('task_options_name', group_keys=False).apply(calculate_differences)
+    
     # Save to CSV, overwriting if it exists
     model_df.to_csv(output_file, index=False)
     print(f"\nBenchmark data for model '{model_name}' saved to: {output_file}")
