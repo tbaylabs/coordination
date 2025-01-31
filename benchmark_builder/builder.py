@@ -356,38 +356,34 @@ def build_benchmark_data(df, model_name):
     summary_stats.to_csv(summary_output_file, index=False)
     print(f"Summary statistics for model '{model_name}' saved to: {summary_output_file}")
     
-    # Create focused statistical results for coordinate condition only
-    coord_stats = pd.DataFrame()
-    coord_stats['model'] = summary_stats['model']
-    coord_stats['task_set'] = summary_stats['task_set']
+    # Create focused summary with key metrics
+    key_summary = pd.DataFrame()
+    key_summary['model'] = summary_stats['model']
+    key_summary['task_set'] = summary_stats['task_set']
     
-    # Add only coordinate-related t-tests and p-values
-    # Add only coordinate-related t-tests and p-values
-    coord_metrics = [
-        # Direct comparison t-tests
-        'top_prop_all_coord',
-        'top_prop_answered_coord',
-        # Difference from zero t-tests
-        'top_prop_all_coord_diff_abs',
-        'top_prop_answered_coord_diff_abs',
-        'top_prop_all_coord_diff_percent',
-        'top_prop_answered_coord_diff_percent'
-    ]
+    # Add proportions for each condition
+    metrics = ['all', 'answered']
+    conditions = ['control', 'coordinate', 'coordinate-COT']
     
-    for metric in coord_metrics:
-        # For direct comparisons
-        if not metric.endswith('_diff_abs') and not metric.endswith('_diff_percent'):
-            coord_stats[f'{metric}_tstat'] = summary_stats[f'{metric}_tstat']
-            coord_stats[f'{metric}_p'] = summary_stats[f'{metric}_p']
-        # For difference metrics
-        else:
-            coord_stats[f'{metric}_vs0_tstat'] = summary_stats[f'{metric}_vs0_tstat']
-            coord_stats[f'{metric}_vs0_p'] = summary_stats[f'{metric}_vs0_p']
+    for metric in metrics:
+        for condition in conditions:
+            col_name = f'top_prop_{metric}_{condition}'
+            key_summary[f'top_prop_{metric}_{condition}'] = summary_stats[f'mean_top_prop_{metric}_{condition}']
     
-    # Save focused statistical results
-    coord_stats_file = base_output_dir / f"{model_name}_coord_stats.csv"
-    coord_stats.to_csv(coord_stats_file, index=False)
-    print(f"Coordinate-only statistical results saved to: {coord_stats_file}")
+    # Add percentage differences and their p-values
+    for metric in metrics:
+        # Coordinate differences
+        key_summary[f'coord_diff_percent_{metric}'] = summary_stats[f'mean_top_prop_{metric}_coord_diff_percent']
+        key_summary[f'coord_diff_p_{metric}'] = summary_stats[f'top_prop_{metric}_coord_diff_percent_vs0_p']
+        
+        # COT differences
+        key_summary[f'cot_diff_percent_{metric}'] = summary_stats[f'mean_top_prop_{metric}_cot_diff_percent']
+        key_summary[f'cot_diff_p_{metric}'] = summary_stats[f'top_prop_{metric}_cot_diff_percent_vs0_p']
+    
+    # Save focused summary
+    key_summary_file = base_output_dir / f"{model_name}_key_summary.csv"
+    key_summary.to_csv(key_summary_file, index=False)
+    print(f"Key summary statistics saved to: {key_summary_file}")
     
     return model_df
 
