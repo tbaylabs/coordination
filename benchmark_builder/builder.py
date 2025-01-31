@@ -157,7 +157,7 @@ def build_benchmark_data(df, model_name):
         'task_options_type',
         'top_prop_all',
         'top_prop_answered',
-        'top_option_name'
+        'avg_token_count'
     ]
     model_df = model_df[columns_to_keep]
     
