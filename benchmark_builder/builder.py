@@ -278,27 +278,42 @@ def build_benchmark_data(df, model_name):
 
         # Define statistical test function
         from scipy import stats
-        def one_tailed_ttest_and_cohens_d(condition_values, control_values):
-            # Paired t-test
-            t_stat, p_value = stats.ttest_rel(condition_values, control_values)
+        def one_tailed_rm_ttest_and_cohens_d(condition_values, control_values, task_names):
+            # Group by task to handle repeated measures
+            task_pairs = pd.DataFrame({
+                'task': task_names,
+                'condition': condition_values,
+                'control': control_values
+            })
+            
+            # Calculate mean for each task
+            task_means = task_pairs.groupby('task').agg({
+                'condition': 'mean',
+                'control': 'mean'
+            })
+            
+            # Paired t-test on task means
+            t_stat, p_value = stats.ttest_rel(task_means['condition'], task_means['control'])
             # Convert to one-tailed p-value if t-statistic is positive (condition > control)
             one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
-        
-            # Cohen's d for paired samples
-            d = (condition_values - control_values).mean() / (condition_values - control_values).std()
-        
+            
+            # Cohen's d for repeated measures
+            diff_scores = task_means['condition'] - task_means['control']
+            d = diff_scores.mean() / diff_scores.std()
+            
             return t_stat, one_tailed_p, d
 
         # Calculate statistical tests for this task set
         # First the paired tests between conditions
         for condition_col, control_col in metrics_to_test:
             metric_name = condition_col.replace('_coordinate', '_coord').replace('_coordinate-COT', '_cot')
-            t_stat, p_val, d = one_tailed_ttest_and_cohens_d(
-                task_df[condition_col], 
-                task_df[control_col]
+            t_stat, p_val, d = one_tailed_rm_ttest_and_cohens_d(
+                task_df[condition_col],
+                task_df[control_col],
+                task_df['task_options_name']
             )
             summary_stats.loc[idx, f'{metric_name}_tstat'] = t_stat
-            summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)  # Round to 4 decimal places
+            summary_stats.loc[idx, f'{metric_name}_p'] = p_val.round(4)
             summary_stats.loc[idx, f'{metric_name}_cohens_d'] = d
         
         # Then test if the difference metrics are greater than 0
@@ -309,17 +324,26 @@ def build_benchmark_data(df, model_name):
             'top_prop_answered_cot_diff_abs'
         ]
         
-        def one_tailed_ttest_against_zero(values):
-            # One-sample t-test against 0
-            t_stat, p_value = stats.ttest_1samp(values, 0)
+        def one_tailed_rm_ttest_against_zero(values, task_names):
+            # Group by task to handle repeated measures
+            task_means = pd.DataFrame({
+                'task': task_names,
+                'value': values
+            }).groupby('task')['value'].mean()
+            
+            # One-sample t-test on task means
+            t_stat, p_value = stats.ttest_1samp(task_means, 0)
             # Convert to one-tailed p-value if t-statistic is positive
             one_tailed_p = p_value / 2 if t_stat > 0 else 1 - (p_value / 2)
-            # Cohen's d for one-sample test
-            d = values.mean() / values.std() if len(values) > 1 else float('nan')
+            # Cohen's d for one-sample repeated measures
+            d = task_means.mean() / task_means.std() if len(task_means) > 1 else float('nan')
             return t_stat, one_tailed_p, d
         
         for metric in difference_metrics:
-            t_stat, p_val, d = one_tailed_ttest_against_zero(task_df[metric])
+            t_stat, p_val, d = one_tailed_rm_ttest_against_zero(
+                task_df[metric],
+                task_df['task_options_name']
+            )
             summary_stats.loc[idx, f'{metric}_vs0_tstat'] = t_stat
             summary_stats.loc[idx, f'{metric}_vs0_p'] = p_val.round(4)
             summary_stats.loc[idx, f'{metric}_vs0_cohens_d'] = d
