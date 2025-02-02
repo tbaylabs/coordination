@@ -403,10 +403,13 @@ def build_benchmark_data(df, model_name):
                     'unanswered_included': unanswered_included,
                     'condition': condition,
                     'top_prop': top_prop_value,
+                    'top_prop_sem': summary_stats.loc[task_idx, f'sem_{metric_prefix}_{condition}'],
                     'top_prop_ci_lower_95': top_prop_ci,
                     'absolute_diff': absolute_diff,
+                    'absolute_diff_sem': None if condition == 'control' else summary_stats.loc[task_idx, f'sem_{metric_name}_abs'],
                     'absolute_diff_ci_lower_95': absolute_diff_ci,
                     'percent_diff': percent_diff,
+                    'percent_diff_sem': None if condition == 'control' else summary_stats.loc[task_idx, f'sem_{metric_name}_percent'],
                     'percent_diff_ci_lower_95': percent_diff_ci,
                     'p_value': p_value
                 })
