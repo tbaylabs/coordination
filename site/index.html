@@ -50,8 +50,19 @@
                     data: tableData,
                     columns: [
                         {title:"Model", field:"model"},
+                        {title:"Task Set", field:"task_set"},
+                        {title:"Unanswered", field:"unanswered_included"},
                         {title:"Condition", field:"condition"},
-                        {title:"Low CI", field:"top_prop_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Top Prop", field:"top_prop", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Top Prop SEM", field:"top_prop_sem", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Top Prop CI Lower", field:"top_prop_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Abs Diff", field:"absolute_diff", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Abs Diff SEM", field:"absolute_diff_sem", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Abs Diff CI Lower", field:"absolute_diff_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Percent Diff", field:"percent_diff", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Percent Diff SEM", field:"percent_diff_sem", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Percent Diff CI Lower", field:"percent_diff_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
+                        {title:"P Value", field:"p_value", formatter:"number", formatterParams:{precision:3}},
                     ],
                 });
                 
