@@ -42,9 +42,8 @@ createApp({
             }
         };
         
-        // Create new grid instance - corrected API usage
-        this.gridApi = new agGrid.Grid(gridDiv, gridOptions);
-        this.gridApi = gridOptions.api;
+        // Use the correct AG Grid initialization
+        this.gridApi = new agGridCommunity.Grid(gridDiv, gridOptions).gridApi;
     },
     methods: {
         filterTaskSet(taskSet) {
