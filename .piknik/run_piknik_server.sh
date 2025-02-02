@@ -58,7 +58,7 @@ while true; do
     if [[ "$CLIPBOARD" != "$LAST_CLIPBOARD" ]]; then
         echo "[Sender] Copying new content to Piknik"
         # Add the clipboard content followed by the instruction line
-        MODIFIED_CONTENT="$CLIPBOARD"$'\nReply with a single code block surrounded by triple backticks and using the language identifier "txt". The content inside this code block should be written in markdown format, but any code blocks within the markdown should use <code_block> and </code_block> tags instead of triple backticks.\n\n'
+        MODIFIED_CONTENT="$CLIPBOARD"$'\nReply with a single code block surrounded by triple backticks and using the language identifier "txt". The content inside this code block should be written in markdown format, but any code blocks within the markdown should use <code_block> and </code_block> tags instead of triple backticks. Except for the inital triple backticks to designate the txt block, DO NOT USE TRIPLE BACKTICKS EVER IN YOUR RESPONSE. DO NOT USE TRIPLE BACKTICKS WITHIN THE CODE_BLOCKS.\n\n'
         echo "$MODIFIED_CONTENT" | piknik -config ./.piknik.toml -copy
         LAST_CLIPBOARD="$CLIPBOARD"
     fi
