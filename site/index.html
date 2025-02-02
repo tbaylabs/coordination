@@ -15,15 +15,19 @@
             padding: 5px 10px;
             cursor: pointer;
         }
+        button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="filters">
         <div class="task-filters">
             Task Set: 
-            <button onclick="filterTaskSet('all')">All</button>
-            <button onclick="filterTaskSet('symbol')">Symbol</button>
-            <button onclick="filterTaskSet('text')">Text</button>
+            <button onclick="filterTaskSet('all')" id="all-button" class="active">All</button>
+            <button onclick="filterTaskSet('symbol')" id="symbol-button">Symbol</button>
+            <button onclick="filterTaskSet('text')" id="text-button">Text</button>
         </div>
         <div class="unanswered-filters">
             Unanswered: 
@@ -69,6 +73,11 @@
                 // Global filter functions
                 window.filterTaskSet = function(value) {
                     table.setFilter("task_set", "=", value);
+                    // Update button styles
+                    document.getElementById("all-button").classList.remove("active");
+                    document.getElementById("symbol-button").classList.remove("active");
+                    document.getElementById("text-button").classList.remove("active");
+                    document.getElementById(value + "-button").classList.add("active");
                 };
                 
                 window.filterUnanswered = function(value) {
