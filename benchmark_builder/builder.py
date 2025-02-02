@@ -901,11 +901,9 @@ def build_percent_diff_ci_summary():
     
     df = pd.read_csv(results_file)
     
-    # Clear existing summary file if it exists
-    output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
-    if output_path.exists():
-        output_path.unlink()
-        
+    # Initialize an empty list to store all summaries
+    all_summaries = []
+    
     print(f"Building percent difference CI summary for selected models...")
     
     # Process each selected model
@@ -919,22 +917,27 @@ def build_percent_diff_ci_summary():
             # Build benchmark data for this model
             build_benchmark_data(df, model)
             
+            # Read the model's summary file
+            model_summary_file = Path(__file__).parent / "benchmark_results" / f"{model}.csv"
+            if model_summary_file.exists():
+                model_summary = pd.read_csv(model_summary_file)
+                all_summaries.append(model_summary)
+            
         except Exception as e:
             print(f"Error processing model {model}: {e}")
             continue
     
-    # Read the full summary and filter for just the percent diff CIs
-    if not output_path.exists():
-        raise ValueError("No summary data was generated")
-        
-    full_summary = pd.read_csv(output_path)
+    if not all_summaries:
+        raise ValueError("No summary data was generated for any model")
     
-    # Filter for just the columns we want and only for selected models
-    ci_summary = full_summary[
-        (full_summary['model'].isin(selected_models))
-    ][['model', 'task_set', 'unanswered_included', 'condition', 'percent_diff_ci_lower_95']]
+    # Combine all summaries
+    full_summary = pd.concat(all_summaries, ignore_index=True)
+    
+    # Filter for just the columns we want
+    ci_summary = full_summary[['model', 'task_set', 'unanswered_included', 'condition', 'percent_diff_ci_lower_95']]
     
     # Save the simplified summary
+    output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
     ci_summary.to_csv(output_path, index=False)
     print("Successfully created percent difference CI summary")
     return ci_summary
