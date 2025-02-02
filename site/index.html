@@ -34,6 +34,11 @@
             <button onclick="filterUnanswered('True')" id="true-button">Include</button>
             <button onclick="filterUnanswered('False')" id="false-button" class="active">Exclude</button>
         </div>
+        <div class="condition-filters">
+            Condition: 
+            <button onclick="filterCondition('coordinate-COT')" id="cot-button" class="active">COT</button>
+            <button onclick="filterCondition('coordinate')" id="pure-button">Pure</button>
+        </div>
     </div>
     <div id="benchmark-table"></div>
 
@@ -73,16 +78,28 @@
                 // Track current filter state
                 var currentFilters = {
                     taskSet: 'all',
-                    unanswered: 'False'
+                    unanswered: 'False',
+                    condition: 'coordinate-COT'
                 };
 
                 // Function to apply both filters
                 function applyFilters() {
                     table.setFilter([
                         {field: "task_set", type: "=", value: currentFilters.taskSet},
-                        {field: "unanswered_included", type: "=", value: currentFilters.unanswered}
+                        {field: "unanswered_included", type: "=", value: currentFilters.unanswered},
+                        {field: "condition", type: "=", value: currentFilters.condition}
                     ]);
                 }
+
+                // Condition filter function
+                window.filterCondition = function(value) {
+                    currentFilters.condition = value;
+                    applyFilters();
+                    // Update condition button styles
+                    document.getElementById("cot-button").classList.remove("active");
+                    document.getElementById("pure-button").classList.remove("active");
+                    document.getElementById((value === 'coordinate-COT' ? 'cot' : 'pure') + "-button").classList.add("active");
+                };
 
                 // Global filter functions
                 window.filterTaskSet = function(value) {
@@ -107,6 +124,7 @@
                 // Set initial filters
                 filterTaskSet('all');
                 filterUnanswered('False');
+                filterCondition('coordinate-COT');
             }
         });
     </script>
