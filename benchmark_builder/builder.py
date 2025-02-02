@@ -393,10 +393,9 @@ def build_benchmark_data(df, model_name):
                     'unanswered_included': unanswered_included,
                     'condition': condition,
                     'top_prop': top_prop_value,
-                    'top_prop_ci_lower': top_prop_ci,
+                    'top_prop_ci_lower_95': top_prop_ci,  # Renamed
                     'percent_diff': percent_diff,
-                    'percent_diff_ci_lower': percent_diff_ci,
-                    'p_value': p_value
+                    'percent_diff_ci_lower_95': percent_diff_ci,  # Renamed
                 })
     
     # Create DataFrame from collected metrics
