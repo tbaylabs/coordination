@@ -19,6 +19,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
+        .main-score {
+            background-color: #f8f9fa !important;
+            font-weight: 600;
+        }
 
         .task-filters, .unanswered-filters, .condition-filters {
             margin: 15px 0;
@@ -169,12 +173,6 @@
     <div id="benchmark-table"></div>
 
     <div class="filters">
-        <div class="task-filters">
-            <span class="filter-label">Task Set:</span>
-            <button onclick="filterTaskSet('all')" id="all-button" class="active">All</button>
-            <button onclick="filterTaskSet('symbol')" id="symbol-button">Symbol</button>
-            <button onclick="filterTaskSet('text')" id="text-button">Text</button>
-        </div>
         <div class="condition-filters">
             <span class="filter-label">Condition:</span>
             <button onclick="filterCondition('cot')" id="cot-button" class="active">COT</button>
@@ -204,13 +202,13 @@
                     layout:"fitColumns",
                     data: tableData,
                     initialSort:[
-                        {column:"all_tasks", dir:"desc"} // Sort by all_tasks by default
+                        {column:"all_tasks", dir:"desc"} // Sort by main score by default
                     ],
                     columns: [
-                        {title:"Model", field:"model", headerSort:true},
-                        {title:"All Tasks", field:"all_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
-                        {title:"Symbol Tasks", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
-                        {title:"Text Tasks", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}}
+                        {title:"Model", field:"model", headerSort:true, width:200},
+                        {title:"Silent Agreement Score (SAv0)", field:"all_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}, cssClass:"main-score", width:250},
+                        {title:"SAv0-symbols", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
+                        {title:"SAv0-text", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}}
                     ],
                 });
                 
