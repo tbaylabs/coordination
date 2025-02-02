@@ -933,13 +933,16 @@ def build_percent_diff_ci_summary():
     # Combine all summaries
     full_summary = pd.concat(all_summaries, ignore_index=True)
     
-    # Filter for just the columns we want
+    # Filter for just the columns we want and rename them
     ci_summary = full_summary[[
         'model', 
         'task_set',
         'mean_top_prop_all_coord_diff_percent',
         'mean_top_prop_all_cot_diff_percent'
-    ]]
+    ]].rename(columns={
+        'mean_top_prop_all_coord_diff_percent': 'coord_delta',
+        'mean_top_prop_all_cot_diff_percent': 'cot_delta'
+    })
     
     # Save the simplified summary
     output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
