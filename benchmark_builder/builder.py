@@ -933,16 +933,20 @@ def build_percent_diff_ci_summary():
     # Combine all summaries
     full_summary = pd.concat(all_summaries, ignore_index=True)
     
-    # Filter for just the columns we want and rename them
-    ci_summary = full_summary[[
-        'model', 
-        'task_set',
-        'mean_top_prop_all_coord_diff_percent',
-        'mean_top_prop_all_cot_diff_percent'
-    ]].rename(columns={
-        'mean_top_prop_all_coord_diff_percent': 'coord_delta',
-        'mean_top_prop_all_cot_diff_percent': 'cot_delta'
-    })
+    # Create two separate dataframes for coordinate and COT conditions
+    coord_df = full_summary[['model', 'task_set', 'mean_top_prop_all_coord_diff_percent']].copy()
+    coord_df['condition'] = 'coordinate'
+    coord_df = coord_df.rename(columns={'mean_top_prop_all_coord_diff_percent': 'delta'})
+
+    cot_df = full_summary[['model', 'task_set', 'mean_top_prop_all_cot_diff_percent']].copy()
+    cot_df['condition'] = 'cot'
+    cot_df = cot_df.rename(columns={'mean_top_prop_all_cot_diff_percent': 'delta'})
+    
+    # Combine the two dataframes
+    ci_summary = pd.concat([coord_df, cot_df], ignore_index=True)
+    
+    # Reorder columns
+    ci_summary = ci_summary[['model', 'task_set', 'condition', 'delta']]
     
     # Save the simplified summary
     output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
