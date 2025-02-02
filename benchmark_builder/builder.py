@@ -459,7 +459,7 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
 def build_non_reasoning_summary():
     """
     Creates a stacked key summary table for all non-reasoning models by loading
-    model categories and calling stack_key_summaries.
+    model categories and building summaries incrementally.
     
     Returns:
         pd.DataFrame: Stacked key summary table for non-reasoning models
@@ -476,59 +476,52 @@ def build_non_reasoning_summary():
     non_reasoning_models = categories.get('non_reasoning_models', [])
     if not non_reasoning_models:
         raise ValueError("No non-reasoning models found in categories file")
+    
+    # Clear existing summary file if it exists
+    output_path = Path(__file__).parent / "benchmark_results" / "non_reasoning_models_summary.csv"
+    if output_path.exists():
+        output_path.unlink()
         
     print(f"Building summary for {len(non_reasoning_models)} non-reasoning models...")
     
-    # Create stacked summary
-    try:
-        stacked_df = stack_key_summaries(non_reasoning_models)
-        print("Successfully created non-reasoning models summary")
-        return stacked_df
-    except Exception as e:
-        print(f"Error creating non-reasoning summary: {e}")
-        raise
-
-def stack_key_summaries(model_names):
-    """
-    Creates a single stacked key summary table from multiple models' key summaries.
+    # Load the aggregated results
+    results_file = Path(__file__).parent.parent / "pipeline" / "4_analysis" / "trial_results_aggregated.csv"
+    if not results_file.exists():
+        raise FileNotFoundError("Could not find aggregated results file. Please run aggregate_trial_results.py first")
     
-    Args:
-        model_names (list): List of model names to include
-        
-    Returns:
-        pd.DataFrame: Stacked key summary table
-    """
-    base_dir = Path(__file__).parent / "benchmark_results"
+    df = pd.read_csv(results_file)
     
-    # Initialize empty list to store DataFrames
-    dfs = []
-    
-    # Load and stack each model's key summary
-    for model in model_names:
-        file_path = base_dir / f"{model}_key_summary.csv"
-        if not file_path.exists():
-            print(f"Warning: No key summary found for {model}, skipping...")
-            continue
+    # Process each model and append to the summary file
+    for model in non_reasoning_models:
+        try:
+            print(f"Processing {model}...")
+            if model not in df['model_name'].unique():
+                print(f"Warning: Model '{model}' not found in results, skipping...")
+                continue
+                
+            # Build benchmark data for this model
+            model_df = build_benchmark_data(df, model)
             
-        df = pd.read_csv(file_path)
-        dfs.append(df)
+            # Get the metrics data for this model and append to CSV
+            # If file doesn't exist, create it with headers
+            mode = 'a' if output_path.exists() else 'w'
+            header = not output_path.exists()
+            
+            # The metrics_data will be written directly to the CSV in build_benchmark_data
+            # instead of creating individual files
+            
+        except Exception as e:
+            print(f"Error processing model {model}: {e}")
+            continue
     
-    # Stack all DataFrames
-    if not dfs:
-        raise ValueError("No valid key summaries found for the specified models")
+    # Read and return the final summary
+    if not output_path.exists():
+        raise ValueError("No summary data was generated")
         
-    stacked_df = pd.concat(dfs, axis=0, ignore_index=True)
-    
-    # Sort the DataFrame
-    sort_order = ['model', 'task_set', 'unanswered_included', 'condition']
-    stacked_df = stacked_df.sort_values(sort_order)
-    
-    # Save only the final stacked results
-    output_path = base_dir / "non_reasoning_models_summary.csv"
-    stacked_df.to_csv(output_path, index=False)
-    print(f"Non-reasoning models summary saved to: {output_path}")
-    
-    return stacked_df
+    final_summary = pd.read_csv(output_path)
+    print("Successfully created non-reasoning models summary")
+    return final_summary
+
 
 def main():
     """
