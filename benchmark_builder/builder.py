@@ -781,6 +781,9 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
         df (pd.DataFrame): DataFrame to display
         max_rows (int): Maximum number of rows to display
         show_index (bool): Whether to show the index in the output
+        
+    Returns:
+        None
     """
     # Set display options for better terminal output
     pd.set_option('display.max_rows', max_rows)
@@ -789,39 +792,14 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
     pd.set_option('display.max_colwidth', None)
     
     if len(df) > max_rows:
-        print(f"\nDisplaying first {max_rows} rows (total: {len(df)}):\n")
+        print(f"\nDisplaying first {max_rows} rows "
+              f"(total: {len(df)}):\n")
         display_df = df.head(max_rows)
     else:
         display_df = df
     
     if not show_index:
-        print(display_df.to_string(index=False))
-    else:
-        print(display_df.to_string())
-    
-    # Reset display options to defaults
-    pd.reset_option('display.max_rows')
-    pd.reset_option('display.max_columns')
-    pd.reset_option('display.width')
-    pd.reset_option('display.max_colwidth')
-        df (pd.DataFrame): DataFrame to display
-        max_rows (int): Maximum number of rows to display
-        show_index (bool): Whether to show the index in the output
-    """
-    # Set display options for better terminal output
-    pd.set_option('display.max_rows', max_rows)
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', None)
-    pd.set_option('display.max_colwidth', None)
-    
-    if len(df) > max_rows:
-        print(f"\nDisplaying first {max_rows} rows (total: {len(df)}):\n")
-        display_df = df.head(max_rows)
-    else:
-        display_df = df
-    
-    if not show_index:
-        print(display_df.to_string(index=False))
+        print(display_df.to_string(index = False))
     else:
         print(display_df.to_string())
     
