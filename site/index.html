@@ -217,13 +217,13 @@
                 // Create COT table
                 var cotTable = new Tabulator("#cot-table", {
                     layout:"fitColumns",
-                    data: tableData.filter(row => row.task_set === 'all' && row.condition === 'coordinate-COT'),
+                    data: tableData.filter(row => row.condition === 'cot'),
                     initialSort:[
-                        {column:"percent_diff_ci_lower_95", dir:"desc"}
+                        {column:"all_tasks", dir:"desc"}
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0-COT)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:function(cell){
+                        {title:"Silent Agreement Score (SAv0-COT)", field:"all_tasks", headerSort:true, formatter:function(cell){
                             return cell.getValue().toFixed(2) + "%";
                         }, cssClass:"main-score", width:250},
                         {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
@@ -237,14 +237,14 @@
 
                 // Create Pure table
                 var pureTable = new Tabulator("#pure-table", {
-                    layout:"fitColumns",
-                    data: tableData.filter(row => row.task_set === 'all' && row.condition === 'coordinate'),
+                    layout:"fitColumns", 
+                    data: tableData.filter(row => row.condition === 'coordinate'),
                     initialSort:[
-                        {column:"percent_diff_ci_lower_95", dir:"desc"}
+                        {column:"all_tasks", dir:"desc"}
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0-Pure)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:function(cell){
+                        {title:"Silent Agreement Score (SAv0-Pure)", field:"all_tasks", headerSort:true, formatter:function(cell){
                             return cell.getValue().toFixed(2) + "%";
                         }, cssClass:"main-score", width:250},
                         {title:"SAv0-Pure-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
