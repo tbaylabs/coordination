@@ -963,9 +963,10 @@ def build_percent_diff_ci_summary():
     ci_summary = pd.DataFrame(summary_rows)
     
     # Save the simplified summary
-    output_path = Path(__file__).parent / "benchmark_results" / "benchmark_table.csv"
+    output_path = Path(__file__).parent.parent / "site" / "data" / "benchmark_table.csv"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     ci_summary.to_csv(output_path, index=False)
-    print("Successfully created benchmark table")
+    print(f"Successfully created benchmark table in site data directory: {output_path}")
     return ci_summary
 
 def main():
