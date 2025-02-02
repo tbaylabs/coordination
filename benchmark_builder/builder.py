@@ -408,6 +408,7 @@ def build_benchmark_data(df, model_name):
                     'absolute_diff_ci_lower_95': absolute_diff_ci,
                     'percent_diff': percent_diff,
                     'percent_diff_ci_lower_95': percent_diff_ci,
+                    'p_value': p_value
                 })
     
     # Create DataFrame from collected metrics
