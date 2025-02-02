@@ -380,7 +380,7 @@ def build_benchmark_data(df, model_name):
                 'condition': condition,
                 'value': top_prop_value,
                 'ci_lower': top_prop_ci,
-                'p_value': summary_stats.loc[task_idx, f'{condition}_tstat'] if 'tstat' in summary_stats.columns else None
+                'p_value': None
             })
                 
             # Add percent_diff metrics if not control
