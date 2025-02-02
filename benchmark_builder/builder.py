@@ -523,10 +523,10 @@ def stack_key_summaries(model_names):
     sort_order = ['model', 'task_set', 'unanswered_included', 'condition']
     stacked_df = stacked_df.sort_values(sort_order)
     
-    # Save the stacked results
-    output_path = base_dir / "stacked_key_summary.csv"
+    # Save only the final stacked results
+    output_path = base_dir / "non_reasoning_models_summary.csv"
     stacked_df.to_csv(output_path, index=False)
-    print(f"Stacked key summary saved to: {output_path}")
+    print(f"Non-reasoning models summary saved to: {output_path}")
     
     return stacked_df
 
