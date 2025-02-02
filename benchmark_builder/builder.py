@@ -963,9 +963,9 @@ def build_percent_diff_ci_summary():
     ci_summary = pd.DataFrame(summary_rows)
     
     # Save the simplified summary
-    output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
+    output_path = Path(__file__).parent / "benchmark_results" / "benchmark_table.csv"
     ci_summary.to_csv(output_path, index=False)
-    print("Successfully created percent difference CI summary")
+    print("Successfully created benchmark table")
     return ci_summary
 
 def main():
