@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Benchmark Results</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Model Benchmark Results</h1>
+        <div class="filters">
+            <button @click="filterTaskSet('all')">All Tasks</button>
+            <button @click="filterTaskSet('symbol')">Symbol Tasks</button>
+            <button @click="filterTaskSet('text')">Text Tasks</button>
+            <label>
+                <input type="checkbox" v-model="includeUnanswered"> Include Unanswered
+            </label>
+        </div>
+        <div id="myGrid" class="ag-theme-alpine"></div>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
