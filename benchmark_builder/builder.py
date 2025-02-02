@@ -370,7 +370,7 @@ def build_benchmark_data(df, model_name):
             # Base metrics for top_prop
             top_prop_value = summary_stats.loc[task_idx, f'mean_top_prop_all_{condition}']
             top_prop_ci = top_prop_value - (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_{condition}'])
-            
+                
             # Create entry for top_prop metrics
             metrics_data.append({
                 'model': model_name,
@@ -382,15 +382,15 @@ def build_benchmark_data(df, model_name):
                 'ci_lower': top_prop_ci,
                 'p_value': summary_stats.loc[task_idx, f'{condition}_tstat'] if 'tstat' in summary_stats.columns else None
             })
-            
+                
             # Add percent_diff metrics if not control
             if condition != 'control':
-                metric_name = f'top_prop_all_{condition.replace("-COT", "_cot")}_diff'
+                metric_name = f'top_prop_all_{"coord" if condition == "coordinate" else "cot"}_diff'
                 percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
                 percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
                     (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
                 p_value = summary_stats.loc[task_idx, f'{metric_name}_vs0_p']
-                
+                    
                 metrics_data.append({
                     'model': model_name,
                     'task_set': task_set,
