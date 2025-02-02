@@ -389,7 +389,7 @@ def build_benchmark_data(df, model_name):
                 percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
                 percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
                     (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
-                p_value = summary_stats.loc[task_idx, f'{metric_name}_vs0_p']
+                p_value = summary_stats.loc[task_idx, f'{metric_name}_percent_vs0_p']
                     
                 metrics_data.append({
                     'model': model_name,
