@@ -217,30 +217,42 @@
                 // Create COT table
                 var cotTable = new Tabulator("#cot-table", {
                     layout:"fitColumns",
-                    data: tableData.filter(row => row.condition === 'coordinate-COT'),
+                    data: tableData.filter(row => row.task_set === 'all' && row.condition === 'coordinate-COT'),
                     initialSort:[
                         {column:"percent_diff_ci_lower_95", dir:"desc"}
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0-COT)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, cssClass:"main-score", width:250},
-                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, width:200},
-                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, width:200}
+                        {title:"Silent Agreement Score (SAv0-COT)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, cssClass:"main-score", width:250},
+                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, width:200},
+                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, width:200}
                     ]
                 });
 
                 // Create Pure table
                 var pureTable = new Tabulator("#pure-table", {
                     layout:"fitColumns",
-                    data: tableData.filter(row => row.condition === 'coordinate'),
+                    data: tableData.filter(row => row.task_set === 'all' && row.condition === 'coordinate'),
                     initialSort:[
                         {column:"percent_diff_ci_lower_95", dir:"desc"}
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0-Pure)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, cssClass:"main-score", width:250},
-                        {title:"SAv0-Pure-symbols", field:"symbol_tasks", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, width:200},
-                        {title:"SAv0-Pure-text", field:"text_tasks", headerSort:true, formatter:"money", formatterParams:{precision:2, symbol:""}, width:200}
+                        {title:"Silent Agreement Score (SAv0-Pure)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, cssClass:"main-score", width:250},
+                        {title:"SAv0-Pure-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, width:200},
+                        {title:"SAv0-Pure-text", field:"text_tasks", headerSort:true, formatter:function(cell){
+                            return cell.getValue().toFixed(2) + "%";
+                        }, width:200}
                     ]
                 });
 
