@@ -958,8 +958,8 @@ def main():
     
     if sys.argv[1] == "--percent-diff-ci":
         build_percent_diff_ci_summary()
-    else:
-        model_name = sys.argv[1]
+        return
+    model_name = sys.argv[1]
     
     # Get the project root directory (2 levels up from this file)
     project_root = Path(__file__).parent.parent
