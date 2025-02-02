@@ -34,17 +34,22 @@ createApp({
     },
     mounted() {
         const gridDiv = document.querySelector('#myGrid');
-        new agGrid.Grid(gridDiv, {
+        const gridOptions = {
             columnDefs: this.columnDefs,
             rowData: benchmarkData,
             defaultColDef: {
                 resizable: true,
             }
-        });
-        this.gridApi = gridDiv.gridApi;
+        };
+        
+        // Create new grid instance
+        this.gridApi = agGridCommunity.createGrid(gridDiv, gridOptions);
+        this.gridApi = gridOptions.api;
     },
     methods: {
         filterTaskSet(taskSet) {
+            if (!this.gridApi) return;
+            
             const filteredData = benchmarkData.filter(row => 
                 row.task_set === taskSet && 
                 row.unanswered_included === this.includeUnanswered
