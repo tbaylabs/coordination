@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Benchmark Results</title>
+    <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
+</head>
+<body>
+    <input id="taskSetFilter" type="text" placeholder="Filter task_set">
+    <label>
+        <input type="checkbox" id="unansweredToggle"> Show unanswered only
+    </label>
+    <div id="benchmark-table"></div>
+
+    <!-- Include Tabulator and PapaParse for CSV parsing -->
+    <script src="https://unpkg.com/tabulator-tables@5.4.3/dist/js/tabulator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        // Load CSV data from the site/data folder
+        Papa.parse('data/non_reasoning_models_summary.csv', {
+            download: true,
+            header: true,
+            complete: function(results) {
+                var tableData = results.data;
+                // Initialize Tabulator with the desired columns
+                var table = new Tabulator("#benchmark-table", {
+                    layout:"fitColumns",
+                    data: tableData,
+                    columns: [
+                        {title:"Model", field:"model"},
+                        {title:"Task Set", field:"task_set"},
+                        {title:"Unanswered", field:"unanswered_included"},
+                        {title:"Condition", field:"condition"},
+                        {title:"Low CI", field:"top_prop_ci_lower_95"},
+                    ],
+                });
+                
+                // Filter by task_set using the input field
+                document.getElementById("taskSetFilter").addEventListener("input", function(){
+                    var value = this.value;
+                    table.setFilter("task_set", "like", value);
+                });
+                
+                // Toggle unanswered filter using the checkbox
+                document.getElementById("unansweredToggle").addEventListener("change", function(){
+                    if(this.checked){
+                        table.setFilter("unanswered_included", "=", "True");
+                    } else {
+                        table.clearFilter("unanswered_included");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
