@@ -209,11 +209,11 @@
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0-COT)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:"number", formatterParams:{precision:2}, cssClass:"main-score", width:250},
-                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:2}},
-                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:2}}
+                        {title:"Silent Agreement Score (SAv0-COT)", field:"percent_diff_ci_lower_95", headerSort:true, formatter:"numeric", formatterParams:{precision:2}, cssClass:"main-score", width:250},
+                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:"numeric", formatterParams:{precision:2}},
+                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:"numeric", formatterParams:{precision:2}}
                     ],
-                    tableBuilt: function() {
+                    renderComplete: function() {
                         // Only start filtering and updating after table is built
                         updateConditionDescription('cot');
                         updateColumnHeaders('cot');
