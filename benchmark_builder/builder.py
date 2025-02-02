@@ -455,6 +455,48 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
     pd.reset_option('display.width')
     pd.reset_option('display.max_colwidth')
 
+def stack_key_summaries(model_names):
+    """
+    Creates a single stacked key summary table from multiple models' key summaries.
+    
+    Args:
+        model_names (list): List of model names to include
+        
+    Returns:
+        pd.DataFrame: Stacked key summary table
+    """
+    base_dir = Path(__file__).parent / "benchmark_results"
+    
+    # Initialize empty list to store DataFrames
+    dfs = []
+    
+    # Load and stack each model's key summary
+    for model in model_names:
+        file_path = base_dir / f"{model}_key_summary.csv"
+        if not file_path.exists():
+            print(f"Warning: No key summary found for {model}, skipping...")
+            continue
+            
+        df = pd.read_csv(file_path)
+        dfs.append(df)
+    
+    # Stack all DataFrames
+    if not dfs:
+        raise ValueError("No valid key summaries found for the specified models")
+        
+    stacked_df = pd.concat(dfs, axis=0, ignore_index=True)
+    
+    # Sort the DataFrame
+    sort_order = ['model', 'task_set', 'unanswered_included', 'condition']
+    stacked_df = stacked_df.sort_values(sort_order)
+    
+    # Save the stacked results
+    output_path = base_dir / "stacked_key_summary.csv"
+    stacked_df.to_csv(output_path, index=False)
+    print(f"Stacked key summary saved to: {output_path}")
+    
+    return stacked_df
+
 def main():
     """
     Command line interface for building benchmark data.
