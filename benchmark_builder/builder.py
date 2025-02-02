@@ -879,11 +879,21 @@ def build_non_reasoning_summary():
 def build_percent_diff_ci_summary():
     """
     Creates a simplified summary table containing only the lower confidence intervals 
-    for percent differences across all models.
+    for percent differences across selected models.
     
     Returns:
-        pd.DataFrame: Summary table with percent difference CIs for all models
+        pd.DataFrame: Summary table with percent difference CIs for selected models
     """
+    # Define the specific models we want
+    selected_models = [
+        'claude-35-sonnet',
+        'gpt-4o',
+        'llama-33-70b',
+        'llama-31-405b',
+        'llama-31-70b',
+        'deepseek-v3'
+    ]
+    
     # Load the aggregated results
     results_file = Path(__file__).parent.parent / "pipeline" / "4_analysis" / "trial_results_aggregated.csv"
     if not results_file.exists():
@@ -891,18 +901,15 @@ def build_percent_diff_ci_summary():
     
     df = pd.read_csv(results_file)
     
-    # Get list of all unique models
-    all_models = sorted(df['model_name'].unique())
-    
     # Clear existing summary file if it exists
     output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
     if output_path.exists():
         output_path.unlink()
         
-    print(f"Building percent difference CI summary for {len(all_models)} models...")
+    print(f"Building percent difference CI summary for selected models...")
     
-    # Process each model
-    for model in all_models:
+    # Process each selected model
+    for model in selected_models:
         try:
             print(f"Processing {model}...")
             if model not in df['model_name'].unique():
@@ -922,9 +929,10 @@ def build_percent_diff_ci_summary():
         
     full_summary = pd.read_csv(output_path)
     
-    # Filter for just the columns we want
-    ci_summary = full_summary[['model', 'task_set', 'unanswered_included', 
-                             'condition', 'percent_diff_ci_lower_95']]
+    # Filter for just the columns we want and only for selected models
+    ci_summary = full_summary[
+        (full_summary['model'].isin(selected_models))
+    ][['model', 'task_set', 'unanswered_included', 'condition', 'percent_diff_ci_lower_95']]
     
     # Save the simplified summary
     ci_summary.to_csv(output_path, index=False)
