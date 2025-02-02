@@ -206,9 +206,9 @@
                     ],
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
-                        {title:"Silent Agreement Score (SAv0)", field:"all_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}, cssClass:"main-score", width:250},
-                        {title:"SAv0-symbols", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
-                        {title:"SAv0-text", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}}
+                        {title:"Silent Agreement Score (SAv0-COT)", field:"all_tasks", headerSort:true, formatter:"number", formatterParams:{precision:2}, cssClass:"main-score", width:250},
+                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:2}},
+                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:2}}
                     ],
                 });
                 
@@ -239,8 +239,28 @@
                     }
                 }
 
+                function updateColumnHeaders(condition) {
+                    const suffix = condition === 'cot' ? 'COT' : 'Pure';
+                    table.updateColumnDefinition("all_tasks", {title: `Silent Agreement Score (SAv0-${suffix})`});
+                    table.updateColumnDefinition("symbol_tasks", {title: `SAv0-${suffix}-symbols`});
+                    table.updateColumnDefinition("text_tasks", {title: `SAv0-${suffix}-text`});
+                }
+
+                // Condition filter function
+                window.filterCondition = function(value) {
+                    currentFilters.condition = value;
+                    table.setFilter("condition", "=", value);
+                    updateConditionDescription(value);
+                    updateColumnHeaders(value);
+                    // Update condition button styles
+                    document.getElementById("cot-button").classList.remove("active");
+                    document.getElementById("pure-button").classList.remove("active");
+                    document.getElementById((value === 'cot' ? 'cot' : 'pure') + "-button").classList.add("active");
+                };
+
                 // Set initial filters and description
                 updateConditionDescription('cot');
+                updateColumnHeaders('cot');
                 filterCondition('cot');
             }
         });
