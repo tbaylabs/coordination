@@ -224,14 +224,17 @@
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
                         {title:"Silent Agreement Score (SAv0-COT)", field:"all_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
-                        }, cssClass:"main-score", width:250},
-                        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
-                        }, width:200},
-                        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
-                        }, width:200}
+            const value = cell.getValue();
+            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
+        }, cssClass:"main-score", width:250},
+        {title:"SAv0-COT-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
+            const value = cell.getValue();
+            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
+        }, width:200},
+        {title:"SAv0-COT-text", field:"text_tasks", headerSort:true, formatter:function(cell){
+            const value = cell.getValue();
+            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
+        }, width:200}
                     ]
                 });
 
@@ -245,15 +248,17 @@
                     columns: [
                         {title:"Model", field:"model", headerSort:true, width:200},
                         {title:"Silent Agreement Score (SAv0-Pure)", field:"all_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
+                            const value = cell.getValue();
+                            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
                         }, cssClass:"main-score", width:250},
                         {title:"SAv0-Pure-symbols", field:"symbol_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
+                            const value = cell.getValue();
+                            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
                         }, width:200},
                         {title:"SAv0-Pure-text", field:"text_tasks", headerSort:true, formatter:function(cell){
-                            return cell.getValue().toFixed(2) + "%";
+                            const value = cell.getValue();
+                            return value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "N/A";
                         }, width:200}
-                    ]
                 });
 
                 // Update condition description function
