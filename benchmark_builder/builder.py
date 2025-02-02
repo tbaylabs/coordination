@@ -371,36 +371,18 @@ def build_benchmark_data(df, model_name):
             top_prop_value = summary_stats.loc[task_idx, f'mean_top_prop_all_{condition}']
             top_prop_ci = top_prop_value - (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_{condition}'])
                 
-            # Create entry for top_prop metrics
+            # Create entry for metrics
             metrics_data.append({
                 'model': model_name,
                 'task_set': task_set,
                 'unanswered_included': True,
-                'metric': 'top_prop',
                 'condition': condition,
-                'value': top_prop_value,
-                'ci_lower': top_prop_ci,
-                'p_value': None
+                'top_prop': top_prop_value,
+                'top_prop_ci_lower': top_prop_ci,
+                'percent_diff': percent_diff if condition != 'control' else None,
+                'percent_diff_ci_lower': percent_diff_ci if condition != 'control' else None,
+                'p_value': p_value if condition != 'control' else None
             })
-                
-            # Add percent_diff metrics if not control
-            if condition != 'control':
-                metric_name = f'top_prop_all_{"coord" if condition == "coordinate" else "cot"}_diff'
-                percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
-                percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
-                    (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
-                p_value = summary_stats.loc[task_idx, f'{metric_name}_percent_vs0_p']
-                    
-                metrics_data.append({
-                    'model': model_name,
-                    'task_set': task_set,
-                    'unanswered_included': True,
-                    'metric': 'percent_diff',
-                    'condition': condition,
-                    'value': percent_diff,
-                    'ci_lower': percent_diff_ci,
-                    'p_value': p_value
-                })
     
     # Create DataFrame from collected metrics
     key_summary = pd.DataFrame(metrics_data)
