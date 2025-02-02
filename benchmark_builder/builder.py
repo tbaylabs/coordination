@@ -359,42 +359,45 @@ def build_benchmark_data(df, model_name):
     
     # Create focused summary with key metrics
     key_summary = pd.DataFrame()
-    # Initialize lists to store metrics for each task set
     metrics_data = []
-    
+
     for task_set in ['all', 'symbol', 'text']:
         task_idx = summary_stats[summary_stats['task_set'] == task_set].index[0]
         
-        # Create rows for each condition and metric type
-        for condition in ['control', 'coordinate', 'coordinate-COT']:
-            # Base metrics for top_prop
-            top_prop_value = summary_stats.loc[task_idx, f'mean_top_prop_all_{condition}']
-            top_prop_ci = top_prop_value - (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_{condition}'])
-                
-            if condition == 'control':
-                percent_diff = None
-                percent_diff_ci = None
-                p_value = None
-            else:
-                # Calculate percent difference from control
-                metric_name = f'top_prop_all_{"coord" if condition == "coordinate" else "cot"}_diff'
-                percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
-                percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
-                    (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
-                p_value = summary_stats.loc[task_idx, f'{metric_name}_percent_vs0_p']
-                
-            # Create entry for metrics
-            metrics_data.append({
-                'model': model_name,
-                'task_set': task_set,
-                'unanswered_included': True,
-                'condition': condition,
-                'top_prop': top_prop_value,
-                'top_prop_ci_lower': top_prop_ci,
-                'percent_diff': percent_diff,
-                'percent_diff_ci_lower': percent_diff_ci,
-                'p_value': p_value
-            })
+        # Loop through both unanswered included and excluded cases
+        for unanswered_included in [True, False]:
+            metric_prefix = 'top_prop_all' if unanswered_included else 'top_prop_answered'
+            
+            # Create rows for each condition and metric type
+            for condition in ['control', 'coordinate', 'coordinate-COT']:
+                # Base metrics for top_prop
+                top_prop_value = summary_stats.loc[task_idx, f'mean_{metric_prefix}_{condition}']
+                top_prop_ci = top_prop_value - (1.645 * summary_stats.loc[task_idx, f'sem_{metric_prefix}_{condition}'])
+                    
+                if condition == 'control':
+                    percent_diff = None
+                    percent_diff_ci = None
+                    p_value = None
+                else:
+                    # Calculate percent difference from control
+                    metric_name = f'{metric_prefix}_{"coord" if condition == "coordinate" else "cot"}_diff'
+                    percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
+                    percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
+                        (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
+                    p_value = summary_stats.loc[task_idx, f'{metric_name}_percent_vs0_p']
+                    
+                # Create entry for metrics
+                metrics_data.append({
+                    'model': model_name,
+                    'task_set': task_set,
+                    'unanswered_included': unanswered_included,
+                    'condition': condition,
+                    'top_prop': top_prop_value,
+                    'top_prop_ci_lower': top_prop_ci,
+                    'percent_diff': percent_diff,
+                    'percent_diff_ci_lower': percent_diff_ci,
+                    'p_value': p_value
+                })
     
     # Create DataFrame from collected metrics
     key_summary = pd.DataFrame(metrics_data)
