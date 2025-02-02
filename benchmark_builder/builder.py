@@ -943,9 +943,9 @@ def build_percent_diff_ci_summary():
         coord_row = {
             'model': model,
             'condition': 'coordinate',
-            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_coord_diff_percent']),
-            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_coord_diff_percent']),
-            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_coord_diff_percent'])
+            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_coord_diff_percent'].iloc[0]),
+            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_coord_diff_percent'].iloc[0]),
+            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_coord_diff_percent'].iloc[0])
         }
         summary_rows.append(coord_row)
         
@@ -953,9 +953,9 @@ def build_percent_diff_ci_summary():
         cot_row = {
             'model': model,
             'condition': 'cot',
-            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_cot_diff_percent']),
-            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_cot_diff_percent']),
-            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_cot_diff_percent'])
+            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_cot_diff_percent'].iloc[0]),
+            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_cot_diff_percent'].iloc[0]),
+            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_cot_diff_percent'].iloc[0])
         }
         summary_rows.append(cot_row)
     
