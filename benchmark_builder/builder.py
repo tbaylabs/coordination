@@ -878,11 +878,11 @@ def build_non_reasoning_summary():
 
 def build_percent_diff_ci_summary():
     """
-    Creates a simplified summary table containing only the lower confidence intervals 
-    for percent differences across selected models.
+    Creates a simplified summary table containing deltas for all task sets,
+    for both coordinate and COT conditions across selected models.
     
     Returns:
-        pd.DataFrame: Summary table with percent difference CIs for selected models
+        pd.DataFrame: Summary table with deltas for all task sets
     """
     # Define the specific models we want
     selected_models = [
@@ -933,20 +933,34 @@ def build_percent_diff_ci_summary():
     # Combine all summaries
     full_summary = pd.concat(all_summaries, ignore_index=True)
     
-    # Create two separate dataframes for coordinate and COT conditions
-    coord_df = full_summary[['model', 'task_set', 'mean_top_prop_all_coord_diff_percent']].copy()
-    coord_df['condition'] = 'coordinate'
-    coord_df = coord_df.rename(columns={'mean_top_prop_all_coord_diff_percent': 'delta'})
-
-    cot_df = full_summary[['model', 'task_set', 'mean_top_prop_all_cot_diff_percent']].copy()
-    cot_df['condition'] = 'cot'
-    cot_df = cot_df.rename(columns={'mean_top_prop_all_cot_diff_percent': 'delta'})
+    # Create rows with model and condition, columns for each task set
+    summary_rows = []
     
-    # Combine the two dataframes
-    ci_summary = pd.concat([coord_df, cot_df], ignore_index=True)
+    for model in selected_models:
+        model_data = full_summary[full_summary['model'] == model]
+        
+        # Add row for coordinate condition
+        coord_row = {
+            'model': model,
+            'condition': 'coordinate',
+            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_coord_diff_percent']),
+            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_coord_diff_percent']),
+            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_coord_diff_percent'])
+        }
+        summary_rows.append(coord_row)
+        
+        # Add row for COT condition
+        cot_row = {
+            'model': model,
+            'condition': 'cot',
+            'all_tasks': float(model_data[model_data['task_set'] == 'all']['mean_top_prop_all_cot_diff_percent']),
+            'symbol_tasks': float(model_data[model_data['task_set'] == 'symbol']['mean_top_prop_all_cot_diff_percent']),
+            'text_tasks': float(model_data[model_data['task_set'] == 'text']['mean_top_prop_all_cot_diff_percent'])
+        }
+        summary_rows.append(cot_row)
     
-    # Reorder columns
-    ci_summary = ci_summary[['model', 'task_set', 'condition', 'delta']]
+    # Create the final summary DataFrame
+    ci_summary = pd.DataFrame(summary_rows)
     
     # Save the simplified summary
     output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
