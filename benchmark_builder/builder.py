@@ -375,17 +375,27 @@ def build_benchmark_data(df, model_name):
                 top_prop_ci = top_prop_value - (1.645 * summary_stats.loc[task_idx, f'sem_{metric_prefix}_{condition}'])
                     
                 if condition == 'control':
+                    absolute_diff = None
+                    absolute_diff_ci = None
                     percent_diff = None
                     percent_diff_ci = None
                     p_value = None
                 else:
-                    # Calculate percent difference from control
-                    metric_name = f'{metric_prefix}_{"coord" if condition == "coordinate" else "cot"}_diff'
+                    # Get the correct metric names based on condition
+                    metric_suffix = "coord" if condition == "coordinate" else "cot"
+                    metric_name = f'{metric_prefix}_{metric_suffix}_diff'
+                    
+                    # Get absolute difference and its CI
+                    absolute_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_abs']
+                    absolute_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_abs'] - \
+                        (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_abs'])
+                    
+                    # Get percent difference and its CI
                     percent_diff = summary_stats.loc[task_idx, f'mean_{metric_name}_percent']
                     percent_diff_ci = summary_stats.loc[task_idx, f'mean_{metric_name}_percent'] - \
                         (1.645 * summary_stats.loc[task_idx, f'sem_{metric_name}_percent'])
                     p_value = summary_stats.loc[task_idx, f'{metric_name}_percent_vs0_p']
-                    
+                
                 # Create entry for metrics
                 metrics_data.append({
                     'model': model_name,
@@ -393,9 +403,11 @@ def build_benchmark_data(df, model_name):
                     'unanswered_included': unanswered_included,
                     'condition': condition,
                     'top_prop': top_prop_value,
-                    'top_prop_ci_lower_95': top_prop_ci,  # Renamed
+                    'top_prop_ci_lower_95': top_prop_ci,
+                    'absolute_diff': absolute_diff,
+                    'absolute_diff_ci_lower_95': absolute_diff_ci,
                     'percent_diff': percent_diff,
-                    'percent_diff_ci_lower_95': percent_diff_ci,  # Renamed
+                    'percent_diff_ci_lower_95': percent_diff_ci,
                 })
     
     # Create DataFrame from collected metrics
