@@ -42,8 +42,8 @@ createApp({
             }
         };
         
-        // Create new grid instance
-        this.gridApi = agGridCommunity.createGrid(gridDiv, gridOptions);
+        // Create new grid instance - corrected API usage
+        this.gridApi = new agGrid.Grid(gridDiv, gridOptions);
         this.gridApi = gridOptions.api;
     },
     methods: {
