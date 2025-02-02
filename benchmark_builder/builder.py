@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 import pandas as pd
 from pathlib import Path
 
@@ -374,8 +375,14 @@ def build_benchmark_data(df, model_name):
                 'task_set': task_set,
                 'metric': 'all',
                 'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_control'],
+                'control_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_control'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_control']),
                 'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'],
+                'coordinate_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_coordinate']),
                 'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'],
+                'coordinate_cot_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_coordinate-COT']),
                 'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_coord_diff_percent'],
                 'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_cot_diff_percent'],
                 'coordinate_p': summary_stats.loc[task_idx, 'top_prop_all_coord_diff_percent_vs0_p'],
@@ -386,8 +393,14 @@ def build_benchmark_data(df, model_name):
                 'task_set': task_set,
                 'metric': 'answered',
                 'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'],
+                'control_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_control']),
                 'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'],
+                'coordinate_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_coordinate']),
                 'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'],
+                'coordinate_cot_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'] - 
+                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_coordinate-COT']),
                 'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_coord_diff_percent'],
                 'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_cot_diff_percent'],
                 'coordinate_p': summary_stats.loc[task_idx, 'top_prop_answered_coord_diff_percent_vs0_p'],
