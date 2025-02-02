@@ -4,6 +4,7 @@ createApp({
     data() {
         return {
             gridApi: null,
+            selectedTaskSet: 'all',
             columnDefs: [
                 { field: 'model', sortable: true, filter: true },
                 { field: 'task_set', sortable: true, filter: true },
@@ -39,19 +40,18 @@ createApp({
             rowData: benchmarkData,
             defaultColDef: {
                 resizable: true,
+            },
+            onGridReady: params => {
+                this.gridApi = params.api;
             }
         };
-        
-        // Create new grid instance using agGrid
         new agGrid.Grid(gridDiv, gridOptions);
-        this.gridApi = gridOptions.api;
     },
     methods: {
         filterTaskSet(taskSet) {
-            if (!this.gridApi) return;
-            
+            this.selectedTaskSet = taskSet;
             const filteredData = benchmarkData.filter(row => 
-                row.task_set === taskSet && 
+                (taskSet === 'all' || row.task_set === taskSet) &&
                 row.unanswered_included === this.includeUnanswered
             );
             this.gridApi.setRowData(filteredData);
@@ -59,10 +59,7 @@ createApp({
     },
     watch: {
         includeUnanswered(newVal) {
-            const currentTaskSet = this.gridApi.getFilterModel()?.task_set?.filter;
-            if (currentTaskSet) {
-                this.filterTaskSet(currentTaskSet);
-            }
+            this.filterTaskSet(this.selectedTaskSet);
         }
     }
 }).mount('#app');
