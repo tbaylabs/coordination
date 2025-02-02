@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import pandas as pd
+import json
 from pathlib import Path
 
 def build_benchmark_data(df, model_name):
@@ -454,6 +455,38 @@ def print_nice_dataframe(df, max_rows=120, show_index=False):
     pd.reset_option('display.max_columns')
     pd.reset_option('display.width')
     pd.reset_option('display.max_colwidth')
+
+def build_non_reasoning_summary():
+    """
+    Creates a stacked key summary table for all non-reasoning models by loading
+    model categories and calling stack_key_summaries.
+    
+    Returns:
+        pd.DataFrame: Stacked key summary table for non-reasoning models
+    """
+    # Load model categories
+    categories_path = Path(__file__).parent.parent / "model_categories.json"
+    try:
+        with open(categories_path) as f:
+            categories = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Could not find model categories file at {categories_path}")
+    
+    # Get non-reasoning models
+    non_reasoning_models = categories.get('non_reasoning_models', [])
+    if not non_reasoning_models:
+        raise ValueError("No non-reasoning models found in categories file")
+        
+    print(f"Building summary for {len(non_reasoning_models)} non-reasoning models...")
+    
+    # Create stacked summary
+    try:
+        stacked_df = stack_key_summaries(non_reasoning_models)
+        print("Successfully created non-reasoning models summary")
+        return stacked_df
+    except Exception as e:
+        print(f"Error creating non-reasoning summary: {e}")
+        raise
 
 def stack_key_summaries(model_names):
     """
