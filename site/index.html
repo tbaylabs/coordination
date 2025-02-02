@@ -193,8 +193,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <script>
-        // Load CSV data from the site/data folder
-        Papa.parse('data/non_reasoning_models_summary.csv', {
+        // Load CSV data from the benchmark_table.csv file
+        Papa.parse('data/benchmark_table.csv', {
             download: true,
             header: true,
             complete: function(results) {
@@ -203,42 +203,36 @@
                 var table = new Tabulator("#benchmark-table", {
                     layout:"fitColumns",
                     data: tableData,
+                    initialSort:[
+                        {column:"all_tasks", dir:"desc"} // Sort by all_tasks by default
+                    ],
                     columns: [
-                        {title:"Model", field:"model"},
-                        {title:"Silent Agreement Score", field:"percent_diff_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
+                        {title:"Model", field:"model", headerSort:true},
+                        {title:"All Tasks", field:"all_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
+                        {title:"Symbol Tasks", field:"symbol_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}},
+                        {title:"Text Tasks", field:"text_tasks", headerSort:true, formatter:"number", formatterParams:{precision:1}}
                     ],
                 });
                 
                 // Track current filter state
                 var currentFilters = {
-                    taskSet: 'all',
-                    unanswered: 'False',
-                    condition: 'coordinate-COT'
+                    condition: 'cot'
                 };
-
-                // Function to apply both filters
-                function applyFilters() {
-                    table.setFilter([
-                        {field: "task_set", type: "=", value: currentFilters.taskSet},
-                        {field: "unanswered_included", type: "=", value: currentFilters.unanswered},
-                        {field: "condition", type: "=", value: currentFilters.condition}
-                    ]);
-                }
 
                 // Condition filter function
                 window.filterCondition = function(value) {
                     currentFilters.condition = value;
-                    applyFilters();
+                    table.setFilter("condition", "=", value);
                     updateConditionDescription(value);
                     // Update condition button styles
                     document.getElementById("cot-button").classList.remove("active");
                     document.getElementById("pure-button").classList.remove("active");
-                    document.getElementById((value === 'coordinate-COT' ? 'cot' : 'pure') + "-button").classList.add("active");
+                    document.getElementById((value === 'cot' ? 'cot' : 'pure') + "-button").classList.add("active");
                 };
 
                 function updateConditionDescription(condition) {
                     const descriptionElement = document.getElementById('condition-description');
-                    if (condition === 'coordinate-COT') {
+                    if (condition === 'cot') {
                         descriptionElement.innerHTML = 
                             "The scores below indicate the silent agreement capabilities of models when they are permitted to use in-context reasoning.";
                     } else {
@@ -247,31 +241,9 @@
                     }
                 }
 
-                // Global filter functions
-                window.filterTaskSet = function(value) {
-                    currentFilters.taskSet = value;
-                    applyFilters();
-                    // Update button styles
-                    document.getElementById("all-button").classList.remove("active");
-                    document.getElementById("symbol-button").classList.remove("active");
-                    document.getElementById("text-button").classList.remove("active");
-                    document.getElementById(value + "-button").classList.add("active");
-                };
-                
-                window.filterUnanswered = function(value) {
-                    currentFilters.unanswered = value;
-                    applyFilters();
-                    // Update unanswered button styles
-                    document.getElementById("true-button").classList.remove("active");
-                    document.getElementById("false-button").classList.remove("active");
-                    document.getElementById(value.toLowerCase() + "-button").classList.add("active");
-                };
-
-                // Set initial filters
-                updateConditionDescription('coordinate-COT'); // Set initial description
-                filterTaskSet('all');
-                filterUnanswered('False');
-                filterCondition('coordinate-COT');
+                // Set initial filters and description
+                updateConditionDescription('cot');
+                filterCondition('cot');
             }
         });
     </script>
