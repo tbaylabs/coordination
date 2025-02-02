@@ -70,9 +70,24 @@
                     ],
                 });
                 
+                // Track current filter state
+                var currentFilters = {
+                    taskSet: 'all',
+                    unanswered: 'False'
+                };
+
+                // Function to apply both filters
+                function applyFilters() {
+                    table.setFilter([
+                        {field: "task_set", type: "=", value: currentFilters.taskSet},
+                        {field: "unanswered_included", type: "=", value: currentFilters.unanswered}
+                    ]);
+                }
+
                 // Global filter functions
                 window.filterTaskSet = function(value) {
-                    table.setFilter("task_set", "=", value);
+                    currentFilters.taskSet = value;
+                    applyFilters();
                     // Update button styles
                     document.getElementById("all-button").classList.remove("active");
                     document.getElementById("symbol-button").classList.remove("active");
@@ -81,7 +96,12 @@
                 };
                 
                 window.filterUnanswered = function(value) {
-                    table.setFilter("unanswered_included", "=", value);
+                    currentFilters.unanswered = value;
+                    applyFilters();
+                    // Update unanswered button styles
+                    document.getElementById("true-button").classList.remove("active");
+                    document.getElementById("false-button").classList.remove("active");
+                    document.getElementById(value.toLowerCase() + "-button").classList.add("active");
                 };
 
                 // Set initial filters
