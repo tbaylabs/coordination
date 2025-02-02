@@ -359,62 +359,51 @@ def build_benchmark_data(df, model_name):
     
     # Create focused summary with key metrics
     key_summary = pd.DataFrame()
-    key_summary['model'] = [model_name] * 3  # One row per task set
-    key_summary['task_set'] = ['all', 'symbol', 'text']
-    
     # Initialize lists to store metrics for each task set
     metrics_data = []
     
     for task_set in ['all', 'symbol', 'text']:
         task_idx = summary_stats[summary_stats['task_set'] == task_set].index[0]
         
-        # Create rows for 'all' metrics
-        metrics_data.extend([
-            {
+        # Create rows for each condition
+        for condition in ['control', 'coordinate', 'coordinate-COT']:
+            if condition == 'control':
+                percent_diff = None
+                percent_diff_ci = None
+            else:
+                if condition == 'coordinate':
+                    percent_diff = summary_stats.loc[task_idx, f'mean_top_prop_all_coord_diff_percent']
+                    percent_diff_ci = summary_stats.loc[task_idx, f'mean_top_prop_all_coord_diff_percent'] - \
+                        (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_coord_diff_percent'])
+                else:  # coordinate-COT
+                    percent_diff = summary_stats.loc[task_idx, f'mean_top_prop_all_cot_diff_percent']
+                    percent_diff_ci = summary_stats.loc[task_idx, f'mean_top_prop_all_cot_diff_percent'] - \
+                        (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_cot_diff_percent'])
+                
+            metrics_data.append({
                 'model': model_name,
                 'task_set': task_set,
                 'metric': 'all',
-                'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_control'],
-                'control_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_control'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_control']),
-                'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'],
-                'coordinate_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_coordinate']),
-                'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'],
-                'coordinate_cot_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_coordinate-COT'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_coordinate-COT']),
-                'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_coord_diff_percent'],
-                'coordinate_percent_diff_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_coord_diff_percent'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_coord_diff_percent']),
-                'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_all_cot_diff_percent'],
-                'coordinate_cot_percent_diff_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_all_cot_diff_percent'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_all_cot_diff_percent']),
-                'coordinate_p': summary_stats.loc[task_idx, 'top_prop_all_coord_diff_percent_vs0_p'],
-                'coordinate_cot_p': summary_stats.loc[task_idx, 'top_prop_all_cot_diff_percent_vs0_p']
-            },
-            {
+                'condition': condition,
+                'top_prop': summary_stats.loc[task_idx, f'mean_top_prop_all_{condition}'],
+                'top_prop_ci_lower': summary_stats.loc[task_idx, f'mean_top_prop_all_{condition}'] - 
+                    (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_all_{condition}']),
+                'percent_diff': percent_diff,
+                'percent_diff_ci_lower': percent_diff_ci
+            })
+            
+            # Add separate entries for answered metrics
+            metrics_data.append({
                 'model': model_name,
                 'task_set': task_set,
                 'metric': 'answered',
-                'control_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'],
-                'control_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_control'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_control']),
-                'coordinate_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'],
-                'coordinate_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_coordinate']),
-                'coordinate_cot_top_prop': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'],
-                'coordinate_cot_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_coordinate-COT'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_coordinate-COT']),
-                'coordinate_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_coord_diff_percent'],
-                'coordinate_percent_diff_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_coord_diff_percent'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_coord_diff_percent']),
-                'coordinate_cot_percent_diff': summary_stats.loc[task_idx, 'mean_top_prop_answered_cot_diff_percent'],
-                'coordinate_cot_percent_diff_ci_lower': summary_stats.loc[task_idx, 'mean_top_prop_answered_cot_diff_percent'] - 
-                    (1.645 * summary_stats.loc[task_idx, 'sem_top_prop_answered_cot_diff_percent']),
-                'coordinate_p': summary_stats.loc[task_idx, 'top_prop_answered_coord_diff_percent_vs0_p'],
-                'coordinate_cot_p': summary_stats.loc[task_idx, 'top_prop_answered_cot_diff_percent_vs0_p']
-            }
-        ])
+                'condition': condition,
+                'top_prop': summary_stats.loc[task_idx, f'mean_top_prop_answered_{condition}'],
+                'top_prop_ci_lower': summary_stats.loc[task_idx, f'mean_top_prop_answered_{condition}'] - 
+                    (1.645 * summary_stats.loc[task_idx, f'sem_top_prop_answered_{condition}']),
+                'percent_diff': percent_diff if condition != 'control' else None,
+                'percent_diff_ci_lower': percent_diff_ci
+            })
     
     # Create DataFrame from collected metrics
     key_summary = pd.DataFrame(metrics_data)
