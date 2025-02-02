@@ -4,38 +4,116 @@
     <title>Benchmark Results</title>
     <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
         .filters {
-            margin: 20px 0;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-        .task-filters, .unanswered-filters {
-            margin: 10px 0;
+
+        .task-filters, .unanswered-filters, .condition-filters {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+
         button {
-            margin: 0 5px;
-            padding: 5px 10px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px 16px;
             cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            color: #333;
         }
+
+        button:hover {
+            background-color: #f8f8f8;
+            border-color: #ccc;
+        }
+
         button.active {
-            background-color: #4CAF50;
+            background-color: #2196F3;
             color: white;
+            border-color: #2196F3;
+            box-shadow: 0 2px 4px rgba(33,150,243,0.2);
+        }
+
+        #benchmark-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Tabulator Overrides */
+        .tabulator {
+            border: none;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .tabulator .tabulator-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tabulator .tabulator-header .tabulator-col {
+            background-color: transparent;
+            border-right: none;
+        }
+
+        .tabulator .tabulator-header .tabulator-col-content {
+            padding: 12px 15px;
+            font-weight: 600;
+        }
+
+        .tabulator .tabulator-row {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tabulator .tabulator-row .tabulator-cell {
+            padding: 12px 15px;
+        }
+
+        .tabulator .tabulator-row:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* Filter section labels */
+        .filter-label {
+            font-weight: 500;
+            color: #666;
+            min-width: 100px;
         }
     </style>
 </head>
 <body>
     <div class="filters">
         <div class="task-filters">
-            Task Set: 
+            <span class="filter-label">Task Set:</span>
             <button onclick="filterTaskSet('all')" id="all-button" class="active">All</button>
             <button onclick="filterTaskSet('symbol')" id="symbol-button">Symbol</button>
             <button onclick="filterTaskSet('text')" id="text-button">Text</button>
         </div>
         <div class="unanswered-filters">
-            Unanswered: 
+            <span class="filter-label">Unanswered:</span>
             <button onclick="filterUnanswered('True')" id="true-button">Include</button>
             <button onclick="filterUnanswered('False')" id="false-button" class="active">Exclude</button>
         </div>
         <div class="condition-filters">
-            Condition: 
+            <span class="filter-label">Condition:</span>
             <button onclick="filterCondition('coordinate-COT')" id="cot-button" class="active">COT</button>
             <button onclick="filterCondition('coordinate')" id="pure-button">Pure</button>
         </div>
