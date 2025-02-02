@@ -876,6 +876,61 @@ def build_non_reasoning_summary():
     return final_summary
 
 
+def build_percent_diff_ci_summary():
+    """
+    Creates a simplified summary table containing only the lower confidence intervals 
+    for percent differences across all models.
+    
+    Returns:
+        pd.DataFrame: Summary table with percent difference CIs for all models
+    """
+    # Load the aggregated results
+    results_file = Path(__file__).parent.parent / "pipeline" / "4_analysis" / "trial_results_aggregated.csv"
+    if not results_file.exists():
+        raise FileNotFoundError("Could not find aggregated results file. Please run aggregate_trial_results.py first")
+    
+    df = pd.read_csv(results_file)
+    
+    # Get list of all unique models
+    all_models = sorted(df['model_name'].unique())
+    
+    # Clear existing summary file if it exists
+    output_path = Path(__file__).parent / "benchmark_results" / "percent_diff_ci_summary.csv"
+    if output_path.exists():
+        output_path.unlink()
+        
+    print(f"Building percent difference CI summary for {len(all_models)} models...")
+    
+    # Process each model
+    for model in all_models:
+        try:
+            print(f"Processing {model}...")
+            if model not in df['model_name'].unique():
+                print(f"Warning: Model '{model}' not found in results, skipping...")
+                continue
+                
+            # Build benchmark data for this model
+            build_benchmark_data(df, model)
+            
+        except Exception as e:
+            print(f"Error processing model {model}: {e}")
+            continue
+    
+    # Read the full summary and filter for just the percent diff CIs
+    if not output_path.exists():
+        raise ValueError("No summary data was generated")
+        
+    full_summary = pd.read_csv(output_path)
+    
+    # Filter for just the columns we want
+    ci_summary = full_summary[['model', 'task_set', 'unanswered_included', 
+                             'condition', 'percent_diff_ci_lower_95']]
+    
+    # Save the simplified summary
+    ci_summary.to_csv(output_path, index=False)
+    print("Successfully created percent difference CI summary")
+    return ci_summary
+
 def main():
     """
     Command line interface for building benchmark data.
@@ -885,7 +940,10 @@ def main():
         print("Usage: python -m benchmark_builder.builder <model_name>")
         sys.exit(1)
     
-    model_name = sys.argv[1]
+    if sys.argv[1] == "--percent-diff-ci":
+        build_percent_diff_ci_summary()
+    else:
+        model_name = sys.argv[1]
     
     # Get the project root directory (2 levels up from this file)
     project_root = Path(__file__).parent.parent
