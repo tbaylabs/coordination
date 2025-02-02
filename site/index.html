@@ -3,12 +3,34 @@
 <head>
     <title>Benchmark Results</title>
     <link href="https://unpkg.com/tabulator-tables@5.4.3/dist/css/tabulator.min.css" rel="stylesheet">
+    <style>
+        .filters {
+            margin: 20px 0;
+        }
+        .task-filters, .unanswered-filters {
+            margin: 10px 0;
+        }
+        button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <input id="taskSetFilter" type="text" placeholder="Filter task_set">
-    <label>
-        <input type="checkbox" id="unansweredToggle"> Show unanswered only
-    </label>
+    <div class="filters">
+        <div class="task-filters">
+            Task Set: 
+            <button onclick="filterTaskSet('all')">All</button>
+            <button onclick="filterTaskSet('symbol')">Symbol</button>
+            <button onclick="filterTaskSet('text')">Text</button>
+        </div>
+        <div class="unanswered-filters">
+            Unanswered: 
+            <button onclick="filterUnanswered('True')">Include</button>
+            <button onclick="filterUnanswered('False')">Exclude</button>
+        </div>
+    </div>
     <div id="benchmark-table"></div>
 
     <!-- Include Tabulator and PapaParse for CSV parsing -->
@@ -28,27 +50,23 @@
                     data: tableData,
                     columns: [
                         {title:"Model", field:"model"},
-                        {title:"Task Set", field:"task_set"},
-                        {title:"Unanswered", field:"unanswered_included"},
                         {title:"Condition", field:"condition"},
-                        {title:"Low CI", field:"top_prop_ci_lower_95"},
+                        {title:"Low CI", field:"top_prop_ci_lower_95", formatter:"number", formatterParams:{precision:3}},
                     ],
                 });
                 
-                // Filter by task_set using the input field
-                document.getElementById("taskSetFilter").addEventListener("input", function(){
-                    var value = this.value;
-                    table.setFilter("task_set", "like", value);
-                });
+                // Global filter functions
+                window.filterTaskSet = function(value) {
+                    table.setFilter("task_set", "=", value);
+                };
                 
-                // Toggle unanswered filter using the checkbox
-                document.getElementById("unansweredToggle").addEventListener("change", function(){
-                    if(this.checked){
-                        table.setFilter("unanswered_included", "=", "True");
-                    } else {
-                        table.clearFilter("unanswered_included");
-                    }
-                });
+                window.filterUnanswered = function(value) {
+                    table.setFilter("unanswered_included", "=", value);
+                };
+
+                // Set initial filters
+                filterTaskSet('all');
+                filterUnanswered('False');
             }
         });
     </script>
