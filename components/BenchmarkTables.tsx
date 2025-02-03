@@ -1,11 +1,13 @@
 import { Table, TableContainer, TableHeader, TableCell, TableBody } from '@/components/ui/table'
-import { useState } from 'react'
-import { models } from '@/lib/data'
+import { useState, useEffect } from 'react'
 
 const BenchmarkTables = () => {
   const [currentView, setCurrentView] = useState<'COT' | 'PURE'>('COT')
-
   const [data, setData] = useState<any[]>([])
+  
+  useEffect(() => {
+    fetchData()
+  }, [])
   
   // Fetch and process benchmark data
   const fetchData = async () => {
